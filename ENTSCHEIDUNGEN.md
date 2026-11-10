@@ -103,6 +103,13 @@ lange und saubere Daten vor Vollständigkeit.
 | 63 | Releases nach Gruppen: `*-edgar`, `*-makro`, `*-web`. Das Veröffentlichungsskript bricht ab, wenn eine erzeugte Datei keinem Release zugeordnet ist. | Keine Datei soll unbemerkt liegen bleiben. |
 | 64 | `GW1-04` (Whited-Wu-Index) aus Jahresabschlüssen statt Quartalswerten, Bilanzsumme nicht preisbereinigt; das Branchenwachstum (dreistelliger SIC, mindestens drei Firmen) stammt aus dem Vorjahr. | Das Branchenwachstum des laufenden Jahres ist am Stichtag eines einzelnen Jahresberichts noch nicht vollständig gemeldet. |
 
+## Erster echter Lauf (Lieferung 6)
+
+| Nr. | Entscheidung | Grund |
+|---|---|---|
+| 65 | Die Annahmezeit der Sammeldatei ist UTC (Lauf vom 10.11.2026: Trefferquote UTC 0,937, ET 0,392). Von Hand bestätigt an den Index-Seiten der SEC, die Ostküstenzeit zeigen: 8-K vom 30.07.2026 `20:30:28Z` = 16:30:28 EDT, Form 4 vom 26.02.2026 `23:33:14Z` = 18:33:14 EST. Die automatische Erkennung (Nr. 8) bleibt als Schutz. | Sommer- und Winterzeit stimmen; damit ist `verfuegbar_ab` richtig. |
+| 66 | `GW2-06`: Der Vormonat ist der jüngste vorhandene Monat davor, höchstens zwei Monate zurück; die Vorjahreswerte müssen genau zwölf Monate zurück vorliegen, sonst entfällt der Stand. | Der Verbraucherpreisindex für Oktober 2025 wurde wegen des Shutdowns nie veröffentlicht. Die alte Regel verlangte 14 lückenlose Monate und verlor dadurch alle Stände ab Dezember 2025. Jetzt entfallen nur Oktober und November 2026 (Vorjahresmonat Oktober 2025 fehlt). |
+
 ## Noch offen
 
 | Baustein | Parameter | Hinderungsgrund |

@@ -192,16 +192,20 @@ def produktionsluecke(indpro: pd.DataFrame, ab: str = "2000-01-01", start: str =
 
 
 def inflationsaenderung(cpi: pd.DataFrame, ab: str = "2000-01-01") -> pd.DataFrame:
+    """Vormonat = jüngster vorhandene Monat davor, höchstens 2 Monate zurück (Lücke Okt. 2025, Shutdown).
+    Die Vorjahreswerte müssen genau 12 Monate zurück vorhanden sein, sonst entfällt der Stand."""
     zeilen = []
     for tag in _staende(cpi, ab):
         s = _stand_zum(cpi, pd.Timestamp(tag))
         if len(s) < 14:
             continue
-        d, w = s["datum"].to_numpy(), s["wert"].to_numpy()
-        monate = lambda a, b: (pd.Timestamp(a).year - pd.Timestamp(b).year) * 12 + pd.Timestamp(a).month - pd.Timestamp(b).month
-        if monate(d[-1], d[-13]) != 12 or monate(d[-2], d[-14]) != 12 or monate(d[-1], d[-2]) != 1:
+        nach_monat = dict(zip(s["datum"].dt.to_period("M"), s["wert"]))
+        monate = sorted(nach_monat)
+        m, v = monate[-1], monate[-2]
+        if (m - v).n > 2 or (m - 12) not in nach_monat or (v - 12) not in nach_monat:
             continue                        # Lücke in der Reihe: keine Jahresrate
-        zeilen.append((pd.Timestamp(tag), pd.Timestamp(d[-1]), (w[-1] / w[-13] - 1) - (w[-2] / w[-14] - 1)))
+        wert = (nach_monat[m] / nach_monat[m - 12] - 1) - (nach_monat[v] / nach_monat[v - 12] - 1)
+        zeilen.append((pd.Timestamp(tag), m.to_timestamp(), wert))
     if not zeilen:
         return leer()
     z = pd.DataFrame(zeilen, columns=["tag", "monat", "wert"])

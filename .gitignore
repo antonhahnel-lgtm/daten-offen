@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+ausgabe/
+arbeit/
+vorlauf/
+PARAMETERKATALOG.md

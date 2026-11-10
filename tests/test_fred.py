@@ -111,6 +111,21 @@ def test_inflation(ergebnis):
     assert z.loc["2000-03-17", "verfuegbar_ab"] == pd.Timestamp("2000-03-17 08:30", tz=ET)
 
 
+def test_inflation_mit_luecke():
+    # Oktober 2025 fehlt (Shutdown): November wird gegen September gerechnet, Oktober 2026 entfällt.
+    tage = [t for t in monate("2024-01-01", 34) if t != "2025-10-01"]
+    werte = {t: 100 * 1.003 ** i for i, t in enumerate(monate("2024-01-01", 34))}
+    zeilen = [{"datum": pd.Timestamp(t), "wert": werte[t], "von": pd.Timestamp(t) + pd.Timedelta(days=45),
+               "bis": pd.Timestamp("2262-01-01")} for t in tage]
+    z = f.inflationsaenderung(pd.DataFrame(zeilen), ab="2025-01-01").set_index("stand")
+    nov = pd.Timestamp("2025-11-01") + pd.Timedelta(days=45)
+    assert nov.strftime("%Y-%m-%d") in z.index                                  # früher: alle Folgestände verloren
+    assert z.loc[nov.strftime("%Y-%m-%d"), "wert"] == pytest.approx(0, abs=1e-12)
+    okt26 = (pd.Timestamp("2026-10-01") + pd.Timedelta(days=45)).strftime("%Y-%m-%d")
+    assert okt26 not in z.index                                                 # Vorjahresmonat fehlt
+    assert len(z) == 19                     # 22 Stände ab 2025, ohne Dez. 2024/Jan. 2025 (kurz) und Okt. 2026
+
+
 def test_termine(ergebnis):
     p, info, hinweise = ergebnis[0], ergebnis[1], ergebnis[2]
     z = je(p, "GW1-05")

@@ -1,5 +1,13 @@
 # Änderungen
 
+## Lieferung 6 – 2026-11-10 (erster echter Lauf)
+
+- Erster echter Lauf (`laufend`) mit allen neun Quellen grün; Prüfberichte ausgewertet (`UEBERGABE.md`).
+- `fred`: `GW2-06` verträgt fehlende Monate (Oktober 2025); vorher fehlten alle Stände ab Dezember 2025.
+- Annahmezeit als UTC von Hand bestätigt (`ENTSCHEIDUNGEN.md` Nr. 65).
+- `.gitignore` angelegt.
+- 103 Offline-Tests.
+
 ## Lieferung 5 – 2026-11-10 (Finanzrestriktion, Übergabe)
 
 Diff zur Lieferung 4: `AENDERUNGEN_lieferung-5.diff`.
