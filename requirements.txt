@@ -1,0 +1,6 @@
+# Gleiche Hauptversionen wie der Insider-Monitor (pandas 2.3.3), damit beide Repos dieselben
+# Parquet-Dateien gleich lesen. Versionswechsel bewusst, nicht beim nächsten Lauf von selbst.
+numpy==2.3.5
+pandas==2.3.3
+pyarrow==26.0.1
+requests==2.33.1

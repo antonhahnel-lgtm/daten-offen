@@ -1,0 +1,274 @@
+diff -ruN '--exclude=AENDERUNGEN_lieferung-*.diff' /tmp/l4/daten-offen/AENDERUNGEN.md daten-offen/AENDERUNGEN.md
+--- lieferung-4/AENDERUNGEN.md	2026-11-10 17:43:00.000000000 +0000
++++ lieferung-5/AENDERUNGEN.md	2026-11-10 17:51:00.583724901 +0000
+@@ -1,5 +1,13 @@
+ # Änderungen
+ 
++## Lieferung 5 – 2026-11-10 (Finanzrestriktion, Übergabe)
++
++Diff zur Lieferung 4: `AENDERUNGEN_lieferung-5.diff`.
++
++- `edgar_xbrl`: Whited-Wu-Index der Finanzrestriktion (GW1-04) mit Branchenwachstum des Vorjahres.
++- `UEBERGABE.md`: Stand, Prüfliste der Annahmen für den ersten echten Lauf, empfohlene Reihenfolge.
++- 102 Offline-Tests, unter pandas 2.3.3 und 3.0.
++
+ ## Lieferung 4 – 2026-11-10 (Rollen, Gesamtwirtschaft, Web und Register)
+ 
+ Diff zur Lieferung 3: `AENDERUNGEN_lieferung-4.diff`.
+diff -ruN '--exclude=AENDERUNGEN_lieferung-*.diff' /tmp/l4/daten-offen/DATENBLAETTER.md daten-offen/DATENBLAETTER.md
+--- lieferung-4/DATENBLAETTER.md	2026-11-10 17:43:00.000000000 +0000
++++ lieferung-5/DATENBLAETTER.md	2026-11-10 17:51:01.030441572 +0000
+@@ -100,6 +100,20 @@
+ | Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
+ | Bekannte Schwächen | Viele Firmen weisen Werbeaufwand nicht gesondert aus |
+ 
++## GW1-04 Finanzrestriktion (Whited-Wu-Index)
++
++| Angabe | Inhalt |
++|---|---|
++| Definition | −0,091·Cashflow/Bilanzsumme − 0,062·Dividendenzahler + 0,021·langfristige Schulden/Bilanzsumme − 0,044·ln(Bilanzsumme in Mio. $) + 0,102·Branchenwachstum − 0,035·Umsatzwachstum, aus dem Jahresabschluss; höher = stärker finanziell beschränkt (Whited & Wu 2006) |
++| Einheit | Indexwert |
++| Frequenz | je Jahresbericht |
++| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise), XBRL-Pflicht |
++| Quelle | SEC EDGAR, Sammeldatei companyfacts.zip (https://www.sec.gov/search-filings/edgar-application-programming-interfaces) |
++| Lizenz | gemeinfrei (US-Behörde) |
++| Historie ab | 2009 (große Firmen), 2011 (alle) |
++| Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
++| Bekannte Schwächen | Jahres- statt Quartalswerte; Bilanzsumme nicht preisbereinigt; Branchenwachstum (dreistelliger SIC, mindestens drei Firmen) aus dem Vorjahr, weil das laufende Jahr am Stichtag noch nicht vollständig gemeldet ist |
++
+ ## GW1-05 Termine von Fed und Statistik
+ 
+ | Angabe | Inhalt |
+diff -ruN '--exclude=AENDERUNGEN_lieferung-*.diff' /tmp/l4/daten-offen/ENTSCHEIDUNGEN.md daten-offen/ENTSCHEIDUNGEN.md
+--- lieferung-4/ENTSCHEIDUNGEN.md	2026-11-10 17:43:00.000000000 +0000
++++ lieferung-5/ENTSCHEIDUNGEN.md	2026-11-10 17:51:00.582818870 +0000
+@@ -101,6 +101,7 @@
+ | 61 | `GA1-08` liefert tatsächliche Erstzulassungen aus Drugs@FDA, nicht künftige Zieltermine. | Zieltermine veröffentlicht nur die Firma (8-K, Pressemitteilung). |
+ | 62 | Selbst gestartete Fortsetzungen tragen einen Zähler; nach zwölf in Folge endet die Kette mit einer Warnung. | Schutz vor einer Endlosschleife, falls eine Quelle nicht vorankommt. |
+ | 63 | Releases nach Gruppen: `*-edgar`, `*-makro`, `*-web`. Das Veröffentlichungsskript bricht ab, wenn eine erzeugte Datei keinem Release zugeordnet ist. | Keine Datei soll unbemerkt liegen bleiben. |
++| 64 | `GW1-04` (Whited-Wu-Index) aus Jahresabschlüssen statt Quartalswerten, Bilanzsumme nicht preisbereinigt; das Branchenwachstum (dreistelliger SIC, mindestens drei Firmen) stammt aus dem Vorjahr. | Das Branchenwachstum des laufenden Jahres ist am Stichtag eines einzelnen Jahresberichts noch nicht vollständig gemeldet. |
+ 
+ ## Noch offen
+ 
+@@ -112,7 +113,7 @@
+ | Patente (USPTO) | GA1-01 | Sammeldateien im Gigabyte-Bereich; Anmelder → CIK |
+ | Textänderung 10-K/10-Q, Ton der Meldungen | UA5-01, UA5-03, WS2-01, WS2-02 | Abruf aller Berichtstexte (Größenordnung 1 Terabyte); erst nach den ersten echten Läufen |
+ | Fondsbestände (13F, N-PORT) | IH5-03, IH5-04, KD3-01 | Wertpapierkennnummern (CUSIP) müssen auf Firmen abgebildet werden |
+-| Finanzrestriktion, Geldpolitik-Exposition | GW1-03, GW1-04 | Baut auf den Abschlüssen auf; folgt |
++| Geldpolitik-Exposition | GW1-03 | Braucht zusätzlich Cashflow-Duration und Volatilität; folgt (Finanzrestriktion GW1-04 ist gebaut) |
+ | Lieferausfälle (SEC) | IH3-06 | Folgt; Zuordnung über Ticker |
+ | Vergütung, Planadoption (Item 408) | UA6-03, IH1-13 | Im Insider-Monitor bereits vorhanden (`gehalt.py`, `plan_408`) |
+ | Segment- und Kundenangaben | WS3-03, GA4-01, GA4-05 | Nicht in der Sammeldatei der Abschlüsse; verlangt die Einzelberichte |
+diff -ruN '--exclude=AENDERUNGEN_lieferung-*.diff' /tmp/l4/daten-offen/README.md daten-offen/README.md
+--- lieferung-4/README.md	2026-11-10 17:43:00.000000000 +0000
++++ lieferung-5/README.md	2026-11-10 17:51:00.583486029 +0000
+@@ -13,7 +13,7 @@
+ | EDGAR: Meldungsverzeichnis mit Annahmezeiten | – | gebaut, offline getestet |
+ | EDGAR: Insidergeschäfte, mit laufender Ergänzung aus Form-4-Dateien | 13 | gebaut, offline getestet |
+ | EDGAR: Ereignisse aus 8-K, Form D, 424B, S-3, Form 25/15, Übernahmeunterlagen | 12 | gebaut, offline getestet |
+-| EDGAR: Abschlüsse aus XBRL | 13 | gebaut, offline getestet |
++| EDGAR: Abschlüsse aus XBRL | 14 | gebaut, offline getestet |
+ | EDGAR: Rollen in Schedule 13D und Form 144 | 3 | gebaut, offline getestet |
+ | Gesamtwirtschaft: FRED/ALFRED mit Datenständen, Termine | 7 | gebaut, offline getestet |
+ | Aufmerksamkeit: Wikipedia-Aufrufe | 1 | gebaut, offline getestet |
+@@ -54,6 +54,7 @@
+ | `SCHNITTSTELLE.md` | Release-Namen, Schema, Lesebeispiel |
+ | `DATENBLAETTER.md` | Definition, Quelle, Lizenz und Schwächen je Parameter (aus dem Code erzeugt) |
+ | `ENTSCHEIDUNGEN.md` | Getroffene Festlegungen mit Begründung |
++| `UEBERGABE.md` | Stand, Prüfliste für den ersten echten Lauf, empfohlene Reihenfolge |
+ | `AENDERUNGEN.md` | Änderungen je Lieferung |
+ 
+ ## Lokal prüfen
+diff -ruN '--exclude=AENDERUNGEN_lieferung-*.diff' /tmp/l4/daten-offen/UEBERGABE.md daten-offen/UEBERGABE.md
+--- lieferung-4/UEBERGABE.md	1970-01-01 00:00:00.000000000 +0000
++++ lieferung-5/UEBERGABE.md	2026-11-10 17:51:00.565184090 +0000
+@@ -0,0 +1,72 @@
++# Übergabe
++
++Stand 10.11.2026, Lieferung 5. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
++und dem Auftragstext, um in einem neuen Chat weiterzuarbeiten.
++
++## Ziel
++
++Möglichst hohe Renditen erwirtschaften; dafür Muster erkennen, die überdurchschnittliche Renditen
++vorhersagen. Dieses Repo liefert die stichtagsechten Daten, Score und Auswertung liegen im privaten
++Insider-Monitor.
++
++## Was gebaut ist
++
++| Quelle | Parameter | Offline getestet | Echter Lauf |
++|---|---|---|---|
++| `edgar_index` | – (Zeitbasis) | ja | nein |
++| `edgar_insider` | IH1-01 bis IH1-07, IH1-09, IH1-10, IH1-16, IH1-17, IH1-18, WS3-01 | ja | nein |
++| `edgar_ereignisse` | WS2-04, UA1-10, UA2-03, UA2-04, IH6-04, UA4-05, GA2-03, UA4-01, UA3-03, UA3-04, KD1-11, WS3-02 | ja | nein |
++| `edgar_xbrl` | UA1-01 bis UA1-07, UA2-01, UA3-01, GA1-02, GA1-06, GA3-03, PR2-03, GW1-04 | ja | nein |
++| `edgar_rollen` | IH5-01, IH5-02, IH1-14 | ja | nein |
++| `fred` | GW2-01, GW2-03, GW1-06, GW3-01, GW2-04, GW2-06, GW1-05 | ja | nein |
++| `wikipedia` | WS3-05 | ja | nein |
++| `cfpb` | GA3-01 | ja | nein |
++| `klinik` | GA1-04, GA1-08 | ja | nein |
++
++53 Parameter, 102 Tests (pandas 2.3.3 und 3.0). Kein Modul hat bisher die echte Schnittstelle gesehen:
++Die Testdateien bilden die Formate nach, wie sie dokumentiert oder im Insider-Monitor erprobt sind.
++
++## Prüfliste für den ersten echten Lauf
++
++Jede Zeile ist eine Annahme, die erst der Lauf bestätigt. Der Prüfbericht je Quelle (Zusammenfassung
++des Workflow-Laufs und Release `pruefbericht`) zeigt die genannten Werte.
++
++| Quelle | Annahme | Woran man es sieht |
++|---|---|---|
++| `edgar_index` | Adresse der Sammeldatei `submissions.zip` stimmt | Lauf bricht sonst mit HTTP-Fehler ab |
++| | Annahmezeit ist Ostküstenzeit | Hinweis „Annahmezeit gelesen als …“ mit beiden Trefferquoten; unter 0,9 Fehler |
++| | Speicher und Laufzeit reichen (rund 1 Mio. Dateien) | Laufzeit des Jobs |
++| `edgar_insider` | Links auf der SEC-Datenseite werden gefunden | Hinweis „Datenseite nicht lesbar“ darf fehlen |
++| | Spaltennamen der TSV-Dateien | Fehler „Pflichtspalten fehlen“ nennt die echten Namen |
++| | Datumsformat `31-MAR-2024` oder ISO | „unplausible Daten“ über 2 % wäre ein Zeichen für falsches Lesen |
++| | Rohdatei der Form 4 liegt ohne den Ordner `xsl…/` daneben | Zählung `gelesen` gegen `fehlt` in `xml` |
++| `edgar_ereignisse` | Items stehen als `2.02,9.01` | Zeilenzahl von WS2-04 und UA1-10 |
++| `edgar_xbrl` | Aktenzeichen passen zum Verzeichnis | Fehler bei über 5 % Berichten ohne Annahmezeit |
++| | Sammeldatei `companyfacts.zip` passt in Speicher und Zeit | Laufzeit des Jobs |
++| `edgar_rollen` | Meldungskopf nennt `SUBJECT COMPANY` auch bei Form 144 | Fehler bei über 20 % `ohne_rolle` |
++| | Teilabruf (Range) wird angenommen | Laufzeit je Meldung |
++| `fred` | Alle Stände von INDPRO und CPIAUCSL in einem Abruf | Zeilenzahl in `info`; sonst HTTP 400 |
++| | Veröffentlichungen heißen „FOMC Press Release“, „Employment Situation“, „Consumer Price Index“ | Hinweis „Termine nicht gefunden für …“ |
++| `wikipedia` | Wikidata-Eigenschaft P5531 ist die CIK | Fehler bei unter 500 Zuordnungen |
++| `cfpb` | Adresse und Spalten `Date received`, `Company` | Fehler „Pflichtspalten fehlen“ |
++| | Namensabgleich trifft | Hinweis mit Trefferquote; unter 20 % Fehler |
++| `klinik` | Seitengröße 1000 und Feld `resultsFirstPostDateStruct` | Zeilenzahl GA1-04 |
++| | Aufbau des openFDA-Verzeichnisses `download.json` | Fehler „ohne … partitions“ |
++| Workflow | Rechte `contents: write`, `actions: write`; Releases werden angelegt | Job `abschluss` |
++
++## Empfohlene Reihenfolge
++
++1. Repo anlegen, Secrets `KONTAKT_EMAIL` und `FRED_API_KEY` setzen, Workflow `abruf` im Modus `laufend` starten.
++2. Log bzw. Prüfberichte auswerten, Abweichungen von der Prüfliste beheben, bis alle neun Quellen grün sind.
++3. Einmal im Modus `rueckwaerts` starten (Historie der 13D- und 144-Meldungen; setzt sich selbst fort).
++4. Erst danach die offenen Bausteine (Tabelle „Noch offen“ in `ENTSCHEIDUNGEN.md`), beginnend mit den
++   Quellen, die den Namensabgleich nutzen, weil dessen Trefferquote dann bekannt ist.
++5. Anbindung im Insider-Monitor (eigener Auftrag; `SCHNITTSTELLE.md` beschreibt das Lesen).
++
++## Dateien für einen neuen Chat
++
++- neuestes Repo-Zip (`daten-offen_lieferung-<n>.zip`)
++- `PARAMETERKATALOG.md` (IH1-18 „Tagescluster“ dort nachtragen)
++- Auftragstext „Öffentliches Datenrepo bauen (selbstständig)“
++- nach dem ersten Lauf: Log oder die Dateien des Release `pruefbericht`
++- nur bei Bedarf: Repo-Zip des Insider-Monitors (Abgleich ist erfolgt, siehe `ENTSCHEIDUNGEN.md` Nr. 27–35)
+diff -ruN '--exclude=AENDERUNGEN_lieferung-*.diff' /tmp/l4/daten-offen/daten_offen/quellen/edgar_xbrl.py daten-offen/daten_offen/quellen/edgar_xbrl.py
+--- lieferung-4/daten_offen/quellen/edgar_xbrl.py	2026-11-10 13:04:55.000000000 +0000
++++ lieferung-5/daten_offen/quellen/edgar_xbrl.py	2026-11-10 17:50:14.988257951 +0000
+@@ -48,6 +48,7 @@
+     "adv": ["AdvertisingExpense", "MarketingAndAdvertisingExpense"],
+     "dep": ["DepreciationDepletionAndAmortization", "DepreciationAndAmortization", "Depreciation"],
+     "tax": ["IncomeTaxExpenseBenefit"],
++    "div": ["PaymentsOfDividendsCommonStock", "PaymentsOfDividends", "PaymentsOfOrdinaryDividends"],
+     "pretax": ["IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
+                "IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments"],
+ }
+@@ -119,6 +120,13 @@
+        schwaechen="Ohne Preisbereinigung; Startwert hängt vom ersten verfügbaren Jahr ab"),
+     _p("GA3-03", "Werbeausgaben-Änderung", "Werbeaufwand des Jahres / Vorjahr − 1", "Verhältnis",
+        frequenz="je Jahresbericht", schwaechen="Viele Firmen weisen Werbeaufwand nicht gesondert aus"),
++    _p("GW1-04", "Finanzrestriktion (Whited-Wu-Index)",
++       "−0,091·Cashflow/Bilanzsumme − 0,062·Dividendenzahler + 0,021·langfristige Schulden/Bilanzsumme "
++       "− 0,044·ln(Bilanzsumme in Mio. $) + 0,102·Branchenwachstum − 0,035·Umsatzwachstum, aus dem Jahresabschluss; "
++       "höher = stärker finanziell beschränkt (Whited & Wu 2006)", "Indexwert", frequenz="je Jahresbericht",
++       schwaechen="Jahres- statt Quartalswerte; Bilanzsumme nicht preisbereinigt; Branchenwachstum (dreistelliger "
++                  "SIC, mindestens drei Firmen) aus dem Vorjahr, weil das laufende Jahr am Stichtag noch nicht "
++                  "vollständig gemeldet ist"),
+     _p("PR2-03", "Effektiver Steuersatz", "Ertragsteueraufwand / Ergebnis vor Steuern des Jahres, nur bei Gewinn vor Steuern",
+        "Verhältnis", frequenz="je Jahresbericht", schwaechen="Latente Steuerpositionen fehlen noch"),
+ )
+@@ -458,15 +466,42 @@
+     aus["GA3-03"] = _verh(werbung, vj(werbung)) - 1
+     steuersatz = _verh(j("tax"), j("pretax"))
+     aus["PR2-03"] = np.where((steuersatz >= -1) & (steuersatz <= 2), steuersatz, np.nan)
++
++    # Bausteine des Whited-Wu-Index; das Branchenwachstum kommt firmenübergreifend in baue_parameter hinzu
++    with np.errstate(divide="ignore", invalid="ignore"):
++        aus["ww_firma"] = (-0.091 * _verh(ni_j + dep_j, aktiva_j) - 0.062 * (np.nan_to_num(j("div")) > 0)
++                           + 0.021 * _verh(schuld, aktiva_j) - 0.044 * np.log(np.where(aktiva_j > 0, aktiva_j / 1e6, np.nan))
++                           - 0.035 * (_verh(umsatz_j, vj(umsatz_j)) - 1))
++    aus["umsatz_j"], aus["umsatz_vj"] = umsatz_j, vj(umsatz_j)
+     return aus
+ 
+ 
+ PARAMETER_IDS = ["UA1-01", "UA1-02", "UA1-03", "UA1-04", "UA1-05", "UA1-06", "UA1-07", "UA2-01", "UA3-01",
+-                 "GA1-02", "GA1-06", "GA3-03", "PR2-03"]
++                 "GA1-02", "GA1-06", "GA3-03", "PR2-03", "GW1-04"]
++MINDEST_BRANCHE = 3
+ 
+ 
+-def baue_parameter(berichte: pd.DataFrame, meldungen: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+-    """Parameter aus den Berichtszeilen; Annahmezeit je Bericht aus dem Meldungsverzeichnis."""
++def _whited_wu(b: pd.DataFrame, firmen: pd.DataFrame | None) -> pd.Series:
++    """Whited-Wu-Index je Jahresbericht: Firmenbausteine plus Umsatzwachstum der Branche im Vorjahr."""
++    leer_ = pd.Series(np.nan, index=b.index)
++    if firmen is None or firmen.empty or "sic" not in firmen.columns:
++        return leer_
++    sic3 = firmen.dropna(subset=["sic"]).drop_duplicates("cik").set_index("cik")["sic"].astype(str).str.slice(0, 3)
++    branche = b["cik"].map(sic3)
++    jahr = b["period_end"].dt.year
++    gueltig = b["umsatz_j"].notna() & b["umsatz_vj"].notna() & (b["umsatz_vj"] > 0) & branche.notna()
++    g = b[gueltig].assign(branche=branche[gueltig], jahr=jahr[gueltig]).groupby(["branche", "jahr"])
++    summen = g.agg(umsatz=("umsatz_j", "sum"), vorjahr=("umsatz_vj", "sum"), firmen=("cik", "nunique"))
++    wachstum = (summen["umsatz"] / summen["vorjahr"] - 1)[summen["firmen"] >= MINDEST_BRANCHE]
++    schluessel = pd.MultiIndex.from_arrays([branche, jahr - 1])
++    isg = pd.Series(wachstum.reindex(schluessel).to_numpy(), index=b.index)
++    return b["ww_firma"] + 0.102 * isg
++
++
++def baue_parameter(berichte: pd.DataFrame, meldungen: pd.DataFrame,
++                   firmen: pd.DataFrame | None = None) -> tuple[pd.DataFrame, dict]:
++    """Parameter aus den Berichtszeilen; Annahmezeit je Bericht aus dem Meldungsverzeichnis.
++    ``firmen`` (cik, sic) wird nur für den Branchenbezug des Whited-Wu-Index gebraucht."""
+     if berichte.empty:
+         return leer(), {"berichte": 0}
+     b = berichte.copy()
+@@ -476,6 +511,7 @@
+     b = b.sort_values(["cik", "period_end", "filed"], kind="stable").reset_index(drop=True)
+     kenn = pd.concat([kennzahlen_firma(g) for _, g in b.groupby("cik", sort=False)])
+     b = b.loc[kenn.index].join(kenn.drop(columns="accn"))
++    b["GW1-04"] = _whited_wu(b, firmen)
+ 
+     zeit = pd.DataFrame(columns=["accn", "annahme_utc", "verfuegbar_ab"])
+     if not meldungen.empty:
+@@ -544,7 +580,10 @@
+                                       filter=[("form", "in", list(BERICHTSFORMEN))])
+     if meldungen.empty:
+         hinweise.append("Meldungsverzeichnis fehlt; Annahmezeiten werden aus dem Einreichungsdatum geschätzt")
+-    parameter, info = baue_parameter(berichte, meldungen)
++    firmen = ablage.lies_bereinigt("edgar_firmen", spalten=["cik", "sic"])
++    if firmen.empty:
++        hinweise.append("Firmentabelle fehlt; der Whited-Wu-Index (GW1-04) entfällt")
++    parameter, info = baue_parameter(berichte, meldungen, firmen)
+     info["quelldateien"] = dateien
+     ablage.schreibe_parameter("edgar_xbrl", parameter)
+     return parameter, info, hinweise
+diff -ruN '--exclude=AENDERUNGEN_lieferung-*.diff' /tmp/l4/daten-offen/tests/test_xbrl.py daten-offen/tests/test_xbrl.py
+--- lieferung-4/tests/test_xbrl.py	2026-11-10 13:04:55.000000000 +0000
++++ lieferung-5/tests/test_xbrl.py	2026-11-10 17:50:14.988257951 +0000
+@@ -158,3 +158,22 @@
+     z = x.berichtszeilen(7, f.json(7))[0]
+     assert z["period_end"] == "2024-03-31" and z["revenue"] == 100 and z["assets"] == 500
+     assert z["shares"] == 880                      # kein Stichtagswert zum Periodenende: Durchschnitt als Ersatz
++
++
++def test_whited_wu_mit_branchenwachstum_des_vorjahres():
++    # drei Firmen derselben Branche (SIC 283x) mit den Zahlen der Musterfirma
++    js = musterfirma().json(42)
++    b = pd.concat([pd.DataFrame(x.berichtszeilen(c, js)).assign(accn=lambda d, c=c: d["accn"] + f"-{c}")
++                   for c in (42, 51, 52)], ignore_index=True)
++    firmen = pd.DataFrame({"cik": [42, 51, 52, 99], "sic": ["2834", "2836", "2833", None]})
++    p, _ = x.baue_parameter(b, pd.DataFrame(), firmen)
++    ww = p[p["parameter_id"] == "GW1-04"].set_index("stand")["wert"]
++    branche_2022 = 450 / 400 - 1                       # Umsatzwachstum der Branche im Vorjahr
++    erwartet = (-0.091 * (68 + 22) / 1040 - 0.062 * 0 + 0.021 * 140 / 1040 - 0.044 * np.log(1040 / 1e6)
++                + 0.102 * branche_2022 - 0.035 * (480 / 450 - 1))
++    assert ww["K-2023-42"] == pytest.approx(erwartet)
++    assert list(ww.index) == ["K-2023-42", "K-2023-51", "K-2023-52"]      # 2022 fehlt das Branchenwachstum 2021
++    # ohne Branchenschlüssel oder mit zu wenigen Firmen entsteht kein Wert
++    assert x.baue_parameter(b, pd.DataFrame(), None)[0].query("parameter_id == 'GW1-04'").empty
++    zwei = b[b["cik"].isin([42, 51])]
++    assert x.baue_parameter(zwei, pd.DataFrame(), firmen)[0].query("parameter_id == 'GW1-04'").empty

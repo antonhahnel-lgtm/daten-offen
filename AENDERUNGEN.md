@@ -1,0 +1,68 @@
+# Änderungen
+
+## Lieferung 5 – 2026-11-10 (Finanzrestriktion, Übergabe)
+
+Diff zur Lieferung 4: `AENDERUNGEN_lieferung-5.diff`.
+
+- `edgar_xbrl`: Whited-Wu-Index der Finanzrestriktion (GW1-04) mit Branchenwachstum des Vorjahres.
+- `UEBERGABE.md`: Stand, Prüfliste der Annahmen für den ersten echten Lauf, empfohlene Reihenfolge.
+- 102 Offline-Tests, unter pandas 2.3.3 und 3.0.
+
+## Lieferung 4 – 2026-11-10 (Rollen, Gesamtwirtschaft, Web und Register)
+
+Diff zur Lieferung 3: `AENDERUNGEN_lieferung-4.diff`.
+
+- `edgar_rollen`: betroffene Firma aus dem Meldungskopf für Schedule 13D und Form 144 → IH5-01, IH5-02, IH1-14.
+- `fred`: Zinsen, Leitzinsänderungen, Ölpreis, Produktionslücke und Inflationsänderung mit Datenständen aus
+  ALFRED, Termine von Fed und Statistik → GW2-01, GW2-03, GW1-06, GW3-01, GW2-04, GW2-06, GW1-05.
+- `wikipedia`: Zuordnung über Wikidata, Wochenaufrufe → WS3-05.
+- Kernmodul Namensabgleich mit Konfidenz und Trefferquote.
+- `cfpb`: Verbraucherbeschwerden je Firma und Monat → GA3-01.
+- `klinik`: Studienergebnisse im Register und Erstzulassungen, Änderungsprotokoll → GA1-04, GA1-08.
+- Workflow: zwei weitere Jobgruppen, Kettenzähler für Fortsetzungen; Releases nach Gruppen.
+- Abruf: Teilabruf von Dateianfängen (`hole_anfang`).
+- 101 Offline-Tests, unter pandas 2.3.3 und 3.0.
+
+## Lieferung 3 – 2026-11-10 (Abschlüsse, laufende Insider-Ergänzung)
+
+Diff zur Lieferung 2: `AENDERUNGEN_lieferung-3.diff`.
+
+- Neue Quelle `edgar_xbrl`: Abschlüsse aus `companyfacts.zip`, Berichtszeilen nach der Logik des
+  Insider-Monitors, daraus UA1-01 bis UA1-07, UA2-01, UA3-01, GA1-02, GA1-06, GA3-03, PR2-03.
+- Insiderdaten: Quartale ohne amtlichen Datensatz werden aus den einzelnen Form-4-Dateien ergänzt
+  (fortsetzbar, jede Meldung nur einmal, vom amtlichen Datensatz später ersetzt).
+- Bereinigte Insidertabelle mit Spalte `herkunft`.
+- Workflow: `edgar_xbrl` als dritter paralleler Job; Stand der laufenden Ergänzung wird mitgeführt.
+- 62 Offline-Tests, unter pandas 2.3.3 und 3.0.
+
+## Lieferung 2 – 2026-11-10 (Abgleich mit dem Insider-Monitor)
+
+Diff zur Lieferung 1: `AENDERUNGEN_lieferung-2.diff`.
+
+- pandas 2.3.3 und numpy 2.3.5 wie im Insider-Monitor; Tests laufen unter pandas 2.3.3 und 3.0.
+- Kontaktadresse aus `KONTAKT_EMAIL` oder `MAIL_USER`.
+- Insider-Quartalsdateien: Adressen von der SEC-Datenseite, feste Pfade als Rückfall.
+- `IH1-01`, `IH1-18`: nur firmeneigene Käufer (wie `n_cluster_1m`).
+- `IH1-04`: Definition des Insider-Monitors (`f_routine`, `f_opportun`).
+- `IH1-06`: Verkäufe aus Meldungen mit Optionsausübung zählen zu 25 % (wie `sale_oe_weight`).
+- `KD1-11`: zusätzlich Insolvenz (8-K 1.03), Übernahmeunterlagen der Zielfirma, 8-K 3.01 und Form-15-Nachträge
+  (wie `classify_filings`).
+- Speicher: Berechnung liest nur Käufe, Verkäufe und benötigte Formulare.
+- Zeitplan Di–Sa 11:20 UTC, nach dem Tageslauf des Insider-Monitors.
+- 44 Offline-Tests.
+
+## Lieferung 1 – 2026-11-10
+
+Erstlieferung, kein Diff zu einer Vorversion.
+
+- Kern: Schema und Registratur, NYSE-Handelskalender mit `verfuegbar_ab`-Regel, Abruf mit
+  Anfragegrenze und Wiederholung, Ablage als Parquet, Zustand und Zeitbudget, Prüfungen mit Bericht.
+- EDGAR-Meldungsverzeichnis aus `submissions.zip` mit Prüfung der Zeitzone der Annahmezeit.
+- Insidergeschäfte aus den SEC-Quartalsdatensätzen: IH1-01 bis IH1-07, IH1-09, IH1-10, IH1-16,
+  IH1-17, IH1-18 (neu), WS3-01.
+- Ereignisse aus dem Verzeichnis: WS2-04, UA1-10, UA2-03, UA2-04, IH6-04, UA4-05, GA2-03, UA4-01,
+  UA3-03, UA3-04, KD1-11, WS3-02.
+- Workflows `abruf` (Zeitplan und manueller Start) und `pruefen` (Tests bei jedem Push).
+- 41 Offline-Tests gegen Beispieldateien im Format der Quellen.
+
+Noch nicht gegen die echten Quellen gelaufen.

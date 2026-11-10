@@ -1,0 +1,74 @@
+# Schnittstelle zum privaten Repo
+
+## Releases
+
+| Release | Dateien | Inhalt |
+|---|---|---|
+| `parameter-edgar` | `parameter__edgar_<quelle>__<jahr>.parquet` | Parameter aus EDGAR: `edgar_insider`, `edgar_ereignisse`, `edgar_xbrl`, `edgar_rollen` |
+| `parameter-makro` | `parameter__fred__<jahr>.parquet` | Parameter der Gesamtwirtschaft (cik = 0) |
+| `parameter-web` | `parameter__<quelle>__<jahr>.parquet` | `wikipedia`, `cfpb`, `klinik` |
+| `bereinigt-edgar` | `bereinigt__edgar_meldungen__<jahr>.parquet` | Meldungsverzeichnis: Firma, Aktenzeichen, Formular, Annahmezeit, `verfuegbar_ab` |
+| | `bereinigt__edgar_firmen__alle.parquet` | Stammdaten je CIK: Name, Ticker, SIC, Sitz |
+| | `bereinigt__insider_transaktionen__<jahr>q<q>.parquet` | Alle nicht-derivativen Insidergeschäfte je Quartal; Spalte `herkunft`: `datensatz` (amtlich) oder `xml` (laufende Ergänzung) |
+| | `bereinigt__edgar_abschluesse__<jahr>.parquet` | Eine Zeile je 10-K/10-Q mit den Abschlussposten (Wert, Vorjahreswert `_py`, abgedeckte Quartale `_q`), geteilt nach Einreichungsjahr |
+| | `bereinigt__edgar_rollen__<jahr>.parquet` | Betroffene Firma und Einreicher je 13D- und 144-Meldung |
+| `bereinigt-makro` | `bereinigt__fred_<reihe>__alle.parquet` | Rohreihen mit allen Ständen (`von`, `bis`) und Termine |
+| `bereinigt-web` | `bereinigt__wiki_wochen__alle.parquet`, `bereinigt__wiki_zuordnung__alle.parquet` | Wochenaufrufe je CIK und Zuordnung CIK → Artikel |
+| | `bereinigt__cfpb_zuordnung__alle.parquet` | Firmenname → CIK mit Konfidenz |
+| | `bereinigt__klinik_studien__alle.parquet`, `…_aenderungen__<jahr>`, `…_zulassungen__alle` | Studienstand, Änderungsprotokoll, Zulassungen |
+| `pruefbericht` | `pruefbericht__<quelle>.md/.json`, `manifest__<quelle>.json` | Prüfergebnis und Dateiliste des letzten Laufs |
+
+## Schema der Parameter-Tabellen
+
+| Spalte | Typ | Bedeutung |
+|---|---|---|
+| `cik` | int64 | SEC-Firmenschlüssel; `0` für marktweite Größen |
+| `parameter_id` | Text | ID aus dem Parameterkatalog, z. B. `IH1-01` |
+| `ereignis_zeit` | Zeitstempel UTC | Zeitpunkt, auf den sich der Wert bezieht |
+| `verfuegbar_ab` | Zeitstempel UTC | frühester Zeitpunkt, zu dem ein Anleger den Wert nutzen konnte |
+| `wert` | float64 | Wert; Bedeutung und Einheit stehen in `DATENBLAETTER.md` |
+| `stand` | Text | Herkunft des Werts (Aktenzeichen der Meldung oder Zeitraum) |
+
+Regel für `verfuegbar_ab`: Annahmezeit der Meldung, wenn sie an einem Handelstag vor
+Börsenschluss liegt (16:00 ET, an verkürzten Tagen 13:00 ET); sonst 09:30 ET des nächsten
+Handelstags.
+
+## Lesebeispiel
+
+Für eine Prognose zum Zeitpunkt `t` darf nur der letzte Wert mit `verfuegbar_ab <= t` verwendet werden.
+
+```python
+import pandas as pd
+
+BASIS = "https://github.com/<konto>/daten-offen/releases/download"
+
+def lade(quelle: str, jahre: range) -> pd.DataFrame:
+    teile = [pd.read_parquet(f"{BASIS}/parameter-edgar/parameter__{quelle}__{j}.parquet") for j in jahre]   # Release je Gruppe
+    return pd.concat(teile, ignore_index=True)
+
+parameter = lade("edgar_insider", range(2023, 2027))
+cluster = parameter[parameter["parameter_id"] == "IH1-01"].sort_values("verfuegbar_ab")
+
+# Tabelle mit den Prognosezeitpunkten je Firma (Spalten: cik, zeitpunkt als UTC-Zeitstempel)
+anfragen = pd.DataFrame({"cik": [320193], "zeitpunkt": pd.to_datetime(["2026-11-10 15:00"], utc=True)})
+anfragen["zeitpunkt"] = anfragen["zeitpunkt"].astype("datetime64[us, UTC]")
+
+stichtagsecht = pd.merge_asof(
+    anfragen.sort_values("zeitpunkt"), cluster[["cik", "verfuegbar_ab", "wert"]],
+    left_on="zeitpunkt", right_on="verfuegbar_ab", by="cik", direction="backward")
+```
+
+Für Fenstergrößen (z. B. alle Käufe der letzten 60 Tage) gilt dieselbe Bedingung
+`verfuegbar_ab <= zeitpunkt`.
+
+## Verknüpfung mit dem Insider-Monitor
+
+- Firmenschlüssel: `issuer_cik` in `data/trades.parquet` ist eine Gleitkommazahl; vor dem Verknüpfen
+  in eine Ganzzahl wandeln (`issuer_cik.astype("Int64")`).
+- Zeitbezug: `filing_dt` im Insider-Monitor ist ohne Zeitzone in Ostküstenzeit gespeichert. Für den
+  Vergleich mit `verfuegbar_ab`: `filing_dt.dt.tz_localize("America/New_York").dt.tz_convert("UTC")`.
+- Gleich definiert wie im Insider-Monitor: `IH1-01` (= `n_cluster_1m`), `IH1-04` (= `f_routine` 1 /
+  `f_opportun` 0), Verkaufsgewicht 0,25 in `IH1-06`, Einstufung in `KD1-11` (= `classify_filings`),
+  `UA1-02` (= `fin_lage_roh`: +1 positiv, 0 gemischt, −1 negativ), `UA1-07` (= `fin_runway_q`).
+- Die Spalten von `edgar_abschluesse` heißen wie in `data/fundamentals.csv` (`revenue`, `revenue_py`,
+  `revenue_q`, `net_income`, `op_cf`, `cash`, `sti`, `debt`, `assets`, `equity`, `shares`, `rev_src`).
