@@ -26,7 +26,7 @@ from pathlib import Path
 import pandas as pd
 
 from ..kern.ablage import Ablage
-from ..kern.http import Abruf
+from ..kern.http import Abruf, QuelleNichtErreichbar
 from ..kern.namen import Namensabgleich, bereinige, kern, trefferquote
 from ..kern.schema import Parameter, als_parameter, leer, registriere
 from ..kern.zeit import ET, handelbar_ab
@@ -310,7 +310,7 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
             if schluessel:
                 quellen[schluessel[0]] = (str(pfad), schluessel[1])
     else:
-        abruf = abruf or Abruf(anfragen_pro_sekunde=2)
+        abruf = abruf or Abruf(anfragen_pro_sekunde=2, versuche=8)        # der Dateiserver weist zeitweise ab
         quellen = verzeichnis(abruf, haushaltsjahr(heute))
     if not quellen:
         raise RuntimeError("Verzeichnis nennt keine Sammeldateien (Schnittstelle geändert?)")
@@ -326,10 +326,22 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
             abgebrochen = True
             break
         adresse, stand = quellen[jahr]
-        pfad = Path(adresse) if lokal is not None else abruf.hole_datei(adresse, Path(arbeits) / "usaspending" / f"fy{jahr}.zip")
-        tabelle, info = lies_archiv(pfad)
-        if lokal is None:
-            pfad.unlink(missing_ok=True)
+        ziel = Path(arbeits) / "usaspending" / f"fy{jahr}.zip"
+        try:
+            pfad = Path(adresse) if lokal is not None else abruf.hole_datei(adresse, ziel)
+            tabelle, info = lies_archiv(pfad)
+        except (QuelleNichtErreichbar, OSError, zipfile.BadZipFile, EOFError) as fehler:
+            # Abruf gestört oder Datei unvollständig: das Gelesene bleibt, der nächste Lauf setzt hier fort
+            if lokal is not None:
+                raise
+            hinweise.append(f"Haushaltsjahr {jahr} nicht gelesen ({type(fehler).__name__}: {str(fehler)[:120]}); "
+                            "der nächste Lauf versucht es erneut")
+            abgebrochen = True
+            break
+        finally:
+            if lokal is None:
+                ziel.unlink(missing_ok=True)
+                ziel.with_suffix(".zip.teil").unlink(missing_ok=True)
         ablage.schreibe_bereinigt(TABELLE_MONAT, f"fy{jahr}", tabelle.astype({s: "category" for s in SCHLUESSEL}))
         neu[jahr] = {"haushaltsjahr": jahr, "datei": Path(adresse).name, "stand": pd.Timestamp(stand), **info}
         print(f"USAspending: Haushaltsjahr {jahr} gelesen ({info['zeilen']} Zeilen)", flush=True)
@@ -342,7 +354,10 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
     ablage.schreibe_bereinigt(TABELLE_DATEIEN, "alle", dateien)
 
     # je Haushaltsjahr einzeln lesen: zusammen wären es mehrere Millionen Zeilen mit drei Textspalten
-    pfade = sorted(ablage.bereinigt.glob(f"bereinigt__{TABELLE_MONAT}__*.parquet"))
+    pfade = [ablage.bereinigt / f"bereinigt__{TABELLE_MONAT}__fy{int(j)}.parquet" for j in dateien["haushaltsjahr"]]
+    pfade = [p for p in pfade if p.exists()]
+    if len(pfade) < len(dateien):
+        raise RuntimeError("Monatstabellen fehlen zu gelesenen Haushaltsjahren (Bestand unvollständig geladen?)")
     if not pfade:
         raise RuntimeError("keine Monatstabellen vorhanden")
     teile = []

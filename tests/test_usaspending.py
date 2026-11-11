@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 
 from daten_offen.kern.ablage import Ablage
+from daten_offen.kern.http import QuelleNichtErreichbar
 from daten_offen.kern.namen import bereinige
 from daten_offen.kern.zeit import ET
 from daten_offen.quellen import usaspending as u
@@ -129,6 +130,48 @@ def test_namen_rechtsform():
     assert bereinige("SANOFI S A") == "SANOFI" and bereinige("FOUR POINTS TECHNOLOGY, L.L.C.") == "FOUR POINTS TECHNOLOGY"
     assert bereinige("AMERICAN NATIONAL RED CROSS, THE") == "AMERICAN NATIONAL RED CROSS"
     assert bereinige("XYZ SERIES A B") == "XYZ SERIES A B" and bereinige("S A") == "S A"
+
+
+class Quelle:
+    """Ersatz für den Abruf: Verzeichnis und Dateien aus einem Ordner; ``gestoert`` bricht bei diesen Jahren ab."""
+
+    def __init__(self, ordner, gestoert=()):
+        self.ordner, self.gestoert, self.abfragen = ordner, set(gestoert), []
+
+    def sende_json(self, url, daten):
+        self.abfragen.append(daten["fiscal_year"])
+        return {"monthly_files": [{"file_name": p.name, "url": f"https://files.example/{p.name}"}
+                                  for p in sorted(self.ordner.glob(f"FY{daten['fiscal_year']}_*.zip"))]
+                + [{"file_name": "FY(All)_All_Contracts_Delta_20261106.zip", "url": "https://files.example/delta.zip"}]}
+
+    def hole_datei(self, url, ziel, erlaube_404=False):
+        name = url.rsplit("/", 1)[-1]
+        if u.datei_schluessel(name)[0] in self.gestoert:
+            raise QuelleNichtErreichbar(f"{url}: Verbindung abgebrochen")
+        ziel.parent.mkdir(parents=True, exist_ok=True)
+        ziel.write_bytes((self.ordner / name).read_bytes())
+        return ziel
+
+
+def test_abruf_gestoert(tmp_path):
+    ablage = Ablage(tmp_path / "aus")
+    ablage.schreibe_bereinigt("edgar_firmen", "alle", firmen())
+    ordner = tmp_path / "zips"
+    ordner.mkdir()
+    baue_zip(ordner / "FY2026_All_Contracts_Full_20261106.zip", FY26)
+    baue_zip(ordner / "FY2027_All_Contracts_Full_20261106.zip",
+             [zeile("60", "2026-10-20", "2026-10-21", roh="ALPHA CORPORATION", **ALPHA)])
+    heute = date(2026, 11, 11)
+    quelle = Quelle(ordner, gestoert=[2026])
+    p, info, hinweise = u.lauf(ablage, tmp_path / "arb", abruf=quelle, heute=heute)
+    assert quelle.abfragen == list(range(2008, 2028))                       # eine Verzeichnisabfrage je Haushaltsjahr
+    assert info["neu_gelesen"] == [2027] and any("Haushaltsjahr 2026 nicht gelesen" in h for h in hinweise)
+    assert p.set_index("stand")["wert"].to_dict() == {"2026-10": 60.0}       # das Gelesene bleibt
+    assert not list((tmp_path / "arb" / "usaspending").glob("*"))            # keine Reste der Sammeldateien
+    p, info, hinweise = u.lauf(ablage, tmp_path / "arb", abruf=Quelle(ordner), heute=heute)
+    assert info["neu_gelesen"] == [2026] and info["haushaltsjahre_gelesen"] == 2
+    assert p.set_index("stand")["wert"].to_dict() == {"2026-09": 1087.0, "2026-10": 110.0}
+    assert not any("nicht gelesen" in h for h in hinweise)
 
 
 def test_lauf(tmp_path):
