@@ -1,6 +1,6 @@
 # Übergabe
 
-Stand 10.11.2026, Lieferung 6. Fortschritt 74 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
+Stand 11.11.2026, Lieferung 7. Fortschritt 82 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
 und dem Auftragstext, um in einem neuen Chat weiterzuarbeiten.
 
 ## Ziel
@@ -22,9 +22,11 @@ Insider-Monitor.
 | `wikipedia` | WS3-05 | ja | ja |
 | `cfpb` | GA3-01 | ja | ja |
 | `klinik` | GA1-04, GA1-08 | ja | ja |
+| `sec_ftd` | IH3-06 | ja | ja (Workflow `einzel`, 11.11.2026) |
+| `edgar_13f` | IH5-03, IH5-04 | ja | erster voller Lauf am 11.11.2026 gestartet (Workflow `einzel`) |
 
-53 Parameter, 103 Tests (zuletzt unter pandas 2.3.3). Alle Module liefen am 10.11.2026 im echten Lauf
-(`laufend`, 53 Minuten) grün; Ergebnis unten.
+56 Parameter, 116 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
+(`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
 
 ## Prüfliste für den ersten echten Lauf
 
@@ -68,14 +70,30 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
 | `wikipedia` | 3.104 Zuordnungen | genügt |
 | Workflow | Hinweis: Node.js 20 der Actions veraltet | bei Gelegenheit Actions-Versionen anheben |
 
+## Stand 11.11.2026 (Lieferung 7)
+
+- Rückwärtslauf (Rollen der 13D- und 144-Meldungen): läuft als Kette, je Lauf rund 27.000 Meldungen und 5 Stunden;
+  am Morgen des 11.11. waren 30.359 von 261.497 gelesen. Die Kette erlaubt zwölf Fortsetzungen.
+- `sec_ftd` im echten Lauf grün: 437 Dateien, 28,2 Mio. Zeilen, 4,1 Mio. Werte für 17.664 Firmen ab 2004;
+  erster Lauf 4 Minuten, Folgeläufe 1,5 Minuten. Seit dem 11.11. im Workflow `abruf`.
+- `edgar_13f`: Module und Tests fertig, erster voller Lauf (54 Datensätze, 2,9 GB) über den Workflow `einzel`
+  gestartet. Nach grünem Prüfbericht `edgar_13f` in die Matrix `folge` von `abruf.yml` aufnehmen (die Zeilen zum
+  Herunterladen stehen schon dort).
+- `klinik`: bessere Zuordnung der Sponsoren ist gepusht, wirkt ab dem nächsten Lauf von `abruf`
+  (erwartet: Studien rund 65 %, Zulassungen ohne Generika rund 44 %).
+- `GW2-06` im echten Lauf bestätigt (340 Werte, letzter Stand 14.10.2026).
+- Actions laufen auf Node 24 (checkout v5, setup-python v6, upload-artifact v6, download-artifact v7).
+- Neue Module zuerst über `gh workflow run einzel.yml -f quelle=<name>` erproben; der Workflow berührt die
+  Fortsetzungskette von `abruf` nicht.
+
 ## Empfohlene Reihenfolge
 
 1. ~~Repo anlegen, Secrets setzen, Workflow `abruf` im Modus `laufend` starten.~~ erledigt
 2. ~~Prüfberichte auswerten, Abweichungen beheben.~~ erledigt (Lieferung 6)
 3. Einmal im Modus `rueckwaerts` starten (Historie der 13D- und 144-Meldungen; setzt sich selbst fort).
    Gestartet am 10.11.2026.
-4. Erst danach die offenen Bausteine (Tabelle „Noch offen“ in `ENTSCHEIDUNGEN.md`), beginnend mit den
-   Quellen, die den Namensabgleich nutzen, weil dessen Trefferquote dann bekannt ist.
+4. Offene Bausteine (Tabelle „Noch offen“ in `ENTSCHEIDUNGEN.md`). Erledigt: Lieferausfälle, 13F, Sponsoren.
+   Als Nächstes: 13F des laufenden Quartals aus den Einzelmeldungen, öffentliche Aufträge, Patente, H-1B.
 5. Anbindung im Insider-Monitor (eigener Auftrag; `SCHNITTSTELLE.md` beschreibt das Lesen).
 
 ## Dateien für einen neuen Chat

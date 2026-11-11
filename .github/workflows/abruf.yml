@@ -35,8 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 350
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -47,7 +47,7 @@ jobs:
           gh release download pruefbericht -D vorlauf -p "pruefbericht__*.json" --clobber || true
       - name: Abruf
         run: python -m daten_offen.lauf --quelle edgar_index --modus "$MODUS" --vorlauf vorlauf
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: edgar_index
@@ -63,15 +63,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        quelle: [edgar_insider, edgar_ereignisse, edgar_xbrl, edgar_rollen, cfpb, klinik]
+        quelle: [edgar_insider, edgar_ereignisse, edgar_xbrl, edgar_rollen, sec_ftd, cfpb, klinik]   # edgar_13f folgt nach dem ersten vollen Lauf im Workflow einzel
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: edgar_index
           path: ausgabe
@@ -89,7 +89,14 @@ jobs:
             klinik)
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber \
                 -p "bereinigt__klinik_studien__*.parquet" -p "bereinigt__klinik_aenderungen__*.parquet" || true ;;
+            sec_ftd)
+              gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_*.parquet" || true ;;
+            edgar_13f)
+              # die Bestände früherer Quartale bleiben im Release; das Modul holt das Vorquartal bei Bedarf selbst
+              gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet" || true
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber                 -p "bereinigt__edgar_13f_dateien__*.parquet" -p "bereinigt__edgar_13f_quartal__*.parquet" || true ;;
           esac
+          touch ausgabe/.vorher
       - name: Abruf
         run: python -m daten_offen.lauf --quelle "${{ matrix.quelle }}" --modus "$MODUS" --vorlauf vorlauf
       - name: Nur eigene Ergebnisse weitergeben
@@ -97,7 +104,13 @@ jobs:
         run: |
           rm -f ausgabe/bereinigt/bereinigt__edgar_meldungen__*.parquet ausgabe/bereinigt/bereinigt__edgar_firmen__*.parquet
           rm -f ausgabe/berichte/*__edgar_index.*
-      - uses: actions/upload-artifact@v4
+          if [ "${{ matrix.quelle }}" != "sec_ftd" ]; then rm -f ausgabe/bereinigt/bereinigt__ftd_*.parquet; fi
+          # unveränderte Jahresdateien der Lieferausfälle liegen schon im Release
+          if [ -f ausgabe/.vorher ]; then
+            find ausgabe/bereinigt -name 'bereinigt__ftd_tage__*.parquet' ! -newer ausgabe/.vorher -delete
+            rm -f ausgabe/.vorher
+          fi
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: ${{ matrix.quelle }}
@@ -114,8 +127,8 @@ jobs:
       matrix:
         quelle: [fred, wikipedia]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -129,7 +142,7 @@ jobs:
           fi
       - name: Abruf
         run: python -m daten_offen.lauf --quelle "${{ matrix.quelle }}" --modus "$MODUS" --vorlauf vorlauf
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: ${{ matrix.quelle }}
@@ -143,8 +156,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v7
         with:
           path: ausgabe
           merge-multiple: true
