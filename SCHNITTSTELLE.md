@@ -4,7 +4,7 @@
 
 | Release | Dateien | Inhalt |
 |---|---|---|
-| `parameter-edgar` | `parameter__edgar_<quelle>__<jahr>.parquet` | Parameter aus EDGAR: `edgar_insider`, `edgar_ereignisse`, `edgar_xbrl`, `edgar_rollen` |
+| `parameter-edgar` | `parameter__edgar_<quelle>__<jahr>.parquet` | Parameter aus EDGAR: `edgar_insider`, `edgar_ereignisse`, `edgar_xbrl`, `edgar_rollen`, `edgar_13f` |
 | `parameter-makro` | `parameter__fred__<jahr>.parquet` | Parameter der Gesamtwirtschaft (cik = 0) |
 | `parameter-web` | `parameter__<quelle>__<jahr>.parquet` | `wikipedia`, `cfpb`, `klinik` |
 | `bereinigt-edgar` | `bereinigt__edgar_meldungen__<jahr>.parquet` | Meldungsverzeichnis: Firma, Aktenzeichen, Formular, Annahmezeit, `verfuegbar_ab` |
@@ -12,6 +12,9 @@
 | | `bereinigt__insider_transaktionen__<jahr>q<q>.parquet` | Alle nicht-derivativen Insidergeschäfte je Quartal; Spalte `herkunft`: `datensatz` (amtlich) oder `xml` (laufende Ergänzung) |
 | | `bereinigt__edgar_abschluesse__<jahr>.parquet` | Eine Zeile je 10-K/10-Q mit den Abschlussposten (Wert, Vorjahreswert `_py`, abgedeckte Quartale `_q`), geteilt nach Einreichungsjahr |
 | | `bereinigt__edgar_rollen__<jahr>.parquet` | Betroffene Firma und Einreicher je 13D- und 144-Meldung |
+| | `bereinigt__edgar_13f_quartal__alle.parquet` | Je CUSIP und Berichtsquartal: `halter`, `stueck`, `manager`, `beste_idee`, `breite_aenderung`, `manager_beide` |
+| | `bereinigt__edgar_13f_bestaende__<jahr>q<q>.parquet` | Je Manager (`filer_cik`) und CUSIP: Stückzahl und Portfoliogewicht (fristgerechte Erstmeldungen) |
+| | `bereinigt__edgar_13f_dateien__alle.parquet` | Gelesene Datensätze mit Zahl der Meldungen |
 | `bereinigt-makro` | `bereinigt__fred_<reihe>__alle.parquet` | Rohreihen mit allen Ständen (`von`, `bis`) und Termine |
 | `bereinigt-web` | `bereinigt__wiki_wochen__alle.parquet`, `bereinigt__wiki_zuordnung__alle.parquet` | Wochenaufrufe je CIK und Zuordnung CIK → Artikel |
 | | `bereinigt__cfpb_zuordnung__alle.parquet` | Firmenname → CIK mit Konfidenz |

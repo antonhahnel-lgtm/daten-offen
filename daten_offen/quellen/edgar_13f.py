@@ -16,6 +16,7 @@ Kennzahlen je Wertpapier und Quartal:
 from __future__ import annotations
 
 import csv
+import os
 import re
 import zipfile
 from datetime import date, datetime, time, timedelta
@@ -25,7 +26,7 @@ import numpy as np
 import pandas as pd
 
 from ..kern.ablage import Ablage
-from ..kern.http import Abruf
+from ..kern.http import Abruf, QuelleNichtErreichbar
 from ..kern.namen import trefferquote
 from ..kern.schema import Parameter, als_parameter, leer, registriere
 from ..kern.zeit import ET, handelbar_ab
@@ -230,8 +231,29 @@ def baue_parameter(quartal: pd.DataFrame, zuordnung: pd.DataFrame) -> pd.DataFra
 
 
 # --------------------------------------------------------------------------- Lauf
+RELEASE_URL = "https://github.com/{repo}/releases/download/bereinigt-edgar/{datei}"
+
+
 def _bestand_pfad(ablage: Ablage, periode) -> Path:
     return ablage.bereinigt / f"bereinigt__{TABELLE_BESTAND}__{quartal_name(periode)}.parquet"
+
+
+def _lies_bestand(ablage: Ablage, arbeits: Path, periode, fern: bool) -> pd.DataFrame | None:
+    """Manager und CUSIP eines Quartals: aus der Ablage, sonst aus dem Release (die Bestände früherer Quartale
+    werden im Tagesbetrieb nicht mitgeführt; gebraucht wird nur das Vorquartal eines neuen Datensatzes)."""
+    pfad = _bestand_pfad(ablage, periode)
+    if not pfad.exists():
+        repo = os.environ.get("GITHUB_REPOSITORY", "").strip()
+        if not fern or not repo:
+            return None
+        try:
+            pfad = Abruf(anfragen_pro_sekunde=2, kontakt_noetig=False).hole_datei(
+                RELEASE_URL.format(repo=repo, datei=pfad.name), Path(arbeits) / "f13" / pfad.name, erlaube_404=True)
+        except QuelleNichtErreichbar:
+            return None
+        if pfad is None:
+            return None
+    return pd.read_parquet(pfad, columns=["filer_cik", "cusip"]).astype({"cusip": str})
 
 
 def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | None = None, lokal: Path | None = None,
@@ -254,6 +276,7 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
     gelesen = set(dateien["datei"]) if len(dateien) else set()
     offen = [k for k in sorted(quellen, key=fensterende, reverse=True) if k not in gelesen]      # neueste zuerst
     neu, geaendert, abgebrochen = [], set(), False
+    vorhanden = set(pd.to_datetime(quartal["periode"])) if len(quartal) else set()
     for schluessel in offen:
         if budget.abgelaufen():
             abgebrochen = True
@@ -267,8 +290,9 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
             pfad.unlink(missing_ok=True)
         teile = []
         for periode, teil in pos.groupby("periode"):
-            if _bestand_pfad(ablage, periode).exists():      # ein Quartal wird nur einmal geschrieben
+            if pd.Timestamp(periode) in vorhanden:           # ein Quartal wird nur einmal geschrieben
                 continue
+            vorhanden.add(pd.Timestamp(periode))
             bestand, je_cusip = verdichte(teil)
             ablage.schreibe_bereinigt(TABELLE_BESTAND, quartal_name(periode), bestand.astype({"cusip": "category"}))
             teile.append(je_cusip.assign(periode=pd.Timestamp(periode)))
@@ -291,11 +315,13 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
         vor = (pd.Timestamp(p) - pd.offsets.QuarterEnd(1)).normalize()
         if pd.Timestamp(p) not in geaendert and vor not in geaendert:
             continue
-        if not (_bestand_pfad(ablage, p).exists() and _bestand_pfad(ablage, vor).exists()):
+        if vor not in vorhanden:
+            continue                                         # erstes Quartal der Historie
+        heute = _lies_bestand(ablage, arbeits, p, fern=lokal is None)
+        davor = _lies_bestand(ablage, arbeits, vor, fern=lokal is None) if heute is not None else None
+        if heute is None or davor is None:
             ohne_vorquartal += pd.Timestamp(p) in geaendert
             continue
-        heute = pd.read_parquet(_bestand_pfad(ablage, p), columns=["filer_cik", "cusip"]).astype({"cusip": str})
-        davor = pd.read_parquet(_bestand_pfad(ablage, vor), columns=["filer_cik", "cusip"]).astype({"cusip": str})
         d = breite_aenderung(heute, davor).assign(periode=pd.Timestamp(p))
         rest = quartal[quartal["periode"] != pd.Timestamp(p)]
         teil = quartal[quartal["periode"] == pd.Timestamp(p)].drop(columns=["breite_aenderung", "manager_beide"])
@@ -317,7 +343,7 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
     if rest:
         hinweise.append(f"{rest} Datensätze noch nicht gelesen (Zeitbudget; der nächste Lauf setzt fort)")
     if ohne_vorquartal:
-        hinweise.append(f"{ohne_vorquartal} Quartale ohne Vorquartal: Änderung der Breite folgt mit dem nächsten Datensatz")
+        hinweise.append(f"{ohne_vorquartal} neue Quartale ohne Bestand des Vorquartals: Änderung der Breite fehlt")
     juengstes = quartal[(quartal["periode"] == quartal["periode"].max()) & (quartal["halter"] >= 10)]
     z = juengstes[["cusip"]].merge(zuordnung[zuordnung["stamm"] & (zuordnung["konfidenz"] >= MINDEST_KONFIDENZ)],
                                    on="cusip", how="left")

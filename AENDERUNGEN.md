@@ -1,5 +1,15 @@
 # Änderungen
 
+## Lieferung 7 – 2026-11-11 (Lieferausfälle, Fondsbestände, Sponsoren)
+
+- Neue Quelle `sec_ftd`: Lieferausfälle der SEC ab 2004 → IH3-06; Tabelle `ftd_wertpapiere` (CUSIP → CIK).
+- Neue Quelle `edgar_13f`: Bestände der 13F-Manager ab 2013 → IH5-04 (Änderung der Eigentümerbreite),
+  IH5-03 (beste Ideen); Tabellen `edgar_13f_quartal` und `edgar_13f_bestaende`.
+- `klinik`: Sponsoren und Antragsteller besser zugeordnet (Studien 53 → 65 %, neue Wirkstoffe 25 → 44 %).
+- Workflow `einzel` zum Erproben einer Quelle; Release-Gruppe `*-markt`; Actions auf Node 24.
+- `GW2-06` im echten Lauf bestätigt (340 Werte).
+- 116 Offline-Tests.
+
 ## Lieferung 6 – 2026-11-10 (erster echter Lauf)
 
 - Erster echter Lauf (`laufend`) mit allen neun Quellen grün; Prüfberichte ausgewertet (`UEBERGABE.md`).

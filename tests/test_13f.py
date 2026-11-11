@@ -121,6 +121,21 @@ def test_fortschreibung(lage):
     assert len(p2) == 4 and not ablage.lies_bereinigt("edgar_13f_quartal").duplicated(["periode", "cusip"]).any()
 
 
+def test_vorquartal_fehlt_lokal(lage):
+    ablage, ordner, tmp = lage
+    spaeter = ordner / "01jun2024-31aug2024_form13f.zip"
+    weg = tmp / "spaeter.zip"
+    spaeter.rename(weg)
+    f.lauf(ablage, tmp / "arb", lokal=ordner)
+    (ablage.bereinigt / "bereinigt__edgar_13f_bestaende__2024q1.parquet").unlink()      # wie im Tagesbetrieb
+    weg.rename(spaeter)
+    p, info, hinweise = f.lauf(ablage, tmp / "arb", lokal=ordner)
+    assert any("ohne Bestand des Vorquartals" in h for h in hinweise)
+    assert set(p["parameter_id"]) == {"IH5-03"}                       # Breite fehlt, beste Ideen sind da
+    q = ablage.lies_bereinigt("edgar_13f_quartal")
+    assert q["periode"].nunique() == 2 and not q.duplicated(["periode", "cusip"]).any()
+
+
 def test_pflichtspalten(tmp_path):
     with zipfile.ZipFile(tmp_path / "k.zip", "w") as z:
         z.writestr("SUBMISSION.tsv", tsv(["ACCESSION_NUMBER", "DATUM"], [["a", "b"]]))
