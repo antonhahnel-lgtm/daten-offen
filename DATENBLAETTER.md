@@ -436,6 +436,34 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | Richtung (Aufstockung oder Abbau) fehlt (Text der Meldung) |
 
+## IH5-03 Beste Ideen der Manager
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Zahl der Manager mit 10 bis 200 Positionen, deren größtes Übergewicht (Portfoliogewicht minus Gewicht im Gesamtbestand aller Manager) diese Firma ist; nur Werte ab 1 |
+| Einheit | Anzahl |
+| Frequenz | je Berichtsquartal |
+| Offenlegung | amtlich offen: Form 13F (§ 13(f) Exchange Act), Frist 45 Tage nach Quartalsende |
+| Quelle | https://www.sec.gov/data-research/sec-markets-data/form-13f-data-sets |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2013 |
+| Verzögerung | erster Handelstag nach Quartalsende + 47 Tage |
+| Bekannte Schwächen | Vereinfachung von Anton, Cohen & Polk: Vergleich mit dem Gesamtbestand der 13F-Manager statt mit dem Marktgewicht, ohne Gewichtung mit der Kursschwankung. Nur Manager über 100 Mio. $ und nur gemeldete Long-Bestände; Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle (Trefferquote im Prüfbericht); der Datensatz der SEC erscheint erst Wochen nach der Frist, die Einzelmeldungen des laufenden Quartals fehlen bis dahin |
+
+## IH5-04 Eigentümerbreite (Änderung)
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Halter im Quartal minus Halter im Vorquartal, geteilt durch die Zahl der Manager; gezählt werden nur Manager, die in beiden Quartalen gemeldet haben (Chen, Hong & Stein 2002). Die Zahl der Halter selbst steht in der bereinigten Tabelle edgar_13f_quartal |
+| Einheit | Anteil der Manager |
+| Frequenz | je Berichtsquartal |
+| Offenlegung | amtlich offen: Form 13F (§ 13(f) Exchange Act), Frist 45 Tage nach Quartalsende |
+| Quelle | https://www.sec.gov/data-research/sec-markets-data/form-13f-data-sets |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2013 |
+| Verzögerung | erster Handelstag nach Quartalsende + 47 Tage |
+| Bekannte Schwächen | Hält ein Manager zwei Gattungen einer Firma, zählt die Gattung mit den meisten Haltern. Nur Manager über 100 Mio. $ und nur gemeldete Long-Bestände; Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle (Trefferquote im Prüfbericht); der Datensatz der SEC erscheint erst Wochen nach der Frist, die Einzelmeldungen des laufenden Quartals fehlen bis dahin |
+
 ## IH6-04 Neue Schulden
 
 | Angabe | Inhalt |

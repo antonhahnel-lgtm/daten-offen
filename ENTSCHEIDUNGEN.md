@@ -110,6 +110,18 @@ lange und saubere Daten vor Vollständigkeit.
 | 65 | Die Annahmezeit der Sammeldatei ist UTC (Lauf vom 10.11.2026: Trefferquote UTC 0,937, ET 0,392). Von Hand bestätigt an den Index-Seiten der SEC, die Ostküstenzeit zeigen: 8-K vom 30.07.2026 `20:30:28Z` = 16:30:28 EDT, Form 4 vom 26.02.2026 `23:33:14Z` = 18:33:14 EST. Die automatische Erkennung (Nr. 8) bleibt als Schutz. | Sommer- und Winterzeit stimmen; damit ist `verfuegbar_ab` richtig. |
 | 66 | `GW2-06`: Der Vormonat ist der jüngste vorhandene Monat davor, höchstens zwei Monate zurück; die Vorjahreswerte müssen genau zwölf Monate zurück vorliegen, sonst entfällt der Stand. | Der Verbraucherpreisindex für Oktober 2025 wurde wegen des Shutdowns nie veröffentlicht. Die alte Regel verlangte 14 lückenlose Monate und verlor dadurch alle Stände ab Dezember 2025. Jetzt entfallen nur Oktober und November 2026 (Vorjahresmonat Oktober 2025 fehlt). |
 
+## Lieferausfälle (Lieferung 7)
+
+| Nr. | Entscheidung | Grund |
+|---|---|---|
+| 67 | `IH3-06` kommt aus den Fails-to-Deliver-Dateien der SEC (ab 03/2004), nicht aus den Threshold-Listen der Börsen. Wert ist der Bestand in Stück je Abwicklungstag, nur ab 10.000 Stück je Gattung (erste Bedingung der Threshold-Liste). | Die Börsenlisten sind nur tagesaktuell abrufbar, die SEC-Dateien reichen 22 Jahre zurück. Bis 15.09.2008 enthält die Quelle ohnehin nur Bestände ab 10.000 Stück; so bleibt die Reihe durchgehend vergleichbar. |
+| 68 | Das Verhältnis zu den ausstehenden Aktien (zweite Bedingung, 0,5 %) und die Dauer (fünf Abwicklungstage) entstehen privat aus `IH3-06` und `UA3-01`. | Wie bei `GA1-02` (Nr. 42): Verhältnisse über Quellen hinweg entstehen privat. |
+| 69 | Die Preisspalte der SEC-Dateien wird nicht übernommen. | Keine Kurse im öffentlichen Repo. |
+| 70 | Veröffentlichungstag einer Datei ist ihr Änderungszeitpunkt beim Server der SEC, wenn er höchstens 90 Tage nach dem Periodenende liegt; sonst gilt die feste Frist von 30 Tagen (Quartalsdateien bis 2009: 60 Tage). Der zuerst festgestellte Zeitpunkt bleibt bestehen. | Gemessen am 11.11.2026 an allen 437 Dateien: üblich sind 14–19 Tage, einzelne Dateien kamen bis zu 68 Tage später (z. B. nach dem Shutdown 2025). Der Änderungszeitpunkt liegt nie vor der Erstveröffentlichung; ältere Dateien wurden 2020 neu hochgeladen und tragen deshalb die Frist. |
+| 71 | Zuordnung CUSIP → CIK in drei Stufen: jüngstes Kürzel der CUSIP gehört heute genau einer Firma und die Bezeichnung beginnt wie deren (auch früherer) Name (0,98); Kürzel passt und die CUSIP war in den letzten 400 Tagen aktiv (0,93); sonst Namensabgleich über die Bezeichnung (Nr. 58). Nur Stammaktien und Hinterlegungsscheine, keine Vorzüge, Optionsscheine, Units, Anleihen, Fonds (SIC 6726, 6221). | Ein neu vergebenes Kürzel darf alte Lieferausfälle nicht der heutigen Firma zuschreiben; delistete Firmen sollen erhalten bleiben (kein Überlebensfehler). |
+| 72 | Die Tabelle `ftd_wertpapiere` (CUSIP → CIK) ist die gemeinsame Grundlage für alle Quellen, die nur die CUSIP nennen (13F, N-PORT). | Eine frei veröffentlichbare CUSIP-Zuordnung gibt es sonst nicht; die Lizenz der CUSIP-Stammdaten ist kostenpflichtig. |
+| 73 | Neue Release-Gruppe `*-markt` für Marktstrukturdaten der SEC. Der Workflow `einzel` lässt eine einzelne Quelle von Hand laufen, ohne den Workflow `abruf` und seine Fortsetzungskette zu berühren. | Neue Module sollen erprobt werden können, während die Rückwärtsbefüllung läuft. |
+
 ## Noch offen
 
 | Baustein | Parameter | Hinderungsgrund |
@@ -119,8 +131,7 @@ lange und saubere Daten vor Vollständigkeit.
 | H-1B-Anträge (DOL) | GA2-02 | Große Excel-Dateien je Quartal mit wechselnden Spalten |
 | Patente (USPTO) | GA1-01 | Sammeldateien im Gigabyte-Bereich; Anmelder → CIK |
 | Textänderung 10-K/10-Q, Ton der Meldungen | UA5-01, UA5-03, WS2-01, WS2-02 | Abruf aller Berichtstexte (Größenordnung 1 Terabyte); erst nach den ersten echten Läufen |
-| Fondsbestände (13F, N-PORT) | IH5-03, IH5-04, KD3-01 | Wertpapierkennnummern (CUSIP) müssen auf Firmen abgebildet werden |
+| Fondsbestände (13F, N-PORT) | IH5-03, IH5-04, KD3-01 | Die CUSIP-Zuordnung liegt mit `ftd_wertpapiere` vor (Nr. 72); Abruf der 13F-Datensätze (rund 3,5 GB) folgt als Nächstes |
 | Geldpolitik-Exposition | GW1-03 | Braucht zusätzlich Cashflow-Duration und Volatilität; folgt (Finanzrestriktion GW1-04 ist gebaut) |
-| Lieferausfälle (SEC) | IH3-06 | Folgt; Zuordnung über Ticker |
 | Vergütung, Planadoption (Item 408) | UA6-03, IH1-13 | Im Insider-Monitor bereits vorhanden (`gehalt.py`, `plan_408`) |
 | Segment- und Kundenangaben | WS3-03, GA4-01, GA4-05 | Nicht in der Sammeldatei der Abschlüsse; verlangt die Einzelberichte |

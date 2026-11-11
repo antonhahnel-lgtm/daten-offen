@@ -24,7 +24,7 @@ import pyarrow.parquet as pq
 
 from ..kern.ablage import Ablage
 from ..kern.http import Abruf
-from ..kern.namen import RECHTSFORM, Namensabgleich, bereinige, trefferquote
+from ..kern.namen import RECHTSFORM, Namensabgleich, bereinige, kern, trefferquote
 from ..kern.schema import Parameter, als_parameter, leer, registriere
 from ..kern.zeit import EROEFFNUNG, ET, UTC, handelbar_ab_serie
 from ..kern.zustand import Zeitbudget, merke_fortsetzung
@@ -61,6 +61,14 @@ KURZFORM = {"HLDGS": "HOLDINGS", "HLDG": "HOLDING", "INTL": "INTERNATIONAL", "FI
 KEIN_STAMM = {"PFD", "PREF", "PREFERRED", "WT", "WTS", "WS", "W", "WARRANT", "WARRANTS", "UNIT", "UNITS", "UT", "RT",
               "RTS", "RIGHT", "RIGHTS", "NT", "NTS", "NOTE", "NOTES", "DEB", "DEBS", "BD", "BDS", "ETN", "ETF", "FDG",
               "TR", "TRUST", "FD", "FUND", "PERP", "CONV", "CV", "LKD", "IDX", "INDEX"}
+# eine Gattungsangabe, die so beginnt, kann eine Stammaktie (oder ihr Hinterlegungsschein) sein
+STAMM_BEGINN = {"COM", "COMMON", "ORD", "ORDINARY", "SHS", "SH", "SHARES", "CL", "CLASS", "CAP", "STK", "STOCK",
+                "SPONSORED", "SPON", "SPONS", "ADR", "ADS", "NEW", "DEL"}
+# Namensabgleich ohne Kürzel nur bei klarer Lage: kein Fondsname, und entweder eine eindeutige Gattungsangabe
+# oder ein Name, der mit einer Rechtsform endet (Fonds heißen oft wie ihre Verwaltungsfirma)
+FONDSWORT = {"TRUST", "FUND", "FUNDS", "FDS", "ETF", "ETFS", "PORTFOLIO", "PORTFOLIOS"}
+STARKER_BEGINN = STAMM_BEGINN - {"SHS", "SH", "SHARES"}
+FIRMENENDE = (RECHTSFORM - {"TRUST"}) | {"BANCORP", "BANCSHARES", "HOLDINGS", "HOLDING", "GROUP"}
 WORT = re.compile(r"[^A-Z0-9& ]+")
 
 registriere(Parameter(
@@ -184,6 +192,20 @@ def teile_bezeichnung(text: str | None) -> tuple[str, str]:
     return " ".join(KURZFORM.get(x, x) for x in w[:schnitt]), " ".join(w[schnitt:])
 
 
+def ist_stamm(gattung: str) -> bool:
+    """Leere Angabe oder Beginn wie bei einer Stammaktie, und kein Wort einer anderen Gattung."""
+    w = gattung.split()
+    return not w or (w[0] in STAMM_BEGINN and not (set(w) & KEIN_STAMM))
+
+
+def namensfaehig(name: str, gattung: str) -> bool:
+    """Darf ein Papier ohne passendes Kürzel allein über den Namen einer Firma zugeordnet werden?"""
+    w, g = name.split(), gattung.split()
+    if not w or set(w) & FONDSWORT:
+        return False
+    return (g[0] in STARKER_BEGINN) if g else (w[-1] in FIRMENENDE)
+
+
 def _kuerzel(text) -> str:
     return re.sub(r"[^A-Z0-9]", "", text.upper()) if isinstance(text, str) else ""
 
@@ -194,11 +216,14 @@ def ordne_zu(wertpapiere: pd.DataFrame, firmen: pd.DataFrame) -> pd.DataFrame:
     abgleich = Namensabgleich(firmen)
     nach_kuerzel: dict[str, set[int]] = {}
     anfang: dict[int, set[str]] = {}
+    voll: dict[int, set[str]] = {}
+    haupt: dict[int, str] = {}
     for z in firmen.itertuples(index=False):
         cik = int(z.cik)
         for t in (z.tickers.split(",") if isinstance(z.tickers, str) else ()):
             if _kuerzel(t):
                 nach_kuerzel.setdefault(_kuerzel(t), set()).add(cik)
+                haupt.setdefault(cik, _kuerzel(t))          # das erste Kürzel ist die Hauptgattung
         namen = [z.name]
         if isinstance(z.fruehere_namen, str) and z.fruehere_namen not in ("", "[]"):
             try:
@@ -206,12 +231,13 @@ def ordne_zu(wertpapiere: pd.DataFrame, firmen: pd.DataFrame) -> pd.DataFrame:
             except ValueError:
                 pass
         anfang[cik] = {bereinige(n).split()[0] for n in namen if bereinige(n)}
+        voll[cik] = {bereinige(n) for n in namen if bereinige(n)} | {kern(bereinige(n)) for n in namen if kern(bereinige(n))}
     grenze = wertpapiere["letzter_tag"].max() - pd.Timedelta(days=AKTIV_TAGE) if len(wertpapiere) else None
     namens_treffer: dict[str, tuple] = {}
     zeilen = []
     for z in wertpapiere.itertuples(index=False):
         name, gattung = teile_bezeichnung(z.beschreibung)
-        stamm = not (set(gattung.split()) & KEIN_STAMM)
+        stamm = ist_stamm(gattung)
         cik, konfidenz, art = None, 0.0, "keiner"
         kandidaten = nach_kuerzel.get(_kuerzel(z.symbol), ())
         if len(kandidaten) == 1:
@@ -221,7 +247,12 @@ def ordne_zu(wertpapiere: pd.DataFrame, firmen: pd.DataFrame) -> pd.DataFrame:
                 cik, konfidenz, art = c, 0.98, "kuerzel_name"
             elif z.letzter_tag >= grenze:
                 cik, konfidenz, art = c, 0.93, "kuerzel"
-        if cik is None and name and stamm:
+            # Emittenten führen auch Zertifikate und Vorzüge unter eigenem Kürzel: Stammaktie ist nur die
+            # Hauptgattung oder ein Papier, dessen Bezeichnung genau den Firmennamen trägt (zweite Aktiengattung)
+            n = bereinige(name)
+            if cik is not None and not (_kuerzel(z.symbol) == haupt.get(c) or n in voll.get(c, ()) or kern(n) in voll.get(c, ())):
+                stamm = False
+        if cik is None and stamm and namensfaehig(name, gattung):
             if name not in namens_treffer:
                 namens_treffer[name] = abgleich.finde(name)
             cik, konfidenz, art = namens_treffer[name]

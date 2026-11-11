@@ -27,7 +27,9 @@ JAN_A = ["20240102|111111111|ALPH|15000|ALPHA CORP COM|10.50",
          "20240105|333333333|GAM|30000|OLDGAMMA CORP CL A|.",                # früherer Name
          "20240105|333333334|GAMB|12000|GAMMA INC CL B|.",                   # zweite Gattung -> Summe
          "20240108|444444444|DLT|99999|DELTA ETF TR SHS|.",                  # Fonds
-         "20240109|555555555|OMG|40000|OMEGA CORP COM|5.00"]
+         "20240109|555555555|OMG|40000|OMEGA CORP COM|5.00",
+         "20240109|555555556|OMGX|90000|OMEGA CORP QUE MICROSECTORS 3X|9.00",   # Zertifikat des Emittenten
+         "20240109|555555557|OMGP|80000|OMEGA CORP DEP SH REPSTG 1/40|9.00"]     # Vorzug als Hinterlegungsschein
 Q1_2008 = {"cnsp_sec_fails_200801.txt": ["20080115|666666666|OMG|25000|OTHER MINING GROUP COM|."],   # Kürzel später neu vergeben
            "cnsp_sec_fails_200802.txt": ["20080220|222222222|BETA|11000|BETA HLDGS INC COM|."]}
 JAN_B = ["20240116|111111111|ALPH|70000|ALPHA CORP COM|10.00"]
@@ -40,7 +42,7 @@ def lage(tmp_path):
         "cik": [10, 11, 12, 13, 14],
         "name": ["ALPHA CORP", "BETA HOLDINGS INC", "GAMMA INC", "DELTA ETF TRUST", "OMEGA CORP"],
         "sic": ["2834", "6021", "3570", "6726", "1000"],
-        "tickers": ["ALPH", None, "GAM", "DLT", "OMG"],
+        "tickers": ["ALPH", None, "GAM", "DLT", "OMG,OMGX,OMGP"],
         "fruehere_namen": ["[]", "[]", '[{"name": "OLDGAMMA CORP"}]', "[]", "[]"]}))
     ordner = tmp_path / "ftd"
     ordner.mkdir()
@@ -108,6 +110,9 @@ def test_lauf_zuordnung_und_parameter(lage):
     assert w.loc["333333334", "cik"] == 12 and w.loc["333333334", "art"] == "exakt"
     assert pd.isna(w.loc["111111112", "cik"]) and not w.loc["111111112", "stamm"]       # Optionsschein
     assert pd.isna(w.loc["444444444", "cik"])                                           # Fonds
+    assert w.loc["555555556", "cik"] == 14 and not w.loc["555555556", "stamm"]          # Zertifikat: Firma ja, Stamm nein
+    assert w.loc["555555557", "cik"] == 14 and not w.loc["555555557", "stamm"]
+    assert w.loc["555555555", "stamm"] and w.loc["333333334", "stamm"]
     assert pd.isna(w.loc["666666666", "cik"])                                           # altes Kürzel, anderer Name
     assert w.loc["222222222", "erster_tag"] == pd.Timestamp("2008-02-20")
     assert "preis" not in " ".join(ablage.lies_bereinigt("ftd_tage").columns).lower()
@@ -125,7 +130,7 @@ def test_fortschreibung_ohne_dubletten(lage):
     assert len(p) == 6 and not p.duplicated(["cik", "ereignis_zeit"]).any()
     assert p[p["stand"] == "202401b"]["wert"].tolist() == [70000.0]
     tage = ablage.lies_bereinigt("ftd_tage")
-    assert len(tage) == 11 and not tage.duplicated(["tag", "cusip"]).any()
+    assert len(tage) == 13 and not tage.duplicated(["tag", "cusip"]).any()
     assert sorted(ablage.lies_bereinigt("ftd_dateien")["datei"]) == ["2008q1", "202401a", "202401b"]
     assert info["dateien_gelesen"] == 3
 
@@ -159,6 +164,11 @@ def test_abruf_mit_aenderungszeitpunkt(lage):
     p, info, hinweise = f.lauf(ablage, tmp / "arb", abruf=abruf)
     # 02.02.2024 10:00 ET liegt in der Handelszeit: sofort nutzbar, früher als die feste Frist
     assert (p["verfuegbar_ab"] == pd.Timestamp("2024-02-02 15:00", tz="UTC")).all() and len(p) == 4
+    assert f.ist_stamm("") and f.ist_stamm("COM NPV") and f.ist_stamm("DEL CL B") and f.ist_stamm("ADS 1 REG SHS")
+    assert not f.ist_stamm("DEP SH REPSTG") and not f.ist_stamm("COM UNIT") and not f.ist_stamm("W") and not f.ist_stamm("ETF")
+    assert f.namensfaehig("PAYLINE SYSTEMS INC", "") and f.namensfaehig("GAMMA INC", "CL B")
+    assert not f.namensfaehig("WISDOMTREE TRUST", "") and not f.namensfaehig("STRATEGY", "SHS EVENTIDE LARGE CA")
+    assert not f.namensfaehig("STRATEGY SHARES", "")
     assert any("aus der Datei bei 1" in h for h in hinweise)
     # ein späterer Lauf ändert den einmal festgestellten Zeitpunkt nicht mehr
     abruf.seiten[adresse].headers["Last-Modified"] = "Mon, 04 Mar 2024 15:00:00 GMT"

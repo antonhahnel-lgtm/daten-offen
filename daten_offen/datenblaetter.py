@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from .kern.schema import REGISTRATUR
-from .quellen import (cfpb, edgar_ereignisse, edgar_insider, edgar_rollen, edgar_xbrl,  # noqa: F401
+from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_insider, edgar_rollen, edgar_xbrl,  # noqa: F401
                       fred, klinik, sec_ftd, wikipedia)  # die Module registrieren ihre Parameter
 
 

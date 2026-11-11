@@ -16,6 +16,10 @@
 | `bereinigt-web` | `bereinigt__wiki_wochen__alle.parquet`, `bereinigt__wiki_zuordnung__alle.parquet` | Wochenaufrufe je CIK und Zuordnung CIK → Artikel |
 | | `bereinigt__cfpb_zuordnung__alle.parquet` | Firmenname → CIK mit Konfidenz |
 | | `bereinigt__klinik_studien__alle.parquet`, `…_aenderungen__<jahr>`, `…_zulassungen__alle` | Studienstand, Änderungsprotokoll, Zulassungen |
+| `parameter-markt` | `parameter__sec_ftd__<jahr>.parquet` | Lieferausfälle (`IH3-06`) |
+| `bereinigt-markt` | `bereinigt__ftd_tage__<jahr>.parquet` | Lieferausfälle je CUSIP und Abwicklungstag (alle Wertpapiere, auch unter 10.000 Stück), Spalte `datei` |
+| | `bereinigt__ftd_wertpapiere__alle.parquet` | CUSIP → CIK mit Konfidenz, Art der Zuordnung und Kennzeichen `stamm`; jüngstes Kürzel und Bezeichnung |
+| | `bereinigt__ftd_dateien__alle.parquet` | Je Datei: Periodenende, Änderungszeitpunkt, Veröffentlichungszeitpunkt |
 | `pruefbericht` | `pruefbericht__<quelle>.md/.json`, `manifest__<quelle>.json` | Prüfergebnis und Dateiliste des letzten Laufs |
 
 ## Schema der Parameter-Tabellen

@@ -15,11 +15,11 @@ import pandas as pd
 
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
-from .quellen import (cfpb, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fred, klinik,
-                      sec_ftd, wikipedia)
+from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fred,
+                      klinik, sec_ftd, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd")
+           "wikipedia", "sec_ftd", "edgar_13f")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -85,6 +85,12 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
         if info["trefferquote"]["zeilen"] >= 100 and info["trefferquote"]["quote"] < 0.2:
             schwer.append("Zuordnung trifft weniger als 20 % der aktiven Stammaktien")
         return parameter, info, schwer, hinweise
+    if args.quelle == "edgar_13f":
+        parameter, info, hinweise = edgar_13f.lauf(ablage, arbeits, modus=args.modus, lokal=args.f13_ordner)
+        schwer = []
+        if info["trefferquote"]["zeilen"] >= 100 and info["trefferquote"].get("quote_gewichtet", 0) < 0.3:
+            schwer.append("CUSIP-Zuordnung trifft weniger als 30 % der Halterpositionen")
+        return parameter, info, schwer, hinweise
     if args.quelle == "fred":
         parameter, info, hinweise = fred.lauf(ablage)
         return parameter, info, [], hinweise
@@ -107,6 +113,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--companyfacts-zip", default=None, help="lokale Sammeldatei der Abschlüsse statt Abruf (Tests)")
     p.add_argument("--cfpb-zip", default=None, help="lokale Beschwerdedatei statt Abruf (Tests)")
     p.add_argument("--ftd-ordner", default=None, help="lokaler Ordner mit Lieferausfall-Archiven statt Abruf (Tests)")
+    p.add_argument("--f13-ordner", default=None, help="lokaler Ordner mit 13F-Datensätzen statt Abruf (Tests)")
     args = p.parse_args(argv)
 
     ablage = Ablage(Path(args.ausgabe))
