@@ -448,7 +448,7 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Lizenz | gemeinfrei (US-Behörde) |
 | Historie ab | 2013 |
 | Verzögerung | Eröffnung des ersten Handelstags nach Ablauf der Meldefrist |
-| Bekannte Schwächen | Vereinfachung von Anton, Cohen & Polk: Vergleich mit dem Gesamtbestand der 13F-Manager statt mit dem Marktgewicht, ohne Gewichtung mit der Kursschwankung. Nur Manager über 100 Mio. $ und nur gemeldete Long-Bestände; Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle zum Zeitpunkt der Berechnung (Trefferquote im Prüfbericht); der Datensatz der SEC erscheint erst Wochen nach der Frist, die Einzelmeldungen des laufenden Quartals fehlen bis dahin |
+| Bekannte Schwächen | Vereinfachung von Anton, Cohen & Polk: Vergleich mit dem Gesamtbestand der 13F-Manager statt mit dem Marktgewicht, ohne Gewichtung mit der Kursschwankung. Nur Manager über 100 Mio. $ und nur gemeldete Long-Bestände; Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle zum Zeitpunkt der Berechnung (Trefferquote im Prüfbericht); bis der Datensatz der SEC erscheint (Wochen nach der Frist), stammt das jüngste Quartal aus den Einzelmeldungen (Stand „… Einzelmeldungen“) und kann sich mit dem Datensatz geringfügig ändern |
 
 ## IH5-04 Eigentümerbreite (Änderung)
 
@@ -462,7 +462,7 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Lizenz | gemeinfrei (US-Behörde) |
 | Historie ab | 2013 |
 | Verzögerung | Eröffnung des ersten Handelstags nach Ablauf der Meldefrist |
-| Bekannte Schwächen | Nur Manager über 100 Mio. $ und nur gemeldete Long-Bestände; Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle zum Zeitpunkt der Berechnung (Trefferquote im Prüfbericht); der Datensatz der SEC erscheint erst Wochen nach der Frist, die Einzelmeldungen des laufenden Quartals fehlen bis dahin |
+| Bekannte Schwächen | Nur Manager über 100 Mio. $ und nur gemeldete Long-Bestände; Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle zum Zeitpunkt der Berechnung (Trefferquote im Prüfbericht); bis der Datensatz der SEC erscheint (Wochen nach der Frist), stammt das jüngste Quartal aus den Einzelmeldungen (Stand „… Einzelmeldungen“) und kann sich mit dem Datensatz geringfügig ändern |
 
 ## IH6-04 Neue Schulden
 

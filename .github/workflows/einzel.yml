@@ -18,6 +18,9 @@ on:
         description: "Bestand der Quelle nicht laden, sondern alles neu aufbauen"
         type: boolean
         default: false
+      pruefquartal:
+        description: "Nur edgar_13f: Gegenprobe der Einzelmeldungen gegen dieses Quartal des Datensatzes (z. B. 2026q2)"
+        default: ""
 
 permissions:
   contents: write
@@ -31,6 +34,7 @@ env:
   FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
   GH_TOKEN: ${{ github.token }}
   ZEITBUDGET_MIN: "300"
+  F13_PRUEFQUARTAL: ${{ inputs.pruefquartal }}
 
 jobs:
   lauf:
@@ -52,7 +56,10 @@ jobs:
             sec_ftd-false)
               gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_*.parquet" || true ;;
             edgar_13f-*)
-              gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet" ;;&
+              gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet"
+              jahr=$(date -u +%Y)      # Meldungsverzeichnis: laufendes Jahr und Vorjahr (Quartale ohne Datensatz der SEC)
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber \
+                -p "bereinigt__edgar_meldungen__${jahr}.parquet" -p "bereinigt__edgar_meldungen__$((jahr - 1)).parquet" ;;&
             edgar_13f-false)
               gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber -p "bereinigt__edgar_13f_*.parquet" || true ;;
           esac

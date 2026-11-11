@@ -7,6 +7,7 @@ Lauf endet mit Code 1; andere Quellen sind davon nicht betroffen.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import traceback
 from pathlib import Path
@@ -86,10 +87,17 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
             schwer.append("Zuordnung trifft weniger als 20 % der aktiven Stammaktien")
         return parameter, info, schwer, hinweise
     if args.quelle == "edgar_13f":
-        parameter, info, hinweise = edgar_13f.lauf(ablage, arbeits, modus=args.modus, lokal=args.f13_ordner)
+        parameter, info, hinweise = edgar_13f.lauf(ablage, arbeits, modus=args.modus, lokal=args.f13_ordner,
+                                                   pruefe_quartal=args.f13_pruefquartal or None)
         schwer = []
         if info["trefferquote"]["zeilen"] >= 100 and info["trefferquote"].get("quote_gewichtet", 0) < 0.3:
             schwer.append("CUSIP-Zuordnung trifft weniger als 30 % der Halterpositionen")
+        for name, e in info.get("einzelmeldungen", {}).items():
+            if not e["vollstaendig"]:
+                schwer.append(f"{name}: Frist abgelaufen, aber die Einzelmeldungen sind unvollständig ({e['status']})")
+        v = info.get("vergleich")
+        if v and (not v.get("vollstaendig") or v.get("halter_gleich", 0) < 0.95):
+            schwer.append(f"Gegenprobe {v['quartal']}: Einzelmeldungen und Datensatz stimmen nicht überein")
         return parameter, info, schwer, hinweise
     if args.quelle == "fred":
         parameter, info, hinweise = fred.lauf(ablage)
@@ -114,6 +122,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cfpb-zip", default=None, help="lokale Beschwerdedatei statt Abruf (Tests)")
     p.add_argument("--ftd-ordner", default=None, help="lokaler Ordner mit Lieferausfall-Archiven statt Abruf (Tests)")
     p.add_argument("--f13-ordner", default=None, help="lokaler Ordner mit 13F-Datensätzen statt Abruf (Tests)")
+    p.add_argument("--f13-pruefquartal", default=os.environ.get("F13_PRUEFQUARTAL", ""),
+                   help="Gegenprobe: dieses Quartal (z. B. 2026q2) zusätzlich aus den Einzelmeldungen lesen")
     args = p.parse_args(argv)
 
     ablage = Ablage(Path(args.ausgabe))
