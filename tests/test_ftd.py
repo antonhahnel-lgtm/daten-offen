@@ -120,7 +120,7 @@ def test_lauf_zuordnung_und_parameter(lage):
 def test_fortschreibung_ohne_dubletten(lage):
     ablage, ordner, tmp = lage
     f.lauf(ablage, tmp / "arb", lokal=ordner)
-    baue_zip(ordner / "cnsfails202401b.zip", {"cnsfails202401b.txt": JAN_B})
+    baue_zip(ordner / "cnsfails202401b.zip", {"cnsfails202401b": JAN_B})       # echte Archive teils ohne Endung
     p, info, _ = f.lauf(ablage, tmp / "arb", lokal=ordner)          # die jüngsten Dateien werden neu gelesen
     assert len(p) == 6 and not p.duplicated(["cik", "ereignis_zeit"]).any()
     assert p[p["stand"] == "202401b"]["wert"].tolist() == [70000.0]

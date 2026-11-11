@@ -120,9 +120,9 @@ def lies_archiv(zip_pfad: Path) -> tuple[pd.DataFrame, int]:
     """Zeilen eines Archivs (tag, cusip, symbol, stueck, beschreibung) und die Abweichung zur Satzzahl im Nachsatz."""
     teile, abweichung = [], 0
     with zipfile.ZipFile(zip_pfad) as archiv:
-        namen = [n for n in archiv.namelist() if n.lower().endswith(".txt")]
+        namen = [n for n in archiv.namelist() if not n.endswith("/")]      # teils ohne Endung .txt
         if not namen:
-            raise KeyError(f"keine Textdatei im Archiv {Path(zip_pfad).name} (enthalten: {archiv.namelist()})")
+            raise KeyError(f"Archiv {Path(zip_pfad).name} ist leer")
         for name in namen:
             with archiv.open(name) as f:
                 roh = pd.read_csv(f, sep="|", dtype=str, encoding="latin-1", quoting=csv.QUOTE_NONE,
