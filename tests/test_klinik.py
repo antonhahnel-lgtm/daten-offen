@@ -122,3 +122,27 @@ def test_verzeichnis_ohne_teile(lage):
 
     with pytest.raises(KeyError, match="partitions"):
         k.lade_zulassungen(Leer([]), tmp)
+
+
+def test_sponsorabgleich():
+    firmen = pd.DataFrame({
+        "cik": [200406, 59478, 30, 31, 32, 33, 34, 35],
+        "name": ["JOHNSON & JOHNSON", "ELI LILLY & Co", "ASTRAZENECA PLC", "NOVARTIS AG", "BAUSCH HEALTH COMPANIES INC",
+                 "BAUSCH & LOMB CORP", "ICON PLC", "Merck & Co., Inc."],
+        "sic": ["2834", "2834", "2834", "2834", "2834", "3851", "8731", "2834"],
+        "tickers": ["JNJ", "LLY", "AZN", "NVS", "BHC", "BLCO", "ICLR", "MRK"],
+        "fruehere_namen": ["[]"] * 8})
+    a = k.Sponsorabgleich(firmen)
+    assert a.finde("Johnson & Johnson") == (200406, 1.0, "exakt")
+    assert a.finde("JANSSEN PHARMS") == (200406, 0.95, "tochter")
+    assert a.finde("LILLY") == (59478, 0.95, "tochter")
+    assert a.finde("ASTRAZENECA AB") == (30, 0.90, "anfang")
+    assert a.finde("Novartis Pharmaceuticals") == (31, 0.90, "anfang")
+    assert a.finde("NOVARTIS PHARMS CORP") == (31, 0.90, "anfang")
+    assert a.finde("BAUSCH")[0] is None and a.finde("BAUSCH")[2] == "mehrdeutig"      # zwei Firmen beginnen so
+    assert a.finde("ICON Bioscience Inc")[0] is None                                  # ICON ist zu kurz für einen Anfang
+    assert a.finde("Merck KGaA, Darmstadt, Germany")[0] is None                       # anderes Unternehmen
+    assert a.finde("MERCK") == (35, 0.90, "anfang")
+    assert a.finde("Unbekannt Pharma")[0] is None
+    z = a.ordne_zu(pd.Series(["LILLY", None, "ASTRAZENECA AB"]))
+    assert z["cik"].tolist()[0] == 59478 and pd.isna(z["cik"].tolist()[1]) and z["art"].tolist()[2] == "anfang"

@@ -17,7 +17,7 @@ import pandas as pd
 
 from ..kern.ablage import Ablage
 from ..kern.http import Abruf
-from ..kern.namen import Namensabgleich, trefferquote
+from ..kern.namen import Namensabgleich, bereinige, kern, trefferquote
 from ..kern.schema import Parameter, als_parameter, leer, registriere
 from ..kern.zeit import ET, handelbar_ab_serie
 
@@ -37,6 +37,17 @@ FDA_VERZEICHNIS = "https://api.fda.gov/download.json"
 STUDIEN, AENDERUNGEN, ZULASSUNGEN = "klinik_studien", "klinik_aenderungen", "klinik_zulassungen"
 BEOBACHTET = ["status", "pcd", "pcd_typ", "ergebnisse"]
 MINDEST_KONFIDENZ = 0.90
+# Branchen, in denen Sponsoren und Antragsteller zu erwarten sind (Arznei, Diagnostik, Medizintechnik, Großhandel)
+PHARMA_SIC = {"2833", "2834", "2835", "2836", "2844", "3841", "3842", "3843", "3844", "3845", "3851", "5122", "8071",
+              "8731", "8734"}
+KURZFORM = {"PHARMS": "PHARMACEUTICALS", "PHARM": "PHARMACEUTICAL", "LABS": "LABORATORIES", "HLTHCARE": "HEALTHCARE",
+            "THERAPS": "THERAPEUTICS", "INDS": "INDUSTRIES", "INTL": "INTERNATIONAL", "PRODS": "PRODUCTS",
+            "MEDCL": "MEDICAL", "BIOPHARM": "BIOPHARMA", "ONCOL": "ONCOLOGY", "HLDGS": "HOLDINGS"}
+EINZAHL = {"PHARMACEUTICALS": "PHARMACEUTICAL", "PHARMA": "PHARMACEUTICAL", "LABORATORIES": "LABORATORY",
+           "THERAPEUTICS": "THERAPEUTIC", "BIOSCIENCES": "BIOSCIENCE", "SCIENCES": "SCIENCE", "TECHNOLOGIES": "TECHNOLOGY"}
+# Töchter, die durchgehend zum selben Konzern gehören: Namensanfang -> CIK der Mutter
+TOCHTER = {("JANSSEN",): 200406, ("LILLY",): 59478}
+NIE_ANFANG = {"KGAA"}      # Merck KGaA ist nicht Merck & Co.
 
 registriere(
     Parameter(id="GA1-04", name="Studienergebnis im Register veröffentlicht",
@@ -151,14 +162,76 @@ def _tagesende(tage: pd.Series) -> pd.Series:
         ET, ambiguous="NaT", nonexistent="shift_forward").dt.tz_convert("UTC")
 
 
+class Sponsorabgleich:
+    """Namensabgleich mit drei Zusätzen für Sponsoren und Antragsteller.
+
+      kurzform  Kürzungen der FDA ausgeschrieben (PHARMS, LABS, HLTHCARE), dann der gewöhnliche Abgleich
+      tochter   feste Liste von Töchtern, die durchgehend zum selben Konzern gehören
+      anfang    der Name ist der Anfang genau eines börsennotierten Firmennamens der Branche oder beginnt
+                mit genau einem solchen (ASTRAZENECA AB -> ASTRAZENECA PLC, NOVARTIS PHARMACEUTICALS -> NOVARTIS AG)
+    """
+
+    def __init__(self, firmen: pd.DataFrame):
+        self.basis = Namensabgleich(firmen)
+        self.vorhanden = set(firmen["cik"].astype("int64"))
+        self.nach_anfang: dict[str, list[tuple[tuple[str, ...], int]]] = {}
+        branche = firmen[firmen["sic"].astype(str).isin(PHARMA_SIC) & firmen["tickers"].notna()]
+        for z in branche.itertuples(index=False):
+            w = self._woerter(z.name)
+            erstes = bereinige(z.name).split()[:1]
+            # nur Namen, deren erstes Wort erhalten blieb (nicht: INTERNATIONAL STEM CELL -> STEM CELL)
+            if w and erstes and EINZAHL.get(KURZFORM.get(erstes[0], erstes[0]), erstes[0]) == w[0]:
+                self.nach_anfang.setdefault(w[0], []).append((w, int(z.cik)))
+
+    @staticmethod
+    def _woerter(name) -> tuple[str, ...]:
+        n = " ".join(KURZFORM.get(x, x) for x in bereinige(name).split())
+        return tuple(EINZAHL.get(x, x) for x in (kern(n) or n).split())
+
+    def finde(self, name) -> tuple[int | None, float, str]:
+        cik, konfidenz, art = self.basis.finde(name)
+        if cik is not None and konfidenz >= MINDEST_KONFIDENZ:
+            return cik, konfidenz, art
+        roh = bereinige(name).split()
+        if not roh:
+            return None, 0.0, "keiner"
+        lang = " ".join(KURZFORM.get(x, x) for x in roh)
+        if lang != " ".join(roh):
+            cik, konfidenz, _ = self.basis.finde(lang)
+            if cik is not None and konfidenz >= MINDEST_KONFIDENZ:
+                return cik, min(konfidenz, 0.95), "kurzform"
+        for anfang, mutter in TOCHTER.items():
+            if tuple(roh[:len(anfang)]) == anfang and mutter in self.vorhanden:
+                return mutter, 0.95, "tochter"
+        w = self._woerter(name)
+        if not w or set(roh) & NIE_ANFANG:
+            return None, 0.0, "keiner"
+        treffer = set()
+        for firma, cik in self.nach_anfang.get(w[0], ()):
+            n = min(len(w), len(firma))
+            kurz_genug = len(w[0]) >= 4 if len(w) <= len(firma) else len(" ".join(firma)) >= 5
+            if w[:n] == firma[:n] and kurz_genug:
+                treffer.add(cik)
+        if len(treffer) == 1:
+            return next(iter(treffer)), 0.90, "anfang"
+        return None, 0.0, "mehrdeutig" if len(treffer) > 1 else "keiner"
+
+    def ordne_zu(self, namen: pd.Series) -> pd.DataFrame:
+        eindeutige = {n: self.finde(n) for n in pd.unique(namen.dropna())}
+        aus = pd.DataFrame([eindeutige.get(n, (None, 0.0, "keiner")) for n in namen],
+                           columns=["cik", "konfidenz", "art"], index=namen.index)
+        aus["cik"] = aus["cik"].astype("Int64")
+        return aus
+
+
 def baue_parameter(studien: pd.DataFrame, zulassungen: pd.DataFrame, firmen: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
-    abgleich = Namensabgleich(firmen)
+    abgleich = Sponsorabgleich(firmen)
     teile, quoten = [], {}
 
-    def zuordnen(df: pd.DataFrame, name: str) -> pd.DataFrame:
+    def zuordnen(df: pd.DataFrame, name: str, maske: pd.Series | None = None) -> pd.DataFrame:
         z = abgleich.ordne_zu(df["sponsor"])
         z.loc[z["konfidenz"] < MINDEST_KONFIDENZ, "cik"] = pd.NA
-        quoten[name] = trefferquote(z)
+        quoten[name] = trefferquote(z if maske is None else z[maske])
         return df.assign(cik=z["cik"])
 
     if len(studien):
@@ -173,7 +246,8 @@ def baue_parameter(studien: pd.DataFrame, zulassungen: pd.DataFrame, firmen: pd.
     if len(zulassungen):
         z = zulassungen[zulassungen["typ"] == "ORIG"].sort_values("datum").drop_duplicates("antrag")
         if len(z):
-            z = zuordnen(z, "zulassungen")
+            # Trefferquote nur für neue Wirkstoffe und Biologika; Generika (ANDA) stammen meist von Firmen ohne CIK
+            z = zuordnen(z, "zulassungen", maske=~z["antrag"].astype(str).str.startswith("ANDA"))
             z = z[z["cik"].notna()]
             ereignis = _tagesende(z["datum"])
             teile.append(pd.DataFrame({"cik": z["cik"].astype("int64").to_numpy(), "parameter_id": "GA1-08",
