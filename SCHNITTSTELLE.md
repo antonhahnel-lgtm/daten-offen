@@ -12,7 +12,8 @@
 | | `bereinigt__insider_transaktionen__<jahr>q<q>.parquet` | Alle nicht-derivativen Insidergeschäfte je Quartal; Spalte `herkunft`: `datensatz` (amtlich) oder `xml` (laufende Ergänzung) |
 | | `bereinigt__edgar_abschluesse__<jahr>.parquet` | Eine Zeile je 10-K/10-Q mit den Abschlussposten (Wert, Vorjahreswert `_py`, abgedeckte Quartale `_q`), geteilt nach Einreichungsjahr |
 | | `bereinigt__edgar_rollen__<jahr>.parquet` | Betroffene Firma und Einreicher je 13D- und 144-Meldung |
-| | `bereinigt__edgar_13f_quartal__alle.parquet` | Je CUSIP und Berichtsquartal: `halter`, `stueck`, `manager`, `beste_idee`, `breite_aenderung`, `manager_beide` |
+| | `bereinigt__edgar_13f_firmen__alle.parquet` | Je Firma (CIK) und Berichtsquartal: `halter`, `beste_idee`, `breite_aenderung`, `manager`, `manager_beide` |
+| | `bereinigt__edgar_13f_quartal__alle.parquet` | Je CUSIP und Berichtsquartal: `halter`, `stueck` (alle Wertpapiere, auch Fonds) |
 | | `bereinigt__edgar_13f_bestaende__<jahr>q<q>.parquet` | Je Manager (`filer_cik`) und CUSIP: Stückzahl und Portfoliogewicht (fristgerechte Erstmeldungen) |
 | | `bereinigt__edgar_13f_dateien__alle.parquet` | Gelesene Datensätze mit Zahl der Meldungen |
 | `bereinigt-makro` | `bereinigt__fred_<reihe>__alle.parquet` | Rohreihen mit allen Ständen (`von`, `bis`) und Termine |

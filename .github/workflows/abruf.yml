@@ -94,7 +94,7 @@ jobs:
             edgar_13f)
               # die Bestände früherer Quartale bleiben im Release; das Modul holt das Vorquartal bei Bedarf selbst
               gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet" || true
-              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber                 -p "bereinigt__edgar_13f_dateien__*.parquet" -p "bereinigt__edgar_13f_quartal__*.parquet" || true ;;
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber                 -p "bereinigt__edgar_13f_dateien__*.parquet" -p "bereinigt__edgar_13f_quartal__*.parquet" -p "bereinigt__edgar_13f_firmen__*.parquet" || true ;;
           esac
           touch ausgabe/.vorher
       - name: Abruf

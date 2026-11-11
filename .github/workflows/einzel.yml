@@ -14,6 +14,10 @@ on:
         description: "Ergebnis in die Releases laden"
         type: boolean
         default: true
+      frisch:
+        description: "Bestand der Quelle nicht laden, sondern alles neu aufbauen"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -44,11 +48,12 @@ jobs:
           mkdir -p vorlauf ausgabe/bereinigt
           gh release download pruefbericht -D vorlauf -p "pruefbericht__*.json" --clobber || true
           gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber -p "bereinigt__edgar_firmen__*.parquet"
-          case "${{ inputs.quelle }}" in
-            sec_ftd)
+          case "${{ inputs.quelle }}-${{ inputs.frisch }}" in
+            sec_ftd-false)
               gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_*.parquet" || true ;;
-            edgar_13f)
-              gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet"
+            edgar_13f-*)
+              gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet" ;;&
+            edgar_13f-false)
               gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber -p "bereinigt__edgar_13f_*.parquet" || true ;;
           esac
           touch ausgabe/.vorher
