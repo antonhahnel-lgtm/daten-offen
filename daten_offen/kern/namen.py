@@ -33,8 +33,19 @@ def bereinige(name: str | None) -> str:
     woerter = ZEICHEN.sub(" ", t).split()
     if woerter and woerter[0] == "THE":
         woerter = woerter[1:]
-    while len(woerter) > 1 and woerter[-1] in RECHTSFORM:
-        woerter.pop()
+    if woerter and woerter[-1] == "THE":            # Register schreiben den Artikel teils ans Ende: "RED CROSS, THE"
+        woerter = woerter[:-1]
+    while len(woerter) > 1:
+        if woerter[-1] in RECHTSFORM:
+            woerter.pop()
+            continue
+        # Rechtsform in Einzelbuchstaben: "S.A." -> "S A", "L.L.C." -> "L L C"
+        for n in (3, 2):
+            if len(woerter) > n and all(len(w) == 1 for w in woerter[-n:]) and "".join(woerter[-n:]) in RECHTSFORM:
+                del woerter[-n:]
+                break
+        else:
+            break
     return " ".join(woerter)
 
 
@@ -83,8 +94,9 @@ class Namensabgleich:
         boerse = ciks & self.mit_ticker
         return next(iter(boerse)) if len(boerse) == 1 else None
 
-    def finde(self, name: str | None) -> tuple[int | None, float, str]:
-        """(cik, konfidenz, art) – art: exakt, frueher, kern, aehnlich, mehrdeutig, keiner."""
+    def finde(self, name: str | None, aehnlich: bool = True) -> tuple[int | None, float, str]:
+        """(cik, konfidenz, art) – art: exakt, frueher, kern, aehnlich, mehrdeutig, keiner.
+        ``aehnlich=False`` lässt die langsame Ähnlichkeitssuche weg (ihre Konfidenz liegt unter 0,90)."""
         n = bereinige(name)
         if not n:
             return None, 0.0, "keiner"
@@ -96,6 +108,8 @@ class Namensabgleich:
         if k and k in self.kerne:
             cik = self._eindeutig(self.kerne[k])
             return (cik, 0.90, "kern") if cik is not None else (None, 0.0, "mehrdeutig")
+        if not aehnlich:
+            return None, 0.0, "keiner"
         beste, zweite, beste_cik = 0.0, 0.0, None
         for kandidat, cik in self.nach_anfang.get(n.split()[0], ()):
             if abs(len(kandidat) - len(n)) > 0.2 * max(len(n), 1) + 2:
@@ -111,9 +125,9 @@ class Namensabgleich:
             return beste_cik, round(0.89 * beste, 3), "aehnlich"
         return None, 0.0, "keiner"
 
-    def ordne_zu(self, namen: pd.Series) -> pd.DataFrame:
+    def ordne_zu(self, namen: pd.Series, aehnlich: bool = True) -> pd.DataFrame:
         """Zuordnung für eine Namensspalte (gleicher Index); jeder verschiedene Name wird einmal gesucht."""
-        eindeutige = {n: self.finde(n) for n in pd.unique(namen.dropna())}
+        eindeutige = {n: self.finde(n, aehnlich) for n in pd.unique(namen.dropna())}
         leer = (None, 0.0, "keiner")
         treffer = [eindeutige.get(n, leer) for n in namen]
         aus = pd.DataFrame(treffer, columns=["cik", "konfidenz", "art"], index=namen.index)

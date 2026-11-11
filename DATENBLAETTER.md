@@ -492,6 +492,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | Form 25 betrifft teils einzelne Wertpapierklassen; SC TO-T und SC 13E3 fehlen, weil sie unter Bieter und Zielfirma stehen und die Rollen noch nicht gelesen werden |
 
+## PR2-01 Vergabevolumen je Firma
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Summe der im Monat bekannt gewordenen Verpflichtungen des Bundes aus Verträgen mit der Firma und ihren Töchtern (federal_action_obligation aller Vertragstransaktionen, Rücknahmen negativ). Monate ohne Zeile zählen null; das Verhältnis zum Umsatz (Katalog: 12 Monate / Umsatz) bildet der Nutzer |
+| Einheit | US-Dollar |
+| Frequenz | monatlich |
+| Offenlegung | gesetzlich: FFATA 2006 und DATA Act 2014; Vertragsmeldung an FPDS binnen 3 Werktagen (FAR 4.604) |
+| Quelle | https://www.usaspending.gov/download_center/award_data_archive |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 10/2007 |
+| Verzögerung | 15 Tage nach Monatsende; Verteidigungsaufträge zählen erst 90 Tage nach dem Auftragsdatum |
+| Bekannte Schwächen | Zuordnung über Firmennamen und die gemeldete Konzernfamilie (Trefferquote im Prüfbericht); Töchter mit eigenem Namen außerhalb der gemeldeten Familie fehlen; die Quelle zeigt den heutigen Stand jeder Transaktion (spätere Korrekturen fließen in alte Monate ein); nur Hauptauftragnehmer, keine Unteraufträge; Rahmenverträge zählen erst mit den Abrufen; als Signal ungeprüft |
+
 ## PR2-03 Effektiver Steuersatz
 
 | Angabe | Inhalt |

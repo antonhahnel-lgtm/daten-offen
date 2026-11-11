@@ -17,10 +17,10 @@ import pandas as pd
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
 from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fred,
-                      klinik, sec_ftd, wikipedia)
+                      klinik, sec_ftd, usaspending, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd", "edgar_13f")
+           "wikipedia", "sec_ftd", "edgar_13f", "usaspending")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -99,6 +99,14 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
         if v and (not v.get("vollstaendig") or v.get("halter_gleich", 0) < 0.95):
             schwer.append(f"Gegenprobe {v['quartal']}: Einzelmeldungen und Datensatz stimmen nicht überein")
         return parameter, info, schwer, hinweise
+    if args.quelle == "usaspending":
+        parameter, info, hinweise = usaspending.lauf(ablage, arbeits, modus=args.modus, lokal=args.usaspending_ordner)
+        schwer = []
+        if info["trefferquote"]["zeilen"] >= 100 and info["trefferquote"].get("quote_gewichtet", 0) < 0.2:
+            schwer.append("Namensabgleich ordnet weniger als 20 % des Auftragsvolumens zu")
+        if info["zeilen_quelle"] and info["ohne_datum"] > 0.02 * info["zeilen_quelle"]:
+            schwer.append(f"{info['ohne_datum']} Transaktionen ohne lesbares Auftragsdatum (über 2 %)")
+        return parameter, info, schwer, hinweise
     if args.quelle == "fred":
         parameter, info, hinweise = fred.lauf(ablage)
         return parameter, info, [], hinweise
@@ -122,6 +130,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cfpb-zip", default=None, help="lokale Beschwerdedatei statt Abruf (Tests)")
     p.add_argument("--ftd-ordner", default=None, help="lokaler Ordner mit Lieferausfall-Archiven statt Abruf (Tests)")
     p.add_argument("--f13-ordner", default=None, help="lokaler Ordner mit 13F-Datensätzen statt Abruf (Tests)")
+    p.add_argument("--usaspending-ordner", default=None, help="lokaler Ordner mit Auftragsdateien statt Abruf (Tests)")
     p.add_argument("--f13-pruefquartal", default=os.environ.get("F13_PRUEFQUARTAL", ""),
                    help="Gegenprobe: dieses Quartal (z. B. 2026q2) zusätzlich aus den Einzelmeldungen lesen")
     args = p.parse_args(argv)

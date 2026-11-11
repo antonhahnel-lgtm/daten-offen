@@ -77,6 +77,25 @@ class Abruf:
     def hole_json(self, url: str, **kw):
         return self.hole(url, **kw).json()
 
+    def sende_json(self, url: str, daten: dict):
+        """POST mit JSON-Inhalt (Abfrageschnittstellen); Anfragegrenze und Wiederholung wie bei ``hole``."""
+        letzter_fehler: Exception | None = None
+        for versuch in range(self.versuche):
+            self._warte()
+            self.anfragen += 1
+            try:
+                antwort = self.sitzung.post(url, json=daten, timeout=self.timeout)
+            except requests.RequestException as fehler:
+                letzter_fehler = fehler
+            else:
+                if antwort.status_code == 200:
+                    return antwort.json()
+                letzter_fehler = RuntimeError(f"HTTP {antwort.status_code} für {url}")
+                if antwort.status_code not in WIEDERHOLBARE_STATUS:
+                    break
+            time.sleep(min(2 ** versuch * 2, 120))
+        raise QuelleNichtErreichbar(f"{url}: {letzter_fehler}")
+
     def hole_anfang(self, url: str, anzahl: int = 12000, erlaube_404: bool = False) -> bytes | None:
         """Liest nur die ersten ``anzahl`` Bytes (für Meldungsköpfe großer Dateien)."""
         antwort = self.hole(url, stream=True, erlaube_404=erlaube_404, headers={"Range": f"bytes=0-{anzahl - 1}"})
