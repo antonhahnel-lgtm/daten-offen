@@ -394,6 +394,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit der Meldung (aus edgar_index) |
 | Bekannte Schwächen | – |
 
+## IH3-06 Lieferausfälle (Reg SHO)
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Bestand nicht gelieferter Stücke der Firma am Abwicklungstag (Fails-to-Deliver im Clearing der NSCC). summiert über ihre Stammaktiengattungen mit jeweils mindestens 10.000 Stück |
+| Einheit | Stück |
+| Frequenz | je Abwicklungstag mit Bestand ab Schwelle; Veröffentlichung je Monatshälfte |
+| Offenlegung | amtlich offen: SEC Fails-to-Deliver Data (Regulation SHO) |
+| Quelle | https://www.sec.gov/data-research/sec-markets-data/fails-deliver-data |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 03/2004 |
+| Verzögerung | Veröffentlichungstag der Datei, üblich 14–19 Tage nach Ende der Monatshälfte; ist er unbekannt, 30 Tage (Quartalsdateien bis 2009: 60 Tage) nach Periodenende |
+| Bekannte Schwächen | Die Threshold-Liste verlangt zusätzlich 0,5 % der ausstehenden Aktien an fünf Abwicklungstagen in Folge; das Verhältnis (mit UA3-01) und die Dauer entstehen privat. Zuordnung über Kürzel, CUSIP und Bezeichnung (Trefferquote im Prüfbericht); die heutige Zuordnung gilt rückwirkend. Der Bestand ist kumuliert, kein Tageszugang. Als Signal ungeprüft |
+
 ## IH5-01 13D-Einstieg
 
 | Angabe | Inhalt |
