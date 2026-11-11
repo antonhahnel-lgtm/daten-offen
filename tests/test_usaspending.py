@@ -105,6 +105,8 @@ def test_zuordnung():
         # Namensanfang von Hand, gleichnamige Firmen von Hand, ohne Treffer
         ("F5", "HUMANA GOVERNMENT BUSINESS INC", "HUMANA GOVERNMENT BUSINESS INC", "2026-01-01", 9),
         ("F6", "RAYTHEON COMPANY", "RAYTHEON COMPANY", "2015-01-01", 8),
+        ("F9", "ELECTRIC BOAT CORPORATION", "ELECTRIC BOAT CORPORATION", "2015-01-01", 6),      # Tochter als eigene Familie
+        ("F10", "OPTUM LABS TOPAZ INC", "OPTUM PUBLIC SECTOR SOLUTIONS INC", "2015-01-01", 5),
         ("F7", "KLEIN LLC", "KLEIN LLC", "2026-01-01", 7),
         # Stützung nur in einem von zehn Monaten und mit wenig Volumen: zu wenig für die ganze Familie
         ("F8", "THETA CORP", "THETA SERVICES LLC", "2025-01-01", 1),
@@ -117,6 +119,8 @@ def test_zuordnung():
     assert pd.isna(z.loc[("F4", "OMEGA SERVE INC"), "cik"]) and z.loc[("F4", "OMEGA SERVE INC"), "art"] == "ungestuetzt"
     assert z.loc[("F5", "HUMANA GOVERNMENT BUSINESS INC"), ["cik", "konfidenz", "art"]].tolist() == [49071, 0.9, "marke"]
     assert z.loc[("F6", "RAYTHEON COMPANY"), ["cik", "art"]].tolist() == [1047122, "exakt"]
+    assert z.loc[("F9", "ELECTRIC BOAT CORPORATION"), ["cik", "art"]].tolist() == [40533, "tochter"]
+    assert z.loc[("F10", "OPTUM PUBLIC SECTOR SOLUTIONS INC"), ["cik", "art"]].tolist() == [731766, "marke"]
     assert pd.isna(z.loc[("F7", "KLEIN LLC"), "cik"]) and z.loc[("F7", "KLEIN LLC"), "art"] == "keiner"
     assert pd.isna(z.loc[("F8", "KAPPA LLC"), "cik"]) and z.loc[("F8", "KAPPA LLC"), "art"] == "ungestuetzt"
     assert pd.isna(z.loc[("F8", "THETA SERVICES LLC"), "cik"])

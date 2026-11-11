@@ -52,10 +52,17 @@ SPALTEN = ["federal_action_obligation", "action_date", "awarding_agency_code", "
 SCHLUESSEL = ["familie", "mutter", "roh"]
 # Töchter, die den Namen einer börsennotierten Mutter tragen, deren Familie in der Quelle aber nicht zu ihr führt.
 # Bewusst kurz und von Hand geprüft: Ein freier Abgleich über den Namensanfang ordnete im Versuch zu viel falsch zu.
-MARKEN = {("HUMANA",): 49071, ("TEXTRON",): 217346, ("STONEX",): 913760, ("CGI", "FEDERAL"): 1061574}
-# Bereinigte Namen, die bei EDGAR zwei Firmen ohne Börsenkürzel tragen: von Hand entschieden.
-# RAYTHEON CO/ (1047122) war bis 04/2020 die börsennotierte Raytheon, RAYTHEON CO (82267) ihr Vorgänger bis 1997.
-GLEICHNAMIG = {"RAYTHEON": 1047122}
+MARKEN = {("HUMANA",): 49071, ("TEXTRON",): 217346, ("STONEX",): 913760, ("CGI", "FEDERAL"): 1061574,
+          ("OPTUM",): 731766}
+# Töchter, die als eigene Familie auftreten (teils selbst bei der SEC gemeldet, ohne Börsenkürzel): bereinigter
+# Name -> börsennotierte Mutter. Nur Töchter, die im ganzen Zeitraum ab 2008 zur selben Mutter gehörten.
+TOCHTER = {"ELECTRIC BOAT": 40533, "GENERAL DYNAMICS LAND SYSTEMS": 40533,
+           "GENERAL DYNAMICS ORDNANCE AND TACTICAL SYSTEMS": 40533, "NORTHROP GRUMMAN SYSTEMS": 1133421,
+           "MODERNATX": 1682852}
+# Bereinigte Namen, die bei EDGAR mehrere Firmen ohne Börsenkürzel tragen: von Hand entschieden für die Firma, die
+# ab 2008 unter dem Namen an der Börse war (RAYTHEON CO/ bis 04/2020; RAYTHEON CO, 82267, endete 1997).
+GLEICHNAMIG = {"RAYTHEON": 1047122, "GREAT LAKES DREDGE AND DOCK": 1372020, "PARATEK PHARMACEUTICALS": 1178711,
+               "NUANCE COMMUNICATIONS": 1002517}
 LEERRAUM = re.compile(r"\s+")
 
 registriere(Parameter(
@@ -198,9 +205,12 @@ def finde_namen(gruppen: pd.DataFrame, firmen: pd.DataFrame) -> tuple[pd.DataFra
     abgleich = Namensabgleich(firmen)
     namen = pd.unique(pd.concat([g["mutter"], g["roh"]], ignore_index=True))
     treffer = {n: abgleich.finde(n, aehnlich=False) for n in namen}
-    for n in namen:                                            # gleichnamige Firmen ohne Börsenkürzel, von Hand entschieden
-        if treffer[n][2] == "mehrdeutig" and bereinige(n) in GLEICHNAMIG:
-            treffer[n] = (GLEICHNAMIG[bereinige(n)], 0.95, "exakt")
+    for n in namen:                                            # von Hand entschiedene Namen
+        b = bereinige(n)
+        if b in TOCHTER:
+            treffer[n] = (TOCHTER[b], 0.95, "tochter")
+        elif treffer[n][2] == "mehrdeutig" and b in GLEICHNAMIG:
+            treffer[n] = (GLEICHNAMIG[b], 0.95, "exakt")
     wort = {n: _anfang(n, 1) for n in namen}
     for spalte, kurz in (("mutter", "m"), ("roh", "r")):
         t = pd.DataFrame([treffer[n] for n in g[spalte]], columns=[f"cik_{kurz}", f"k_{kurz}", f"art_{kurz}"], index=g.index)
