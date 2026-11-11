@@ -139,6 +139,7 @@ lange und saubere Daten vor Vollständigkeit.
 | Patente (USPTO) | GA1-01 | Sammeldateien im Gigabyte-Bereich; Anmelder → CIK |
 | Textänderung 10-K/10-Q, Ton der Meldungen | UA5-01, UA5-03, WS2-01, WS2-02 | Abruf aller Berichtstexte (Größenordnung 1 Terabyte); erst nach den ersten echten Läufen |
 | Fondsflüsse (N-PORT) | KD3-01 | 13F ist gebaut (Nr. 75–78); N-PORT braucht die Monatsbestände der Fonds und ihre Mittelflüsse |
+| Nachfolge von CIK | IH5-04, IH3-06 u. a. | Gründet eine Firma eine neue Holding, bekommt sie eine neue CIK (Exxon Mobil 2026, Alphabet 2015); die Reihen der alten und der neuen CIK sind noch nicht verbunden |
 | 13F des laufenden Quartals | IH5-03, IH5-04 | Der Datensatz der SEC erscheint erst Wochen nach der Frist; für den Tagesbetrieb müssten die Einzelmeldungen (XML) gelesen werden, wie bei den Insidern (Nr. 45) |
 | Geldpolitik-Exposition | GW1-03 | Braucht zusätzlich Cashflow-Duration und Volatilität; folgt (Finanzrestriktion GW1-04 ist gebaut) |
 | Vergütung, Planadoption (Item 408) | UA6-03, IH1-13 | Im Insider-Monitor bereits vorhanden (`gehalt.py`, `plan_408`) |

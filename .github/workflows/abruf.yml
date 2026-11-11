@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        quelle: [edgar_insider, edgar_ereignisse, edgar_xbrl, edgar_rollen, sec_ftd, cfpb, klinik]   # edgar_13f folgt nach dem ersten vollen Lauf im Workflow einzel
+        quelle: [edgar_insider, edgar_ereignisse, edgar_xbrl, edgar_rollen, edgar_13f, sec_ftd, cfpb, klinik]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6

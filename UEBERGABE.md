@@ -1,6 +1,6 @@
 # Übergabe
 
-Stand 11.11.2026, Lieferung 7. Fortschritt 82 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
+Stand 11.11.2026, Lieferung 7. Fortschritt 84 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
 und dem Auftragstext, um in einem neuen Chat weiterzuarbeiten.
 
 ## Ziel
@@ -23,7 +23,7 @@ Insider-Monitor.
 | `cfpb` | GA3-01 | ja | ja |
 | `klinik` | GA1-04, GA1-08 | ja | ja |
 | `sec_ftd` | IH3-06 | ja | ja (Workflow `einzel`, 11.11.2026) |
-| `edgar_13f` | IH5-03, IH5-04 | ja | erster voller Lauf am 11.11.2026 gestartet (Workflow `einzel`) |
+| `edgar_13f` | IH5-03, IH5-04 | ja | ja (Workflow `einzel`, 11.11.2026) |
 
 56 Parameter, 116 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
 (`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
@@ -76,9 +76,13 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
   am Morgen des 11.11. waren 30.359 von 261.497 gelesen. Die Kette erlaubt zwölf Fortsetzungen.
 - `sec_ftd` im echten Lauf grün: 437 Dateien, 28,2 Mio. Zeilen, 4,1 Mio. Werte für 17.664 Firmen ab 2004;
   erster Lauf 4 Minuten, Folgeläufe 1,5 Minuten. Seit dem 11.11. im Workflow `abruf`.
-- `edgar_13f`: Module und Tests fertig, erster voller Lauf (54 Datensätze, 2,9 GB) über den Workflow `einzel`
-  gestartet. Nach grünem Prüfbericht `edgar_13f` in die Matrix `folge` von `abruf.yml` aufnehmen (die Zeilen zum
-  Herunterladen stehen schon dort).
+- `edgar_13f` im echten Lauf grün: 54 Datensätze (2,9 GB) in 8 Minuten, 53 Quartale ab 2013 Q2, 8.580 Manager
+  im jüngsten Quartal; IH5-04 303.351 Werte für 11.664 Firmen, IH5-03 54.326 Werte. Seit dem 11.11. im Workflow
+  `abruf`; dort ist es ohne neuen Datensatz ein Lauf von Sekunden. Der erste Lauf deckte zwei Fehler auf, beide
+  behoben (Frist an Feiertagen, CUSIP-Wechsel; `ENTSCHEIDUNGEN.md` Nr. 75, 77).
+  Bekannte Grenze: Wechselt eine Firma die CIK (neue Holding, z. B. Exxon Mobil 2026), sieht das bei der alten CIK
+  wie ein Rückgang der Halter aus; eine Nachfolgetabelle für CIK gibt es noch nicht.
+  Neuaufbau mit heutiger Zuordnung: `gh workflow run einzel.yml -f quelle=edgar_13f -f frisch=true`.
 - `klinik`: bessere Zuordnung der Sponsoren ist gepusht, wirkt ab dem nächsten Lauf von `abruf`
   (erwartet: Studien rund 65 %, Zulassungen ohne Generika rund 44 %).
 - `GW2-06` im echten Lauf bestätigt (340 Werte, letzter Stand 14.10.2026).
