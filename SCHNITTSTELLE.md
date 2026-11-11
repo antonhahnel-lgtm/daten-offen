@@ -12,10 +12,10 @@
 | | `bereinigt__insider_transaktionen__<jahr>q<q>.parquet` | Alle nicht-derivativen Insidergeschäfte je Quartal; Spalte `herkunft`: `datensatz` (amtlich) oder `xml` (laufende Ergänzung) |
 | | `bereinigt__edgar_abschluesse__<jahr>.parquet` | Eine Zeile je 10-K/10-Q mit den Abschlussposten (Wert, Vorjahreswert `_py`, abgedeckte Quartale `_q`), geteilt nach Einreichungsjahr |
 | | `bereinigt__edgar_rollen__<jahr>.parquet` | Betroffene Firma und Einreicher je 13D- und 144-Meldung |
-| | `bereinigt__edgar_13f_firmen__alle.parquet` | Je Firma (CIK) und Berichtsquartal: `halter`, `beste_idee`, `breite_aenderung`, `manager`, `manager_beide` |
+| | `bereinigt__edgar_13f_firmen__alle.parquet` | Je Firma (CIK) und Berichtsquartal: `halter`, `beste_idee`, `breite_aenderung`, `manager`, `manager_beide`; `herkunft`: `datensatz` (amtlich) oder `einzelmeldungen` (jüngstes Quartal, bis der Datensatz der SEC erscheint) |
 | | `bereinigt__edgar_13f_quartal__alle.parquet` | Je CUSIP und Berichtsquartal: `halter`, `stueck` (alle Wertpapiere, auch Fonds) |
 | | `bereinigt__edgar_13f_bestaende__<jahr>q<q>.parquet` | Je Manager (`filer_cik`) und CUSIP: Stückzahl und Portfoliogewicht (fristgerechte Erstmeldungen) |
-| | `bereinigt__edgar_13f_dateien__alle.parquet` | Gelesene Datensätze mit Zahl der Meldungen |
+| | `bereinigt__edgar_13f_dateien__alle.parquet` | Gelesene Datensätze mit Zahl der Meldungen; Zeile `einzel-<jahr>q<q>` für ein Quartal aus Einzelmeldungen |
 | `bereinigt-makro` | `bereinigt__fred_<reihe>__alle.parquet` | Rohreihen mit allen Ständen (`von`, `bis`) und Termine |
 | `bereinigt-web` | `bereinigt__wiki_wochen__alle.parquet`, `bereinigt__wiki_zuordnung__alle.parquet` | Wochenaufrufe je CIK und Zuordnung CIK → Artikel |
 | | `bereinigt__cfpb_zuordnung__alle.parquet` | Firmenname → CIK mit Konfidenz |
@@ -35,7 +35,7 @@
 | `ereignis_zeit` | Zeitstempel UTC | Zeitpunkt, auf den sich der Wert bezieht |
 | `verfuegbar_ab` | Zeitstempel UTC | frühester Zeitpunkt, zu dem ein Anleger den Wert nutzen konnte |
 | `wert` | float64 | Wert; Bedeutung und Einheit stehen in `DATENBLAETTER.md` |
-| `stand` | Text | Herkunft des Werts (Aktenzeichen der Meldung oder Zeitraum) |
+| `stand` | Text | Herkunft des Werts (Aktenzeichen der Meldung oder Zeitraum); bei 13F mit Zusatz „Einzelmeldungen“, solange der Datensatz der SEC fehlt |
 
 Regel für `verfuegbar_ab`: Annahmezeit der Meldung, wenn sie an einem Handelstag vor
 Börsenschluss liegt (16:00 ET, an verkürzten Tagen 13:00 ET); sonst 09:30 ET des nächsten

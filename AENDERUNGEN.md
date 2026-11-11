@@ -1,5 +1,17 @@
 # Änderungen
 
+## Lieferung 8 – 2026-11-11 (13F des laufenden Quartals)
+
+- `edgar_13f`: Ein Quartal ohne Datensatz der SEC entsteht aus den einzelnen 13F-HR-Meldungen, sobald das
+  Meldungsverzeichnis über die Frist hinausreicht; der Datensatz ersetzt es später (`ENTSCHEIDUNGEN.md` Nr. 81–86).
+- Gegenprobe im echten Lauf für 2026 Q2: 8.695 Meldungen, Zahl der Halter bei allen 23.229 Wertpapieren wie im
+  Datensatz der SEC.
+- Abruf: Anfragegrenze gilt auch für gleichzeitige Abrufe; die Einzelmeldungen werden zu viert gelesen (20 statt 55 Minuten je Quartal).
+- `edgar_13f_firmen` mit Spalte `herkunft`; Parameter-`stand` mit Zusatz „Einzelmeldungen“ für vorläufige Werte.
+- Workflow `einzel`: Eingabe `pruefquartal` (Gegenprobe der Einzelmeldungen gegen ein Quartal des Datensatzes),
+  lädt das Meldungsverzeichnis des laufenden und des vorigen Jahres.
+- 122 Offline-Tests.
+
 ## Lieferung 7 – 2026-11-11 (Lieferausfälle, Fondsbestände, Sponsoren)
 
 - Neue Quelle `sec_ftd`: Lieferausfälle der SEC ab 2004 → IH3-06; Tabelle `ftd_wertpapiere` (CUSIP → CIK).
