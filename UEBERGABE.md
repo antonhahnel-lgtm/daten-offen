@@ -72,8 +72,9 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
 
 ## Stand 11.11.2026 (Lieferung 7)
 
-- Rückwärtslauf (Rollen der 13D- und 144-Meldungen): läuft als Kette, je Lauf rund 27.000 Meldungen und 5 Stunden;
-  am Morgen des 11.11. waren 30.359 von 261.497 gelesen. Die Kette erlaubt zwölf Fortsetzungen.
+- Rückwärtslauf (Rollen der 13D- und 144-Meldungen): läuft als Kette, je Lauf 27.000 bis 53.000 Meldungen und
+  5 Stunden; am 11.11. um 17 Uhr UTC waren 133.072 von 261.726 gelesen (vierter Lauf der Kette läuft). Die Kette
+  erlaubt zwölf Fortsetzungen; solange sie läuft, ersetzt sie die geplanten Tagesläufe.
 - `sec_ftd` im echten Lauf grün: 437 Dateien, 28,2 Mio. Zeilen, 4,1 Mio. Werte für 17.664 Firmen ab 2004;
   erster Lauf 4 Minuten, Folgeläufe 1,5 Minuten. Seit dem 11.11. im Workflow `abruf`.
 - `edgar_13f` im echten Lauf grün: 54 Datensätze (2,9 GB) in 8 Minuten, 53 Quartale ab 2013 Q2, 8.580 Manager
@@ -83,8 +84,11 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
   Bekannte Grenze: Wechselt eine Firma die CIK (neue Holding, z. B. Exxon Mobil 2026), sieht das bei der alten CIK
   wie ein Rückgang der Halter aus; eine Nachfolgetabelle für CIK gibt es noch nicht.
   Neuaufbau mit heutiger Zuordnung: `gh workflow run einzel.yml -f quelle=edgar_13f -f frisch=true`.
-- `klinik`: bessere Zuordnung der Sponsoren ist gepusht, wirkt ab dem nächsten Lauf von `abruf`
-  (erwartet: Studien rund 65 %, Zulassungen ohne Generika rund 44 %).
+- `klinik`: bessere Zuordnung der Sponsoren im echten Lauf bestätigt (Studien 65,3 %, Zulassungen ohne
+  Generika 44,3 %).
+- Alle elf Quellen im Lauf vom 11.11. (07:45 UTC) ohne schweren Befund; die Warnung zu Node 20 ist weg.
+- Nächster Schritt: 13F des laufenden Quartals aus den Einzelmeldungen. Die Frist für das dritte Quartal 2026
+  endet am 16.11.2026, der Datensatz der SEC dazu erscheint erst Anfang Dezember.
 - `GW2-06` im echten Lauf bestätigt (340 Werte, letzter Stand 14.10.2026).
 - Actions laufen auf Node 24 (checkout v5, setup-python v6, upload-artifact v6, download-artifact v7).
 - Neue Module zuerst über `gh workflow run einzel.yml -f quelle=<name>` erproben; der Workflow berührt die
