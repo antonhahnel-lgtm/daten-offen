@@ -6,7 +6,9 @@ import pandas as pd
 import pytest
 
 from daten_offen.kern.ablage import Ablage
+from daten_offen.kern.http import QuelleNichtErreichbar
 from daten_offen.kern.zeit import ET
+from daten_offen.kern.zustand import Zeitbudget
 from daten_offen.quellen import edgar_13f as f
 from tests.hilfen import tsv
 
@@ -274,7 +276,7 @@ def test_einzelmeldungen(lage):
     quelle = Quelle(q3_dateien())
     p, info, hinweise = f.lauf(ablage, tmp / "arb", lokal=ordner, abruf=quelle)
     assert len(quelle.anfragen) == 6                          # verspätete Meldung, Nachtrag, anderes Quartal: nicht geholt
-    assert quelle.anfragen[0].endswith("/data/1/Q3-M1-ALT.txt")
+    assert "https://www.sec.gov/Archives/edgar/data/1/Q3-M1-ALT.txt" in quelle.anfragen
     assert info["einzelmeldungen"]["2024q3"]["status"] == {"gelesen": 5, "anderes_quartal": 1}
     assert info["aus_einzelmeldungen"] == ["2024q3"] and info["datensaetze_gelesen"] == 2 and info["datensaetze_neu"] == 0
     fi = ablage.lies_bereinigt("edgar_13f_firmen")
@@ -335,6 +337,20 @@ def test_einzelmeldungen_unvollstaendig(lage):
     assert info["einzelmeldungen"]["2024q3"]["status"]["fehlt"] == 1 and info["juengstes_quartal"] == "2024q2"
     assert set(p["stand"]) == {"2024q2"} and "einzel-2024q3" not in set(ablage.lies_bereinigt("edgar_13f_dateien")["datei"])
     assert not (ablage.bereinigt / "bereinigt__edgar_13f_bestaende__2024q3.parquet").exists()
+
+    class Gestoert(Quelle):                                   # die Quelle antwortet für eine Meldung nicht
+        def hole(self, url, erlaube_404=False, **kw):
+            if "Q3-M2" in url:
+                raise QuelleNichtErreichbar(url)
+            return super().hole(url, erlaube_404, **kw)
+
+    kandidaten = f.waehle_meldungen(f._verzeichnis(ablage, 2024)[0], Q3)
+    ergebnis, e = f.lies_einzelmeldungen(kandidaten, Q3, Gestoert(q3_dateien()), Zeitbudget(5))
+    assert ergebnis is None and e["status"] == {"gelesen": 4, "anderes_quartal": 1, "abruffehler": 1}
+    with pytest.raises(QuelleNichtErreichbar, match="in Folge"):
+        f.lies_einzelmeldungen(kandidaten, Q3, Gestoert(q3_dateien()), Zeitbudget(5), max_fehler=1)
+    ergebnis, e = f.lies_einzelmeldungen(kandidaten, Q3, Quelle(q3_dateien()), Zeitbudget(0))      # Zeitbudget erschöpft
+    assert ergebnis is None and e["status"] == {"offen": 6}
 
 
 def test_gegenprobe(lage):

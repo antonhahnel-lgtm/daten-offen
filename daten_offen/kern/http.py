@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import threading
 import time
 from pathlib import Path
 
@@ -36,13 +37,16 @@ class Abruf:
             "Accept-Encoding": "gzip, deflate",
         })
         self._letzte = 0.0
+        self._sperre = threading.Lock()
         self.anfragen = 0
 
     def _warte(self) -> None:
-        rest = self.abstand - (time.monotonic() - self._letzte)
-        if rest > 0:
-            time.sleep(rest)
-        self._letzte = time.monotonic()
+        with self._sperre:                      # die Anfragegrenze gilt auch für parallele Abrufe insgesamt
+            jetzt = time.monotonic()
+            start = max(jetzt, self._letzte + self.abstand)
+            self._letzte = start
+        if start > jetzt:
+            time.sleep(start - jetzt)
 
     def hole(self, url: str, stream: bool = False, erlaube_404: bool = False, **kw) -> requests.Response | None:
         letzter_fehler: Exception | None = None

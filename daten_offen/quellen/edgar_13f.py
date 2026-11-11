@@ -22,9 +22,11 @@ import csv
 import io
 import os
 import re
+import threading
 import xml.etree.ElementTree as ET_XML
 import zipfile
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
 
@@ -52,6 +54,7 @@ RELEASE_URL = "https://github.com/{repo}/releases/download/bereinigt-edgar/{date
 MELDUNG_URL = "https://www.sec.gov/Archives/edgar/data/{cik}/{accession}.txt"
 EINZEL = "einzel-"                 # Vorsatz in edgar_13f_dateien: Quartal aus Einzelmeldungen
 MAX_AUSFALL = 0.02                 # höchstens dieser Anteil der Meldungen darf fehlen oder unlesbar sein
+PARALLEL = 4                       # gleichzeitige Abrufe; die Anfragegrenze des Abrufs gilt für alle zusammen
 KOPF_FELD = re.compile(rb"^[ \t]*(CONFORMED SUBMISSION TYPE|CONFORMED PERIOD OF REPORT|FILED AS OF DATE|"
                        rb"CENTRAL INDEX KEY):[ \t]*(\S+)", re.M)
 TABELLE_XML = re.compile(rb"<TYPE>INFORMATION TABLE.*?<XML>\s*(.*?)</XML>", re.S)
@@ -290,37 +293,44 @@ def lies_einzelmeldungen(kandidaten: pd.DataFrame, periode, abruf, budget: Zeitb
     periode = pd.Timestamp(periode)
     letzter = pd.Timestamp(frist(periode))
     koepfe, teile, status, fehler_in_folge = [], {}, Counter(), 0
-    for nr, z in enumerate(kandidaten.itertuples(index=False)):
-        if budget.abgelaufen():
-            status["offen"] = len(kandidaten) - nr
-            break
-        if nr and nr % 1000 == 0:
-            print(f"13F {quartal_name(periode)}: {nr} von {len(kandidaten)} Meldungen gelesen", flush=True)
+    abbruch = threading.Event()
+
+    def hole(z) -> tuple[str, tuple | None]:
+        if abbruch.is_set() or budget.abgelaufen():
+            return "offen", None
         try:
             antwort = abruf.hole(MELDUNG_URL.format(cik=int(z.cik), accession=z.accession), erlaube_404=True)
         except QuelleNichtErreichbar:
-            fehler_in_folge += 1
-            if fehler_in_folge >= max_fehler:
-                raise
-            status["abruffehler"] += 1
-            continue
-        fehler_in_folge = 0
+            return "abruffehler", None
         if antwort is None:
-            status["fehlt"] += 1
-            continue
+            return "fehlt", None
         try:
-            kopf, pos = lies_meldung(antwort.content)
+            return "gelesen", lies_meldung(antwort.content)
         except (ET_XML.ParseError, ValueError):
-            status["unlesbar"] += 1
-            continue
-        eingereicht = kopf["eingereicht"] if pd.notna(kopf["eingereicht"]) else pd.Timestamp(z.filing_date)
-        if kopf["form"] != "13F-HR" or kopf["periode"] != periode or pd.isna(kopf["filer_cik"]) \
-                or not (periode < eingereicht <= letzter):
-            status["anderes_quartal"] += 1
-            continue
-        status["gelesen"] += 1
-        koepfe.append((z.accession, int(kopf["filer_cik"]), eingereicht, kopf["zeilen"]))
-        teile[z.accession] = pos
+            return "unlesbar", None
+
+    # mehrere Abrufe zugleich: die Antwortzeit der SEC, nicht die Anfragegrenze, bestimmt sonst die Dauer
+    with ThreadPoolExecutor(max_workers=PARALLEL) as becken:
+        zeilen = list(kandidaten.itertuples(index=False))
+        for nr, (z, (art, ergebnis)) in enumerate(zip(zeilen, becken.map(hole, zeilen))):
+            if nr and nr % 1000 == 0:
+                print(f"13F {quartal_name(periode)}: {nr} von {len(zeilen)} Meldungen gelesen", flush=True)
+            fehler_in_folge = fehler_in_folge + 1 if art == "abruffehler" else 0
+            if fehler_in_folge >= max_fehler:
+                abbruch.set()                                 # die übrigen Abrufe enden sofort
+                raise QuelleNichtErreichbar(f"{max_fehler} Abruffehler in Folge bei den 13F-Einzelmeldungen")
+            if ergebnis is None:
+                status[art] += 1
+                continue
+            kopf, pos = ergebnis
+            eingereicht = kopf["eingereicht"] if pd.notna(kopf["eingereicht"]) else pd.Timestamp(z.filing_date)
+            if kopf["form"] != "13F-HR" or kopf["periode"] != periode or pd.isna(kopf["filer_cik"]) \
+                    or not (periode < eingereicht <= letzter):
+                status["anderes_quartal"] += 1
+                continue
+            status["gelesen"] += 1
+            koepfe.append((z.accession, int(kopf["filer_cik"]), eingereicht, kopf["zeilen"]))
+            teile[z.accession] = pos
     ausfall = status["offen"] + status["abruffehler"] + status["fehlt"] + status["unlesbar"]
     info = {"meldungen": int(len(kandidaten)), "erstmeldungen": int(status["gelesen"]), "fristgerecht": 0,
             "positionszeilen": int(sum(k[3] for k in koepfe)), "status": dict(status)}
