@@ -17,10 +17,10 @@ import pandas as pd
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
 from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fred,
-                      klinik, sec_ftd, usaspending, wikipedia)
+                      klinik, sec_ftd, usaspending, uspto_patente, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd", "edgar_13f", "usaspending")
+           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -106,6 +106,14 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
             schwer.append("Namensabgleich ordnet weniger als 20 % des Auftragsvolumens zu")
         if info["zeilen_quelle"] and info["ohne_datum"] > 0.02 * info["zeilen_quelle"]:
             schwer.append(f"{info['ohne_datum']} Transaktionen ohne lesbares Auftragsdatum (über 2 %)")
+        return parameter, info, schwer, hinweise
+    if args.quelle == "uspto_patente":
+        parameter, info, hinweise = uspto_patente.lauf(ablage, arbeits, modus=args.modus)
+        schwer = []
+        if info["tage_seit_ausgabe"] > 21:
+            schwer.append(f"jüngste Ausgabe des Amtsblatts ist {info['tage_seit_ausgabe']} Tage alt (Seite geändert?)")
+        if info["trefferquote"]["zeilen"] >= 1000 and info["trefferquote"].get("quote_gewichtet", 0) < 0.1:
+            schwer.append("Namensabgleich ordnet weniger als 10 % der Patente zu")
         return parameter, info, schwer, hinweise
     if args.quelle == "fred":
         parameter, info, hinweise = fred.lauf(ablage)

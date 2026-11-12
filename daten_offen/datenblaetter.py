@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from .kern.schema import REGISTRATUR
 from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_insider, edgar_rollen, edgar_xbrl,  # noqa: F401
-                      fred, klinik, sec_ftd, usaspending, wikipedia)  # die Module registrieren ihre Parameter
+                      fred, klinik, sec_ftd, usaspending, uspto_patente, wikipedia)  # die Module registrieren ihre Parameter
 
 
 def text() -> str:

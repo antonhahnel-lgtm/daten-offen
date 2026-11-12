@@ -2,6 +2,20 @@
 
 Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine dieser IDs.
 
+## GA1-01 Erteilte Patente
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Zahl der an einem Ausgabetag an die Firma und ihre bekannten Patent-Töchter erteilten Erfindungspatente (utility). Ein Patent mit mehreren Inhabern zählt bei jedem. Wochen ohne Zeile zählen null; das Verhältnis zum F&E-Aufwand (Katalog: Innovationseffizienz) bildet der Nutzer |
+| Einheit | Anzahl |
+| Frequenz | wöchentlich (Dienstag) |
+| Offenlegung | amtlich offen: 35 U.S.C. 153; das Amtsblatt erscheint am Tag der Erteilung (jeder Dienstag) |
+| Quelle | https://www.uspto.gov/learning-and-resources/official-gazette/official-gazette-patents |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 11/2025 |
+| Verzögerung | Eröffnung des ersten Handelstags nach dem Ausgabetag |
+| Bekannte Schwächen | Nur die letzten 52 Wochen rückwirkend (die Historie des USPTO liegt hinter einer Anmeldung); Zuordnung über Firmennamen und eine von Hand geprüfte Liste von Patent-Töchtern (Trefferquote im Prüfbericht), weitere Töchter mit eigenem Namen fehlen; Zitationen sind nicht enthalten; spätere Übertragungen eines Patents bleiben unberücksichtigt |
+
 ## GA1-02 F&E-Aufwand (12 Monate)
 
 | Angabe | Inhalt |

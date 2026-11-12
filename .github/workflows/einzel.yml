@@ -9,7 +9,7 @@ on:
       quelle:
         description: "Quelle"
         type: choice
-        options: [sec_ftd, edgar_13f, usaspending]
+        options: [sec_ftd, edgar_13f, usaspending, uspto_patente]
       veroeffentlichen:
         description: "Ergebnis in die Releases laden"
         type: boolean
@@ -64,6 +64,8 @@ jobs:
               gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber -p "bereinigt__edgar_13f_*.parquet" || true ;;
             usaspending-false)
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__usaspending_*.parquet" || true ;;
+            uspto_patente-false)
+              gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__patente_*.parquet" || true ;;
           esac
           touch ausgabe/.vorher
       - name: Abruf
