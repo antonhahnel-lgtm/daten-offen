@@ -156,7 +156,7 @@ lange und saubere Daten vor Vollständigkeit.
 |---|---|---|
 | Wahlkampfspenden, Lobbying | PR3-01, PR3-02 | Schlüssel `DATA_GOV_API_KEY` nötig; Namensabgleich über Ausschuss- und Mandantennamen |
 | H-1B-Anträge (DOL) | GA2-02 | Große Excel-Dateien je Quartal mit wechselnden Spalten |
-| Patente: Historie vor 11/2025 und Zitationen | GA1-01 | Die Sammeldaten des USPTO (PatentsView, Erteilungsdateien) brauchen einen Schlüssel des Open Data Portal (USPTO-Konto und Identitätsprüfung über ID.me); die laufende Reihe aus dem Amtsblatt ist gebaut (Nr. 96–101) |
+| Patente: Historie vor 11/2025 und Zitationen | GA1-01 | Die Sammeldaten des USPTO (PatentsView, Erteilungsdateien) brauchen einen Schlüssel des Open Data Portal (USPTO-Konto und Identitätsprüfung über ID.me, außerhalb der USA per Videoanruf). Der Inhaber verzichtet darauf (12.11.2026); die laufende Reihe aus dem Amtsblatt ist gebaut (Nr. 96–101) |
 | Textänderung 10-K/10-Q, Ton der Meldungen | UA5-01, UA5-03, WS2-01, WS2-02 | Abruf aller Berichtstexte (Größenordnung 1 Terabyte); erst nach den ersten echten Läufen |
 | Fondsflüsse (N-PORT) | KD3-01 | 13F ist gebaut (Nr. 75–78); N-PORT braucht die Monatsbestände der Fonds und ihre Mittelflüsse |
 | Nachfolge von CIK | IH5-04, IH3-06 u. a. | Gründet eine Firma eine neue Holding, bekommt sie eine neue CIK (Exxon Mobil 2026, Alphabet 2015); die Reihen der alten und der neuen CIK sind noch nicht verbunden |

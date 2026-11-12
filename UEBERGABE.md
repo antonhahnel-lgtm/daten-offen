@@ -112,8 +112,11 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
   Die Reihe wächst ab jetzt wöchentlich (neue Ausgabe jeden Dienstag; der Lauf am Mittwoch liest sie).
   Offen ist die Historie vor 11/2025 und sind die Zitationen: Die Sammeldaten des USPTO liegen seit 06/2026
   hinter einem Schlüssel des Open Data Portal, den nur der Kontoinhaber selbst beantragen kann (USPTO-Konto
-  und Identitätsprüfung über ID.me; als Secret `USPTO_API_KEY` zu hinterlegen). Solange er fehlt, lässt sich
-  GA1-01 erst ab Ende 2025 rückrechnen.
+  und Identitätsprüfung über ID.me, außerhalb der USA nur per Videoanruf). Entscheidung des Inhabers vom
+  12.11.2026: Dieser Weg ist zu aufwendig, der Schlüssel wird nicht beantragt. GA1-01 lässt sich deshalb erst
+  ab Ende 2025 rückrechnen. Ungeprüfte Alternative: Die Tabellen von PatentsView lassen sich laut USPTO auf der
+  Webseite des Portals auch ohne Schlüssel laden (nur USPTO-Konto); einmal von Hand geladen und in ein Release
+  gelegt, ließe sich die Historie daraus bauen.
 - `GW2-06` im echten Lauf bestätigt (340 Werte, letzter Stand 14.10.2026).
 - Actions laufen auf Node 24 (checkout v5, setup-python v6, upload-artifact v6, download-artifact v7).
 - Neue Module zuerst über `gh workflow run einzel.yml -f quelle=<name>` erproben; der Workflow berührt die
