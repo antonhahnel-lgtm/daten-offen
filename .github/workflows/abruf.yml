@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        quelle: [edgar_insider, edgar_ereignisse, edgar_xbrl, edgar_rollen, edgar_13f, sec_ftd, cfpb, klinik]
+        quelle: [edgar_insider, edgar_ereignisse, edgar_xbrl, edgar_rollen, edgar_13f, sec_ftd, cfpb, klinik, usaspending]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -91,6 +91,8 @@ jobs:
                 -p "bereinigt__klinik_studien__*.parquet" -p "bereinigt__klinik_aenderungen__*.parquet" || true ;;
             sec_ftd)
               gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_*.parquet" || true ;;
+            usaspending)
+              gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__usaspending_*.parquet" || true ;;
             edgar_13f)
               # die Bestände früherer Quartale bleiben im Release; das Modul holt das Vorquartal bei Bedarf selbst
               gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet" || true
@@ -105,9 +107,9 @@ jobs:
           rm -f ausgabe/bereinigt/bereinigt__edgar_meldungen__*.parquet ausgabe/bereinigt/bereinigt__edgar_firmen__*.parquet
           rm -f ausgabe/berichte/*__edgar_index.*
           if [ "${{ matrix.quelle }}" != "sec_ftd" ]; then rm -f ausgabe/bereinigt/bereinigt__ftd_*.parquet; fi
-          # unveränderte Jahresdateien der Lieferausfälle liegen schon im Release
+          # unveränderte Jahresdateien der Lieferausfälle und der Bundesaufträge liegen schon im Release
           if [ -f ausgabe/.vorher ]; then
-            find ausgabe/bereinigt -name 'bereinigt__ftd_tage__*.parquet' ! -newer ausgabe/.vorher -delete
+            find ausgabe/bereinigt '(' -name 'bereinigt__ftd_tage__*.parquet' -o -name 'bereinigt__usaspending_monat__*.parquet' ')' ! -newer ausgabe/.vorher -delete
             rm -f ausgabe/.vorher
           fi
       - uses: actions/upload-artifact@v6

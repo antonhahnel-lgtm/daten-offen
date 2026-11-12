@@ -1,5 +1,17 @@
 # Änderungen
 
+## Lieferung 9 – 2026-11-12 (Bundesaufträge)
+
+- Neue Quelle `usaspending`: Vertragstransaktionen des Bundes ab Haushaltsjahr 2008 → PR2-01 (Verpflichtungen je
+  Firma und Monat des Bekanntwerdens); Tabellen `usaspending_monat`, `usaspending_zuordnung`, `usaspending_dateien`.
+- Zuordnung über Konzernfamilien (Mutter-UEI) mit Abstimmung der gemeldeten Namen (`ENTSCHEIDUNGEN.md` Nr. 87–95).
+- Namensabgleich: Rechtsformen in Einzelbuchstaben und nachgestelltes „THE“; Suche ohne Ähnlichkeitsstufe.
+- Abruf: `sende_json` für Abfrageschnittstellen.
+- Echter Lauf: 20 Haushaltsjahre, 94,5 Mio. Transaktionen; 52,8 % des Auftragsvolumens zugeordnet, 43,2 % bei
+  Firmen mit Börsenkürzel; 419.841 Monatswerte für 8.168 Firmen ab 10/2007. Seit dem 12.11. im Workflow `abruf`.
+- Rückwärtsbefüllung der Rollen (13D, 144) abgeschlossen: 261.725 Meldungen gelesen, keine offen.
+- 129 Offline-Tests.
+
 ## Lieferung 8 – 2026-11-11 (13F des laufenden Quartals)
 
 - `edgar_13f`: Ein Quartal ohne Datensatz der SEC entsteht aus den einzelnen 13F-HR-Meldungen, sobald das

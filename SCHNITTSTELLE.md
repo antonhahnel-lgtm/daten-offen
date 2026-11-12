@@ -6,7 +6,7 @@
 |---|---|---|
 | `parameter-edgar` | `parameter__edgar_<quelle>__<jahr>.parquet` | Parameter aus EDGAR: `edgar_insider`, `edgar_ereignisse`, `edgar_xbrl`, `edgar_rollen`, `edgar_13f` |
 | `parameter-makro` | `parameter__fred__<jahr>.parquet` | Parameter der Gesamtwirtschaft (cik = 0) |
-| `parameter-web` | `parameter__<quelle>__<jahr>.parquet` | `wikipedia`, `cfpb`, `klinik` |
+| `parameter-web` | `parameter__<quelle>__<jahr>.parquet` | `wikipedia`, `cfpb`, `klinik`, `usaspending` |
 | `bereinigt-edgar` | `bereinigt__edgar_meldungen__<jahr>.parquet` | Meldungsverzeichnis: Firma, Aktenzeichen, Formular, Annahmezeit, `verfuegbar_ab` |
 | | `bereinigt__edgar_firmen__alle.parquet` | Stammdaten je CIK: Name, Ticker, SIC, Sitz |
 | | `bereinigt__insider_transaktionen__<jahr>q<q>.parquet` | Alle nicht-derivativen Insidergeschäfte je Quartal; Spalte `herkunft`: `datensatz` (amtlich) oder `xml` (laufende Ergänzung) |
@@ -20,6 +20,9 @@
 | `bereinigt-web` | `bereinigt__wiki_wochen__alle.parquet`, `bereinigt__wiki_zuordnung__alle.parquet` | Wochenaufrufe je CIK und Zuordnung CIK → Artikel |
 | | `bereinigt__cfpb_zuordnung__alle.parquet` | Firmenname → CIK mit Konfidenz |
 | | `bereinigt__klinik_studien__alle.parquet`, `…_aenderungen__<jahr>`, `…_zulassungen__alle` | Studienstand, Änderungsprotokoll, Zulassungen |
+| | `bereinigt__usaspending_monat__fy<jahr>.parquet` | Bundesaufträge je Konzernfamilie (`familie` = UEI der Mutter), heutigem Mutternamen, gemeldetem Namen und Monat des Bekanntwerdens: `betrag`, `zeilen`; eine Datei je Haushaltsjahr der Quelle (ein Monat kann in zweien stehen) |
+| | `bereinigt__usaspending_zuordnung__alle.parquet` | Familie, Mutternamen, gemeldeter Name → CIK mit Konfidenz und Art (`exakt`, `frueher`, `kern`, `familie`, `marke`, `ungestuetzt`, `mehrdeutig`, `keiner`), dazu Betrag und Umfang |
+| | `bereinigt__usaspending_dateien__alle.parquet` | Gelesene Sammeldateien je Haushaltsjahr mit Stand und Zeilenzahl |
 | `parameter-markt` | `parameter__sec_ftd__<jahr>.parquet` | Lieferausfälle (`IH3-06`) |
 | `bereinigt-markt` | `bereinigt__ftd_tage__<jahr>.parquet` | Lieferausfälle je CUSIP und Abwicklungstag (alle Wertpapiere, auch unter 10.000 Stück), Spalte `datei` |
 | | `bereinigt__ftd_wertpapiere__alle.parquet` | CUSIP → CIK mit Konfidenz, Art der Zuordnung und Kennzeichen `stamm`; jüngstes Kürzel und Bezeichnung |
