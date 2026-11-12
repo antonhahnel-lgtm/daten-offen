@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        quelle: [edgar_insider, edgar_ereignisse, edgar_xbrl, edgar_rollen, edgar_13f, sec_ftd, cfpb, klinik, usaspending]
+        quelle: [edgar_insider, edgar_ereignisse, edgar_xbrl, edgar_rollen, edgar_13f, sec_ftd, cfpb, klinik, usaspending, uspto_patente]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -93,6 +93,8 @@ jobs:
               gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_*.parquet" || true ;;
             usaspending)
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__usaspending_*.parquet" || true ;;
+            uspto_patente)
+              gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__patente_*.parquet" || true ;;
             edgar_13f)
               # die Bestände früherer Quartale bleiben im Release; das Modul holt das Vorquartal bei Bedarf selbst
               gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet" || true

@@ -1,5 +1,16 @@
 # Änderungen
 
+## Lieferung 10 – 2026-11-12 (Patente)
+
+- Neue Quelle `uspto_patente`: erteilte Patente je Firma aus dem Amtsblatt des USPTO → GA1-01; Tabellen
+  `patente_erteilt`, `patente_zuordnung`, `patente_ausgaben` (`ENTSCHEIDUNGEN.md` Nr. 96–101).
+- Die Reihe beginnt am 18.11.2025 (52 Ausgaben rückwirkend) und wächst wöchentlich; die Historie davor braucht
+  einen Schlüssel des USPTO und ist offen.
+- Echter Lauf: 52 Ausgaben (18.11.2025 bis 10.11.2026), 380.575 Patente, davon 324.271 Erfindungspatente;
+  33 % zugeordnet, 28 % bei Firmen mit Börsenkürzel; 25.353 Werte für 2.633 Firmen. Seit dem 12.11. im Workflow
+  `abruf`.
+- 134 Offline-Tests.
+
 ## Lieferung 9 – 2026-11-12 (Bundesaufträge)
 
 - Neue Quelle `usaspending`: Vertragstransaktionen des Bundes ab Haushaltsjahr 2008 → PR2-01 (Verpflichtungen je
