@@ -10,11 +10,11 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Einheit | Anzahl |
 | Frequenz | wöchentlich (Dienstag) |
 | Offenlegung | amtlich offen: 35 U.S.C. 153; das Amtsblatt erscheint am Tag der Erteilung (jeder Dienstag) |
-| Quelle | https://www.uspto.gov/learning-and-resources/official-gazette/official-gazette-patents |
-| Lizenz | gemeinfrei (US-Behörde) |
-| Historie ab | 11/2025 |
+| Quelle | https://www.uspto.gov/learning-and-resources/official-gazette/official-gazette-patents; Historie: https://data.uspto.gov/bulkdata/datasets/pvgpatdis |
+| Lizenz | gemeinfrei (US-Behörde); Historie aus PatentsView (USPTO), CC BY 4.0 |
+| Historie ab | 01/2001 |
 | Verzögerung | Eröffnung des ersten Handelstags nach dem Ausgabetag |
-| Bekannte Schwächen | Nur die letzten 52 Wochen rückwirkend (die Historie des USPTO liegt hinter einer Anmeldung); Zuordnung über Firmennamen und eine von Hand geprüfte Liste von Patent-Töchtern (Trefferquote im Prüfbericht), weitere Töchter mit eigenem Namen fehlen; Zitationen sind nicht enthalten; spätere Übertragungen eines Patents bleiben unberücksichtigt |
+| Bekannte Schwächen | Die Historie stammt aus von Hand geladenen Sammeldateien (PatentsView) und reicht bis zu deren Stand, danach das Amtsblatt; rund 0,4 % der Patente einer Ausgabe fehlen in PatentsView. Zuordnung über Firmennamen und eine von Hand geprüfte Liste von Patent-Töchtern mit Zeiträumen (Trefferquote im Prüfbericht), weitere Töchter mit eigenem Namen fehlen; ein Patent zählt bei der Firma, der der Inhaber am Ausgabetag gehörte, spätere Übertragungen bleiben unberücksichtigt; Zitationen stehen in GA1-09 |
 
 ## GA1-02 F&E-Aufwand (12 Monate)
 
@@ -71,6 +71,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Historie ab | 1939 |
 | Verzögerung | nächster Handelstag nach dem Zulassungsdatum |
 | Bekannte Schwächen | Künftige Zieltermine (PDUFA) stehen nicht in den Daten der FDA; Zuordnung über den Antragsteller, der vom heutigen Rechteinhaber abweichen kann |
+
+## GA1-09 Zitationen der Patente
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Zahl der Zitationen, die die an einem Ausgabetag neu erteilten Erfindungspatente auf Erfindungspatente der Firma enthalten, die höchstens fünf Jahre zuvor erteilt wurden (Selbstzitate eingeschlossen). Das zitierte Patent zählt bei der Firma, die es bei der Erteilung erhielt (Zuordnung wie GA1-01). Wochen ohne Zeile zählen null; das Verhältnis zum F&E-Aufwand (Katalog: Innovationseffizienz) bildet der Nutzer |
+| Einheit | Anzahl |
+| Frequenz | wöchentlich (Dienstag) |
+| Offenlegung | amtlich offen: Die Patentschrift nennt die zitierten Schriften und erscheint am Tag der Erteilung |
+| Quelle | https://data.uspto.gov/bulkdata/datasets/pvgpatdis |
+| Lizenz | PatentsView (USPTO), CC BY 4.0 |
+| Historie ab | 01/2001 |
+| Verzögerung | Eröffnung des ersten Handelstags nach dem Ausgabetag des zitierenden Patents |
+| Bekannte Schwächen | Nur aus von Hand geladenen Sammeldateien: Die Reihe endet mit deren Stand und wächst erst mit einer neu geladenen Datei (das Amtsblatt nennt keine Zitate). Rohe Zahl ohne Bereinigung um Technikfeld und Jahrgang; Zuordnung und ihre Lücken wie GA1-01 |
 
 ## GA2-03 Entlassungs- und Restrukturierungsmeldung
 

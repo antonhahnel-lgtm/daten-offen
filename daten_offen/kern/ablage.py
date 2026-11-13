@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -23,6 +24,13 @@ def _sha256(pfad: Path) -> str:
         for block in iter(lambda: f.read(1 << 20), b""):
             h.update(block)
     return h.hexdigest()
+
+
+def _schreibe(df: pd.DataFrame, pfad: Path) -> None:
+    """Schreibt erst in eine Nebendatei und benennt sie dann um: Ein abgebrochener Lauf hinterlässt keine halbe Datei."""
+    neben = pfad.with_name(pfad.name + ".teil")
+    df.to_parquet(neben, index=False, compression="zstd")
+    os.replace(neben, pfad)
 
 
 class Ablage:
@@ -41,7 +49,7 @@ class Ablage:
 
     def schreibe_bereinigt(self, tabelle: str, teil: str, df: pd.DataFrame) -> Path:
         pfad = self.bereinigt / f"bereinigt__{tabelle}__{teil}.parquet"
-        df.to_parquet(pfad, index=False, compression="zstd")
+        _schreibe(df, pfad)
         self._vermerke(pfad, len(df), "bereinigt")
         return pfad
 
@@ -54,7 +62,7 @@ class Ablage:
         jahre = df["verfuegbar_ab"].dt.year
         for jahr, teil in df.groupby(jahre, sort=True):
             pfad = self.parameter / f"parameter__{quelle}__{int(jahr)}.parquet"
-            teil.to_parquet(pfad, index=False, compression="zstd")
+            _schreibe(teil, pfad)
             self._vermerke(pfad, len(teil), "parameter")
             pfade.append(pfad)
         return pfade

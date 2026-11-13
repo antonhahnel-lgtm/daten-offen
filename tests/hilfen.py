@@ -191,3 +191,54 @@ def baue_companyfacts_zip(pfad: Path) -> Path:
         z.writestr("CIK0000000045.json", json.dumps({"cik": 45, "facts": {}}))
         z.writestr("CIK0000000046.json", "{kaputt")
     return pfad
+
+
+# --------------------------------------------------------------------------- PatentsView (Sammeldateien des USPTO)
+PV_PATENT_KOPF = ["patent_id", "patent_type", "patent_date", "patent_title", "wipo_kind", "num_claims", "withdrawn", "filename"]
+PV_INHABER_KOPF = ["patent_id", "assignee_sequence", "assignee_id", "raw_assignee_individual_name_first",
+                   "raw_assignee_individual_name_last", "raw_assignee_organization", "assignee_type", "rawlocation_id"]
+PV_ZITAT_KOPF = ["patent_id", "citation_sequence", "citation_patent_id", "citation_date", "record_name", "wipo_kind",
+                 "citation_category"]
+# Nummer, Art, Ausgabetag, zurückgezogen, Inhaber (leer = Privatperson)
+PV_PATENTE = [
+    ("6000001", "utility", "1999-12-28", 0, ["Alpha Corp"]),                  # vor dem Beginn der Parameter-Historie
+    ("7000001", "utility", "2006-02-21", 0, ["Alpha  Corp", "Boeing Co"]),    # zwei Inhaber, doppeltes Leerzeichen
+    ("7000002", "utility", "2006-02-21", 1, ["Alpha Corp"]),                  # zurückgezogen
+    ("7000003", "utility", "2006-02-28", 0, [""]),                            # gehört einer Privatperson
+    ("D500001", "design", "2006-02-21", 0, ["Alpha Corp"]),
+    ("H2000", "statutory invention registration", "2006-02-21", 0, ["Alpha Corp"]),
+    ("11000001", "utility", "2020-03-31", 0, ["Raytheon Company"]),           # vor der Fusion zu RTX
+    ("11000002", "utility", "2020-04-07", 0, ["Raytheon Company"]),           # danach
+    ("11500000", "utility", "2022-11-08", 0, ["Alpha Corp"]),
+    ("11999000", "utility", "2026-11-03", 0, ["Alpha Corp"]),
+    ("11999001", "utility", "2026-11-03", 0, ["BOEING CO"]),
+]
+
+
+def pv_tsv(kopf: list[str], zeilen: list[list]) -> str:
+    """Tabulatorgetrennt mit Zeichenketten in Anführungszeichen, wie PatentsView liefert."""
+    def feld(v):
+        return f'"{v}"' if isinstance(v, str) else str(v)
+    return "\n".join(["\t".join(feld(k) for k in kopf)] + ["\t".join(feld(v) for v in z) for z in zeilen]) + "\n"
+
+
+def baue_patentsview(ordner: Path, roh: bool = True, gepackt: bool = False, zitate: list[tuple] | None = None) -> Path:
+    """Legt die Sammeldateien in ``ordner`` an: Patente, Inhaber (wie gedruckt oder vereinheitlicht) und Zitate."""
+    ordner.mkdir(parents=True, exist_ok=True)
+    patente = pv_tsv(PV_PATENT_KOPF, [[n, art, tag, f"Titel {n}", "B2", 3, zurueck, "ipg.xml"] for n, art, tag, zurueck, _ in PV_PATENTE])
+    kopf = PV_INHABER_KOPF if roh else [k.replace("raw_assignee", "disambig_assignee").replace("rawlocation", "location")
+                                        for k in PV_INHABER_KOPF]
+    inhaber = pv_tsv(kopf, [[n, i, f"a{n}{i}", "" if name else "Kim", "" if name else "Lee", name, 2 if name else 4, "ort"]
+                            for n, _, _, _, namen in PV_PATENTE for i, name in enumerate(namen)])
+    dateien = {"g_patent.tsv": patente,
+               ("g_assignee_not_disambiguated.tsv" if roh else "g_assignee_disambiguated.tsv"): inhaber}
+    if zitate is not None:
+        dateien["g_us_patent_citation.tsv"] = pv_tsv(PV_ZITAT_KOPF, [[von, i, auf, "2000-01-01", "Name", "B2", "cited by examiner"]
+                                                                    for i, (von, auf) in enumerate(zitate)])
+    for name, text in dateien.items():
+        if gepackt:
+            with zipfile.ZipFile(ordner / (name + ".zip"), "w", zipfile.ZIP_DEFLATED) as z:
+                z.writestr(name, text)
+        else:
+            (ordner / name).write_text(text, encoding="utf-8")
+    return ordner

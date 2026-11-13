@@ -1,5 +1,22 @@
 # Änderungen
 
+## Lieferung 11 – 2026-11-13 (Patent-Historie, Zitationen)
+
+- `uspto_patente`: Historie aller US-Patente ab 1976 aus den Sammeldateien von PatentsView, von Hand geladen und nur
+  lokal gelesen (`werkzeuge/patente_historie.sh`); `GA1-01` beginnt damit 01/2001 (`ENTSCHEIDUNGEN.md` Nr. 102–104, 107).
+- Leseverfahren des Amtsblatts, Fassung 2: Mitinhaber werden erkannt, Nachprüfungsbescheide zählen nicht mehr,
+  Patentnummern ohne führende Nullen; ältere Ausgaben liest der Tageslauf einmal neu (Nr. 105).
+- Töchterliste mit Zeiträumen: 203 Inhaber, je Zeitraum die Mutter am Ausgabetag (Nr. 106); `patente_zuordnung` mit
+  `gilt_ab` und `gilt_bis`, `patente_ausgaben` mit `herkunft` und `lesart`.
+- Neue Quelle `uspto_zitate`: Zitationen auf Patente der Firma aus den letzten fünf Jahren → `GA1-09` (neu), nur
+  lokal aus der Zitatdatei von PatentsView (Nr. 108).
+- Kern: Ergebnisdateien werden über eine Nebendatei geschrieben; ein abgebrochener Lauf hinterlässt keine halbe Datei.
+- Lokaler Probelauf (mit den vereinheitlichten Namen, die gedruckten Namen lädt der Inhaber noch): 9,43 Mio. Patente
+  1976 bis 2025, `GA1-01` mit 627.358 Werten für 10.302 Firmen, je Jahr 37 bis 44 % der Erfindungspatente zugeordnet
+  und 23 bis 33 % bei Firmen mit Börsenkürzel; 152,6 Mio. Zitate gelesen, 17,6 Mio. im Fünfjahresfenster ab 2001,
+  `GA1-09` mit 937.206 Werten für 9.803 Firmen. Veröffentlicht ist davon noch nichts.
+- 140 Offline-Tests.
+
 ## Lieferung 10 – 2026-11-12 (Patente)
 
 - Neue Quelle `uspto_patente`: erteilte Patente je Firma aus dem Amtsblatt des USPTO → GA1-01; Tabellen

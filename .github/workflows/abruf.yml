@@ -109,9 +109,9 @@ jobs:
           rm -f ausgabe/bereinigt/bereinigt__edgar_meldungen__*.parquet ausgabe/bereinigt/bereinigt__edgar_firmen__*.parquet
           rm -f ausgabe/berichte/*__edgar_index.*
           if [ "${{ matrix.quelle }}" != "sec_ftd" ]; then rm -f ausgabe/bereinigt/bereinigt__ftd_*.parquet; fi
-          # unveränderte Jahresdateien der Lieferausfälle und der Bundesaufträge liegen schon im Release
+          # unveränderte Jahresdateien der Lieferausfälle, der Bundesaufträge und der Patente liegen schon im Release
           if [ -f ausgabe/.vorher ]; then
-            find ausgabe/bereinigt '(' -name 'bereinigt__ftd_tage__*.parquet' -o -name 'bereinigt__usaspending_monat__*.parquet' ')' ! -newer ausgabe/.vorher -delete
+            find ausgabe/bereinigt '(' -name 'bereinigt__ftd_tage__*.parquet' -o -name 'bereinigt__usaspending_monat__*.parquet' -o -name 'bereinigt__patente_erteilt__*.parquet' ')' ! -newer ausgabe/.vorher -delete
             rm -f ausgabe/.vorher
           fi
       - uses: actions/upload-artifact@v6

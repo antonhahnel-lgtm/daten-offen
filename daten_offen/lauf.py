@@ -17,10 +17,10 @@ import pandas as pd
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
 from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fred,
-                      klinik, sec_ftd, usaspending, uspto_patente, wikipedia)
+                      klinik, sec_ftd, usaspending, uspto_patente, uspto_zitate, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente")
+           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -108,12 +108,19 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
             schwer.append(f"{info['ohne_datum']} Transaktionen ohne lesbares Auftragsdatum (über 2 %)")
         return parameter, info, schwer, hinweise
     if args.quelle == "uspto_patente":
-        parameter, info, hinweise = uspto_patente.lauf(ablage, arbeits, modus=args.modus)
+        parameter, info, hinweise = uspto_patente.lauf(ablage, arbeits, modus=args.modus,
+                                                       historie=Path(args.patente_ordner) if args.patente_ordner else None)
         schwer = []
         if info["tage_seit_ausgabe"] > 21:
             schwer.append(f"jüngste Ausgabe des Amtsblatts ist {info['tage_seit_ausgabe']} Tage alt (Seite geändert?)")
         if info["trefferquote"]["zeilen"] >= 1000 and info["trefferquote"].get("quote_gewichtet", 0) < 0.1:
             schwer.append("Namensabgleich ordnet weniger als 10 % der Patente zu")
+        return parameter, info, schwer, hinweise
+    if args.quelle == "uspto_zitate":
+        parameter, info, hinweise = uspto_zitate.lauf(ablage, Path(args.patente_ordner) if args.patente_ordner else None)
+        schwer = []
+        if info["im_fenster"] and info["anteil_zugeordnet"] < 0.1:
+            schwer.append("weniger als 10 % der Zitate treffen Patente zugeordneter Firmen")
         return parameter, info, schwer, hinweise
     if args.quelle == "fred":
         parameter, info, hinweise = fred.lauf(ablage)
@@ -139,6 +146,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--ftd-ordner", default=None, help="lokaler Ordner mit Lieferausfall-Archiven statt Abruf (Tests)")
     p.add_argument("--f13-ordner", default=None, help="lokaler Ordner mit 13F-Datensätzen statt Abruf (Tests)")
     p.add_argument("--usaspending-ordner", default=None, help="lokaler Ordner mit Auftragsdateien statt Abruf (Tests)")
+    p.add_argument("--patente-ordner", default=None,
+                   help="lokaler Ordner mit den von Hand geladenen Sammeldateien von PatentsView (Historie der Patente)")
     p.add_argument("--f13-pruefquartal", default=os.environ.get("F13_PRUEFQUARTAL", ""),
                    help="Gegenprobe: dieses Quartal (z. B. 2026q2) zusätzlich aus den Einzelmeldungen lesen")
     args = p.parse_args(argv)

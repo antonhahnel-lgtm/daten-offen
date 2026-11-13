@@ -39,7 +39,7 @@ lade bereinigt-web "Bereinigte Web- und Registerdaten" "$B"/bereinigt__wiki_*.pa
 lade bereinigt-markt "Bereinigte Marktstrukturdaten (SEC)" "$B"/bereinigt__ftd_*.parquet
 lade parameter-edgar "Parameter aus EDGAR" "$P"/parameter__edgar_*.parquet
 lade parameter-makro "Parameter Gesamtwirtschaft" "$P"/parameter__fred__*.parquet
-lade parameter-web "Parameter aus Web- und Registerdaten" "$P"/parameter__wikipedia__*.parquet "$P"/parameter__cfpb__*.parquet "$P"/parameter__klinik__*.parquet "$P"/parameter__usaspending__*.parquet "$P"/parameter__uspto_patente__*.parquet
+lade parameter-web "Parameter aus Web- und Registerdaten" "$P"/parameter__wikipedia__*.parquet "$P"/parameter__cfpb__*.parquet "$P"/parameter__klinik__*.parquet "$P"/parameter__usaspending__*.parquet "$P"/parameter__uspto_patente__*.parquet "$P"/parameter__uspto_zitate__*.parquet
 lade parameter-markt "Parameter Marktstruktur" "$P"/parameter__sec_*.parquet
 lade pruefbericht "Prüfberichte und Manifeste" ausgabe/berichte/*
 
@@ -47,7 +47,7 @@ lade pruefbericht "Prüfberichte und Manifeste" ausgabe/berichte/*
 for datei in "$B"/*.parquet "$P"/*.parquet; do
   case "$(basename "$datei")" in
     bereinigt__edgar_*|bereinigt__insider_*|bereinigt__fred_*|bereinigt__wiki_*|bereinigt__cfpb_*|bereinigt__klinik_*|bereinigt__ftd_*|bereinigt__usaspending_*|bereinigt__patente_*) ;;
-    parameter__edgar_*|parameter__fred__*|parameter__wikipedia__*|parameter__cfpb__*|parameter__klinik__*|parameter__sec_*|parameter__usaspending__*|parameter__uspto_patente__*) ;;
+    parameter__edgar_*|parameter__fred__*|parameter__wikipedia__*|parameter__cfpb__*|parameter__klinik__*|parameter__sec_*|parameter__usaspending__*|parameter__uspto_patente__*|parameter__uspto_zitate__*) ;;
     *) echo "Keinem Release zugeordnet: $datei" >&2; exit 1 ;;
   esac
 done
