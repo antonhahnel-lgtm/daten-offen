@@ -15,6 +15,8 @@
   1976 bis 2025, `GA1-01` mit 627.358 Werten für 10.302 Firmen, je Jahr 37 bis 44 % der Erfindungspatente zugeordnet
   und 23 bis 33 % bei Firmen mit Börsenkürzel; 152,6 Mio. Zitate gelesen, 17,6 Mio. im Fünfjahresfenster ab 2001,
   `GA1-09` mit 937.206 Werten für 9.803 Firmen. Veröffentlicht ist davon noch nichts.
+- Echter Lauf (Workflow `einzel`, 13.11.): alle 52 Ausgaben des Amtsblatts mit der neuen Fassung gelesen – 379.801
+  Patente (774 Nachprüfungsbescheide zählen nicht mehr), `GA1-01` mit 25.520 Werten für 2.649 Firmen (vorher 25.353).
 - 140 Offline-Tests.
 
 ## Lieferung 10 – 2026-11-12 (Patente)

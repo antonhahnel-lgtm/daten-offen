@@ -126,7 +126,8 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
   – das holt den Bestand, liest die Historie (rund 3 Minuten) und die Zitate (rund 6 Minuten) und lädt alles in die
   Releases. (3) Zahlen des echten Laufs in `AENDERUNGEN.md` und hier nachtragen, einen Tageslauf abwarten.
   Der Rechner hat 8 GB Arbeitsspeicher: währenddessen nichts Großes nebenher laufen lassen.
-  Der erste Tageslauf nach dem 13.11. liest die Ausgaben des Amtsblatts einmal neu (Lesart 2, rund 15 Minuten).
+  Die neue Lesart des Amtsblatts ist im echten Lauf bestätigt (Workflow `einzel`, 13.11.2026): 52 Ausgaben neu
+  gelesen, 379.801 Patente, 25.520 Werte für 2.649 Firmen.
   `frisch=true` im Workflow `einzel` für `uspto_patente` nicht mehr verwenden: Es baute `patente_ausgaben` und
   `patente_zuordnung` ohne die Historie neu.
   Die Sammeldateien erscheinen vierteljährlich; neu laden und Schritt (2) wiederholen verlängert Historie und
