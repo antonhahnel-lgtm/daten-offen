@@ -11,10 +11,10 @@
 - Neue Quelle `uspto_zitate`: Zitationen auf Patente der Firma aus den letzten fünf Jahren → `GA1-09` (neu), nur
   lokal aus der Zitatdatei von PatentsView (Nr. 108).
 - Kern: Ergebnisdateien werden über eine Nebendatei geschrieben; ein abgebrochener Lauf hinterlässt keine halbe Datei.
-- Lokaler Probelauf (mit den vereinheitlichten Namen, die gedruckten Namen lädt der Inhaber noch): 9,43 Mio. Patente
-  1976 bis 2025, `GA1-01` mit 627.358 Werten für 10.302 Firmen, je Jahr 37 bis 44 % der Erfindungspatente zugeordnet
-  und 23 bis 33 % bei Firmen mit Börsenkürzel; 152,6 Mio. Zitate gelesen, 17,6 Mio. im Fünfjahresfenster ab 2001,
-  `GA1-09` mit 937.206 Werten für 9.803 Firmen. Veröffentlicht ist davon noch nichts.
+- Historie veröffentlicht (15.11., lokaler Lauf mit den Namen wie gedruckt): 9,43 Mio. Patente 1976 bis 2025 in 51
+  Jahresdateien; `GA1-01` mit 633.607 Werten für 10.628 Firmen ab 01/2001 (36,9 % der Patente zugeordnet, 26,3 % bei
+  Firmen mit Börsenkürzel); 152,6 Mio. Zitate gelesen, 17,6 Mio. im Fünfjahresfenster, `GA1-09` mit 952.420 Werten
+  für 10.119 Firmen bis 12/2025.
 - Echter Lauf (Workflow `einzel`, 13.11.): alle 52 Ausgaben des Amtsblatts mit der neuen Fassung gelesen – 379.801
   Patente (774 Nachprüfungsbescheide zählen nicht mehr), `GA1-01` mit 25.520 Werten für 2.649 Firmen (vorher 25.353).
 - 140 Offline-Tests.
