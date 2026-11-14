@@ -121,6 +121,8 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
   `GA1-01` 633.607 Werte für 10.628 Firmen ab 01/2001, `GA1-09` 952.420 Werte für 10.119 Firmen bis 12/2025.
   Plausibilität: IBM 9.097 Patente im Jahr 2018; Raytheon bis 04/2020 unter eigener CIK, danach bei RTX.
   Die neue Lesart des Amtsblatts (Mitinhaber) ist im echten Lauf bestätigt (Workflow `einzel`, 13.11.2026).
+  Der Lauf auf GitHub mit der Historie im Bestand ist bestätigt (Workflow `einzel`, 14.11.2026 abends UTC:
+  49 Sekunden, dieselben 633.607 Werte).
   Verlängern: Die Dateien erscheinen vierteljährlich. Neu laden, dann im Repo-Ordner (ohne Ordner `ausgabe`)
   `PYTHON=<venv>/Scripts/python.exe bash werkzeuge/patente_historie.sh ../rohdaten/patente` – rund 10 Minuten;
   die Zitationen wachsen nur so. Der Rechner hat 8 GB Arbeitsspeicher: nichts Großes nebenher laufen lassen.
