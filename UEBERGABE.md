@@ -93,10 +93,12 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
   einzelnen 13F-HR-Meldungen, sobald das Meldungsverzeichnis über die Frist hinausreicht (`ENTSCHEIDUNGEN.md`
   Nr. 81–86). Gegenprobe im echten Lauf für 2026 Q2: Zahl der Halter bei allen 23.229 Wertpapieren wie im
   Datensatz, 8.580 Manager auf beiden Wegen; 20 Minuten für 8.695 Meldungen.
-- Zu prüfen am 17.11.2026: Die Frist für das dritte Quartal 2026 endet am 16.11. Der erste Lauf danach (geplant
-  Di 17.11., 11:20 UTC) muss im Prüfbericht `edgar_13f` die Zeile `aus_einzelmeldungen: ['2026q3']` zeigen; die
-  Werte tragen den Stand `2026q3 Einzelmeldungen` und gelten ab 17.11., 09:30 Uhr Ostküste. Meldet der Lauf
-  „Einzelmeldungen unvollständig“, liest der nächste neu.
+- Zu prüfen am 18.11.2026: Die Frist für das dritte Quartal 2026 endet am 16.11. Das Meldungsverzeichnis eines
+  Laufs reicht nur bis zum Vortag (Lauf vom 14.11.: jüngstes Datum 13.11.), der Lauf am 17.11. sieht also erst den
+  16.11. Der erste Lauf mit einem Datum nach der Frist ist der am Mi 18.11.: Er muss im Prüfbericht `edgar_13f`
+  die Zeile `aus_einzelmeldungen: ['2026q3']` zeigen; die Werte tragen den Stand `2026q3 Einzelmeldungen` und
+  gelten ab 17.11., 09:30 Uhr Ostküste. Meldet der Lauf „Einzelmeldungen unvollständig“, liest der nächste neu.
+  Eine geplante Aufgabe (`pruefung-13f-q3`) prüft das am 19.11. früh.
 - Bundesaufträge (Lieferung 9): `usaspending` im echten Lauf grün. 20 Haushaltsjahre (2008–2027), 94,5 Mio.
   Transaktionen, 12,1 Billionen $ Umfang; zugeordnet 52,8 % des Volumens (43,2 % bei Firmen mit Börsenkürzel),
   PR2-01 mit 419.841 Monatswerten für 8.168 Firmen ab 10/2007. Größte: Lockheed Martin 983 Mrd. $, Boeing 483,
