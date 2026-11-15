@@ -50,7 +50,10 @@ MONATE = {m: i + 1 for i, m in enumerate("jan feb mar apr may jun jul aug sep oc
 TABELLE_DATEIEN, TABELLE_BESTAND = "edgar_13f_dateien", "edgar_13f_bestaende"
 TABELLE_QUARTAL, TABELLE_FIRMEN = "edgar_13f_quartal", "edgar_13f_firmen"
 MIN_SPLIT_PAARE = 3        # so viele fortbestehende Positionen braucht die Schätzung eines Splitfaktors
+BESITZ_LESART = 2          # Fassung der Rechnung von IH5-05; ältere Quartale werden einmal neu gerechnet
 SPLIT_GRENZE_13F = 1.3     # Median-Verhältnis der Positionen über 1,3 (unter 1/1,3): Split zwischen den Quartalen
+# übliche Splitverhältnisse; liegt der Median höchstens 5 % daneben, gilt das glatte Verhältnis
+SPLITS = np.array(sorted({float(n) for n in range(2, 51)} | {1 / n for n in range(2, 51)} | {1.5, 2 / 3, 2.5, 0.4, 4 / 3, 0.75}))
 SPALTEN_MELDUNG = ["ACCESSION_NUMBER", "FILING_DATE", "SUBMISSIONTYPE", "CIK", "PERIODOFREPORT"]
 SPALTEN_POSITION = ["ACCESSION_NUMBER", "CUSIP", "VALUE", "SSHPRNAMT", "SSHPRNAMTTYPE", "PUTCALL"]
 RELEASE_URL = "https://github.com/{repo}/releases/download/bereinigt-edgar/{datei}"
@@ -93,8 +96,9 @@ registriere(
        "Summe der gemeldeten Stückzahlen der Firma im Quartal geteilt durch die Summe im Vorquartal, minus 1; gezählt "
        "werden nur Manager, die in beiden Quartalen gemeldet haben. Ein Aktiensplit zwischen den Quartalen wird "
        "herausgerechnet: Liegt der Median des Verhältnisses der Positionen, die in beiden Quartalen bestehen "
-       f"(mindestens {MIN_SPLIT_PAARE}), über {SPLIT_GRENZE_13F} oder unter 1/{SPLIT_GRENZE_13F}, gilt er als Splitfaktor "
-       "(Spalte split_faktor in edgar_13f_firmen)", "Anteil (relative Änderung)",
+       f"(mindestens {MIN_SPLIT_PAARE}), über {SPLIT_GRENZE_13F} oder unter 1/{SPLIT_GRENZE_13F}, gilt er als Splitfaktor, "
+       "gerundet auf ein übliches Verhältnis, wenn er höchstens 5 % davon abweicht (Spalte split_faktor in edgar_13f_firmen)",
+       "Anteil (relative Änderung)",
        "Relative Änderung der 13F-Bestände, nicht die Änderung des Anteils am Aktienkapital (Sias, Starks & Titman "
        "2006); ohne Bezug auf die Zahl der ausgegebenen Aktien. Nur Firmen, die im Vorquartal ein solcher Manager hielt."),
 )
@@ -470,7 +474,10 @@ def besitz_aenderung(heute: pd.DataFrame, vor: pd.DataFrame, zu_firma: pd.Series
     faktor = pd.Series(1.0, index=s0.index)
     ok = paare.index[(paare["size"] >= MIN_SPLIT_PAARE)
                      & ((paare["median"] > SPLIT_GRENZE_13F) | (paare["median"] < 1 / SPLIT_GRENZE_13F))]
-    faktor[ok.intersection(faktor.index)] = paare.loc[ok.intersection(faktor.index), "median"]
+    median = paare.loc[ok.intersection(faktor.index), "median"]
+    naechster = SPLITS[np.abs(np.log(median.to_numpy()[:, None] / SPLITS[None, :])).argmin(axis=1)] if len(median) else np.array([])
+    glatt = np.abs(np.log(median.to_numpy() / naechster)) <= np.log(1.05) if len(median) else np.array([], dtype=bool)
+    faktor[median.index] = np.where(glatt, naechster, median.to_numpy())
     basis = s0[s0 > 0] * faktor.reindex(s0[s0 > 0].index)
     wert = s1.reindex(basis.index, fill_value=0) / basis - 1
     return pd.DataFrame({"cik": wert.index.to_numpy(dtype="int64"), "besitz_aenderung": wert.to_numpy(dtype="float64"),
@@ -569,7 +576,7 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
         ablage.schreibe_bereinigt(TABELLE_BESTAND, quartal_name(periode), bestand.astype({"cusip": "category"}))
         je_cusip = je_cusip.assign(periode=periode)
         je_firma = je_firma.assign(periode=periode, breite_aenderung=np.nan, besitz_aenderung=np.nan, split_faktor=np.nan,
-                                   manager_beide=0)
+                                   besitz_lesart=np.nan, manager_beide=0)
         quartal = pd.concat([quartal, je_cusip], ignore_index=True) if len(quartal) else je_cusip
         firmen = pd.concat([firmen, je_firma], ignore_index=True) if len(firmen) else je_firma
         return je_cusip
@@ -639,10 +646,10 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
     # Breite und Besitz: für jedes neue Quartal und für das Quartal nach einem neuen, sofern beide Bestände vorliegen;
     # außerdem für Quartale, denen die Änderung des Besitzes noch fehlt (eingeführt mit Lieferung 17)
     ohne_vorquartal = 0
-    for spalte in ("besitz_aenderung", "split_faktor"):
+    for spalte in ("besitz_aenderung", "split_faktor", "besitz_lesart"):
         if len(firmen) and spalte not in firmen.columns:
             firmen[spalte] = np.nan
-    mit_besitz = set(firmen.loc[firmen["besitz_aenderung"].notna(), "periode"]) if len(firmen) else set()
+    mit_besitz = set(firmen.loc[firmen["besitz_lesart"] == BESITZ_LESART, "periode"]) if len(firmen) else set()
     nachgeholt = 0
     for p in sorted(vorhanden):
         vor = (p - pd.offsets.QuarterEnd(1)).normalize()
@@ -658,13 +665,15 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
             continue
         d = breite_aenderung(heute, davor, zu_firma)
         b = besitz_aenderung(heute, davor, zu_firma)
-        teil = firmen[firmen["periode"] == p].drop(columns=["breite_aenderung", "manager_beide", "besitz_aenderung", "split_faktor"])
+        teil = firmen[firmen["periode"] == p].drop(columns=["breite_aenderung", "manager_beide", "besitz_aenderung", "split_faktor",
+                                                            "besitz_lesart"])
         manager = int(teil["manager"].max()) if len(teil) else int(heute["filer_cik"].nunique())
         teil = teil.merge(d, on="cik", how="outer").merge(b, on="cik", how="left").assign(periode=p, manager=manager)
         for s in ("halter", "beste_idee"):
             teil[s] = teil[s].fillna(0).astype("int64")
         teil["manager_beide"] = int(d["manager_beide"].max()) if len(d) else 0
         teil["breite_aenderung"] = teil["breite_aenderung"].fillna(0.0)      # nur von neuen Managern gehalten
+        teil["besitz_lesart"] = float(BESITZ_LESART)
         firmen = pd.concat([firmen[firmen["periode"] != p], teil], ignore_index=True)
     if len(firmen):
         firmen = firmen.astype({"cik": "int64"}).sort_values(["periode", "cik"], kind="stable").reset_index(drop=True)

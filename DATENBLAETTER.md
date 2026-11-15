@@ -552,7 +552,7 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 
 | Angabe | Inhalt |
 |---|---|
-| Definition | Summe der gemeldeten Stückzahlen der Firma im Quartal geteilt durch die Summe im Vorquartal, minus 1; gezählt werden nur Manager, die in beiden Quartalen gemeldet haben. Ein Aktiensplit zwischen den Quartalen wird herausgerechnet: Liegt der Median des Verhältnisses der Positionen, die in beiden Quartalen bestehen (mindestens 3), über 1.3 oder unter 1/1.3, gilt er als Splitfaktor (Spalte split_faktor in edgar_13f_firmen) |
+| Definition | Summe der gemeldeten Stückzahlen der Firma im Quartal geteilt durch die Summe im Vorquartal, minus 1; gezählt werden nur Manager, die in beiden Quartalen gemeldet haben. Ein Aktiensplit zwischen den Quartalen wird herausgerechnet: Liegt der Median des Verhältnisses der Positionen, die in beiden Quartalen bestehen (mindestens 3), über 1.3 oder unter 1/1.3, gilt er als Splitfaktor, gerundet auf ein übliches Verhältnis, wenn er höchstens 5 % davon abweicht (Spalte split_faktor in edgar_13f_firmen) |
 | Einheit | Anteil (relative Änderung) |
 | Frequenz | je Berichtsquartal |
 | Offenlegung | amtlich offen: Form 13F (§ 13(f) Exchange Act), Frist 45 Tage nach Quartalsende |

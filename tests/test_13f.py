@@ -146,7 +146,7 @@ def test_fortschreibung(lage):
     assert info["datensaetze_neu"] == 0 and len(p3) == 20
 
     # Bestand aus der Zeit vor IH5-05: die Änderung des Besitzes wird nachgerechnet
-    fi = ablage.lies_bereinigt("edgar_13f_firmen").drop(columns=["besitz_aenderung", "split_faktor"])
+    fi = ablage.lies_bereinigt("edgar_13f_firmen").drop(columns=["besitz_aenderung", "split_faktor", "besitz_lesart"])
     ablage.schreibe_bereinigt("edgar_13f_firmen", "alle", fi)
     p4, _, hinweise = f.lauf(ablage, tmp / "arb", lokal=ordner)
     assert len(p4) == 20 and any("1 frühere Quartale nachgerechnet" in h for h in hinweise)
@@ -160,6 +160,10 @@ def test_besitz_mit_split():
     b = f.besitz_aenderung(heute, vor, zu_firma).set_index("cik")
     assert b.loc[10, "split_faktor"] == 2.0 and b.loc[10, "besitz_aenderung"] == pytest.approx(160 / 200 - 1)
     assert b.loc[11, "split_faktor"] == 1.0 and b.loc[11, "besitz_aenderung"] == pytest.approx(0.1)
+    # Median 3,9 bei einem Split 4:1 (Positionen leicht verkleinert): das glatte Verhältnis gilt
+    heute = pd.DataFrame({"filer_cik": [1, 2, 3, 4], "cusip": [A] * 4, "stueck": [39, 78, 117, 160]})
+    b = f.besitz_aenderung(heute, vor[vor["cusip"] == A], zu_firma).set_index("cik")
+    assert b.loc[10, "split_faktor"] == 4.0 and b.loc[10, "besitz_aenderung"] == pytest.approx(394 / 400 - 1)
 
 
 def test_vorquartal_fehlt_lokal(lage):
