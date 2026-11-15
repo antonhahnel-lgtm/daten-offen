@@ -9,7 +9,7 @@ on:
       quelle:
         description: "Quelle"
         type: choice
-        options: [sec_ftd, edgar_13f, usaspending, uspto_patente, fed_sf, rueckrufe]
+        options: [sec_ftd, edgar_13f, usaspending, uspto_patente, fed_sf, rueckrufe, sec_verfahren]
       veroeffentlichen:
         description: "Ergebnis in die Releases laden"
         type: boolean
@@ -68,6 +68,8 @@ jobs:
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__patente_*.parquet" || true ;;
             rueckrufe-false)
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__rueckrufe_fda__*.parquet" || true ;;
+            sec_verfahren-false)
+              gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__verfahren_ereignisse__*.parquet" || true ;;
           esac
           touch ausgabe/.vorher
       - name: Abruf

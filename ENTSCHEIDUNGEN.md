@@ -199,6 +199,17 @@ lange und saubere Daten vor Vollständigkeit.
 | 129 | Firma eines CPSC-Rückrufs: der Name vor „Recalls“ im Titel und die genannten Hersteller, Importeure und Händler ohne Ortsangabe – nicht die Liste der Verkaufsstellen. | Die Verkaufsstellen („Sold at: Amazon, Walmart …“) sind nicht verantwortlich; sie zuzuordnen legte den Händlern fremde Rückrufe zur Last. |
 | 130 | Zuordnung wie bei den Patenten: Namensabgleich (exakt, früherer Name, Kernname), dazu die Töchterliste der Patente und eine eigene Liste von rund 60 meldenden Töchtern mit Zeiträumen (Jayco erst seit 2016 bei Thor, Hospira seit 2015 bei Pfizer). | Probelauf mit den echten Daten (15.11.2026): 68.363 Rückrufe, 29,9 % zugeordnet, 22.302 Werte für 1.403 Firmen. Nicht zuzuordnen sind vor allem ausländische Autohersteller ohne SEC-Meldung (BMW, Volkswagen, Hyundai, Daimler) und private Firmen. |
 
+## SEC-Verfahren (Lieferung 15)
+
+| Nr. | Entscheidung | Grund |
+|---|---|---|
+| 131 | Neue Quelle `sec_verfahren` → `PR4-01`: eine Zeile je Veröffentlichung und genannter Firma aus drei Listen der SEC (Litigation Releases, Administrative Proceedings, AAER). wert: 1 = Zivilklage, 2 = Verwaltungsverfahren (erster Bescheid des Aktenzeichens), 3 = Folgebescheid desselben Aktenzeichens; plus 10, wenn die Veröffentlichung eine AAER-Nummer trägt. | Der Katalog nennt Litigation Releases und AAER; die meisten Verfahren gegen Emittenten laufen aber als Verwaltungsverfahren, und AAER ist ein Querschnitt beider Listen. Folgebescheide (Verteilung eines Fonds, Aufhebung) nennen dieselbe Firma Jahre später ohne neue Nachricht; über das Aktenzeichen sind sie zu trennen. |
+| 132 | Zugeordnet wird nur, was in der Beteiligtenzeile der Liste steht: ein Firmenname als abgegrenzter Abschnitt (von Komma, „and“, Semikolon, Klammer oder Rechtsform bis zum nächsten Trenner), der längste Treffer gewinnt; ein einzelnes Wort zählt nur mit Rechtsform dahinter. Treffer sind der heutige oder ein früherer EDGAR-Name und eine Liste meldender Töchter mit Zeiträumen – kein Kernname, keine Ähnlichkeit. | Die Zeile ist freier Text, teils ohne Trennzeichen zwischen den Namen. Die SEC schreibt Firmen mit ihrem registrierten Namen; unter den Beteiligten sind viele kleine Gesellschaften mit ähnlichen Namen, bei denen ein lockerer Abgleich verwechselt. |
+| 133 | Ein Name gilt erst ab seinem Auftreten bei EDGAR (heutiger Name ab dem letzten Namenswechsel, früherer ab seinem Beginn, je ein Jahr Toleranz), danach ohne Ende. Mehrere gleichnamige Firmen: die mit dem heutigen Namen, sonst die mit Börsenticker, sonst keine. | Mantelgesellschaften übernehmen alte Namen; ohne die Grenze fiele ein Verfahren von 2003 der Firma zu, die den Namen 2020 angenommen hat. Unter früherem Namen nennt die SEC eine Firma auch nach dem Wechsel („f/k/a“). |
+| 134 | Stichtag ist der Tag der Liste in New Yorker Zeit; gültig ab der nächsten Börseneröffnung. Parameter ab 2001 (Nr. 107), die Tabelle `verfahren_ereignisse` reicht bis 09/1995. | Die Liste führt für alte Einträge nur den Tag, die Uhrzeit ist dort ein Rest der Datenübernahme. |
+| 135 | Verfahren nur gegen Personen (Vorstände, Prüfer) werden keiner Firma zugerechnet. | Die Firma steht dann nur im Text der Veröffentlichung (rund 34.000 Dokumente, teils PDF); der Name im Fließtext sagt nicht, ob die Firma Beteiligte, Arbeitgeber oder Geschädigte ist. |
+| 136 | Der Bestand liegt in `verfahren_ereignisse`; laufend wird je Liste von vorn gelesen, bis eine Seite nichts Neues mehr zeigt (mindestens zwei Seiten). Neuaufbau: Workflow `einzel` mit `frisch`. | Die Listen haben 343 Seiten; neue Einträge stehen vorn. Nachträgliche Änderungen alter Einträge sind selten und kommen mit einem Neuaufbau. |
+
 ## Noch offen
 
 | Baustein | Parameter | Hinderungsgrund |
@@ -207,7 +218,7 @@ lange und saubere Daten vor Vollständigkeit.
 | H-1B-Anträge (DOL) | GA2-02 | dol.gov weist automatische Abrufe ab (Nr. 120); nur als Handimport von rund 40 großen Excel-Dateien möglich |
 | Weitere Abschlusskennzahlen | UA2-02, GW1-03 | Dechow-F-Score braucht weitere Bilanzposten (Vorräte, Verbindlichkeiten, Anlagen); die geldpolitische Exposition braucht Cashflow-Duration und Volatilität |
 | Beschwerden und Vorkommnisse zu Produkten | GA3-02 (zweiter Teil) | Rückrufe sind gebaut (Nr. 126–130); offen sind Fahrzeugbeschwerden (NHTSA), Vorkommnisse mit Medizinprodukten (MAUDE) und Verbrauchermeldungen (SaferProducts) |
-| SEC-Verfahren | PR4-01 | Litigation Releases und AAER von sec.gov; Namensabgleich Beklagte → Firma |
+| SEC-Verfahren gegen Vorstände und Prüfer | PR4-01 (zweiter Teil) | Verfahren mit der Firma als Beteiligter sind gebaut (Nr. 131–136); offen sind Verfahren nur gegen Personen – dafür müssten die Texte der Veröffentlichungen gelesen werden |
 | Indexaufnahme und -streichung | KD3-03 | Ankündigungen der Indexanbieter; freie, weiterverbreitbare Quelle suchen |
 | Insider: Optionsausübung nahe Verfall | UA6-02 | Derivatetabelle der Insider-Datensätze wird noch nicht gelesen |
 | Passive Großaktionäre, institutioneller Besitz | IH5-07, IH5-05 | 13G braucht die Rollen aus dem Meldungskopf (viele Abrufe); die 13F-Summe ist aus den Beständen ableitbar |

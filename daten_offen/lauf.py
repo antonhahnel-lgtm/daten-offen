@@ -17,10 +17,10 @@ import pandas as pd
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
 from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fed_sf, fred,
-                      klinik, rueckrufe, sec_ftd, usaspending, uspto_patente, uspto_zitate, wikipedia)
+                      klinik, rueckrufe, sec_ftd, sec_verfahren, usaspending, uspto_patente, uspto_zitate, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe")
+           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe", "sec_verfahren")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -132,6 +132,16 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
                 schwer.append(f"{quelle}: nur {zahlen[quelle]} Rückrufe gelesen (erwartet über {mindestens}; Aufbau geändert?)")
         if info["trefferquote"].get("quote_gewichtet", 0) < 0.1:
             schwer.append("Namensabgleich ordnet weniger als 10 % der Rückrufe zu")
+        return parameter, info, schwer, hinweise
+    if args.quelle == "sec_verfahren":
+        parameter, info, hinweise = sec_verfahren.lauf(ablage)
+        schwer = []
+        zahlen = {**info["ereignisse"], "aaer": info["mit_aaer"]}
+        for liste, mindestens in sec_verfahren.MINDESTENS.items():
+            if zahlen.get(liste, 0) < mindestens:
+                schwer.append(f"Liste {liste}: nur {zahlen.get(liste, 0)} Einträge (erwartet über {mindestens}; Aufbau der Seite geändert?)")
+        if info["mit_firma"] < 0.02 * max(sum(info["ereignisse"].values()), 1):
+            schwer.append("Namenssuche findet in weniger als 2 % der Veröffentlichungen eine Firma")
         return parameter, info, schwer, hinweise
     if args.quelle == "fed_sf":
         parameter, info, hinweise = fed_sf.lauf(ablage)

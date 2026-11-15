@@ -604,6 +604,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
 | Bekannte Schwächen | Latente Steuerpositionen fehlen noch |
 
+## PR4-01 SEC-Verfahren
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Eine Zeile je Veröffentlichung der SEC, die die Firma oder eine bekannte Tochter als Beteiligte nennt; wert: 1 = Zivilklage (Litigation Release), 2 = Verwaltungsverfahren, erster Bescheid des Aktenzeichens, 3 = Verwaltungsverfahren, Folgebescheid; plus 10, wenn die Veröffentlichung eine AAER-Nummer trägt (Bilanzierung und Prüfung). Beteiligte, Aktenzeichen und Anlagen stehen in verfahren_ereignisse |
+| Einheit | Art (1–3, 11–13) |
+| Frequenz | je Veröffentlichung |
+| Offenlegung | amtliche Veröffentlichung der SEC (Litigation Releases, Administrative Proceedings, AAER) |
+| Quelle | sec.gov/enforcement-litigation (Litigation Releases, Administrative Proceedings, Accounting and Auditing Enforcement Releases) |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2001 (Listen ab 09/1995 in verfahren_ereignisse) |
+| Verzögerung | Eröffnung des ersten Handelstags nach dem Veröffentlichungstag der Liste |
+| Bekannte Schwächen | Zuordnung nur über den Namen in der Beteiligtenzeile: Verfahren gegen Vorstände oder Prüfer ohne die Firma als Beteiligte fehlen, ebenso Firmen ohne EDGAR-Namen in der Zeile; gleichnamige Firmen können verwechselt werden. Zivilklagen tragen kein Aktenzeichen, Folgemeldungen (Urteil, Vergleich) sind dort nicht von der Klage zu trennen. Die Liste zeigt den Tag, nicht die Uhrzeit der Veröffentlichung |
+
 ## UA1-01 Gewinnüberraschung (SUE)
 
 | Angabe | Inhalt |

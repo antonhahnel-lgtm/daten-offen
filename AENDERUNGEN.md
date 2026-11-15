@@ -1,5 +1,13 @@
 # Änderungen
 
+## Lieferung 15 – 2026-11-15 (SEC-Verfahren)
+
+- Neue Quelle `sec_verfahren`: Litigation Releases, Administrative Proceedings und AAER der SEC (ab 09/1995) →
+  `PR4-01`; Tabellen `verfahren_ereignisse`, `verfahren_zuordnung` (`ENTSCHEIDUNGEN.md` Nr. 131–136).
+- `werkzeuge/veroeffentliche.sh`: `parameter__sec_verfahren__*` geht nach `parameter-web`, `parameter-markt` nimmt
+  nur noch `parameter__sec_ftd__*`.
+- 154 Offline-Tests.
+
 ## Lieferung 14 – 2026-11-15 (Rückrufe)
 
 - Neue Quelle `rueckrufe`: Rückrufe von NHTSA (ab 1967), CPSC (ab 1973) und FDA (ab 2012) → `GA3-02`; Tabellen

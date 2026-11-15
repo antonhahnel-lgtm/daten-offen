@@ -1,6 +1,6 @@
 # Übergabe
 
-Stand 15.11.2026, Lieferung 14. Fortschritt 93 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
+Stand 15.11.2026, Lieferung 15. Fortschritt 93 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
 und dem Auftragstext, um in einem neuen Chat weiterzuarbeiten.
 
 ## Ziel
@@ -29,8 +29,9 @@ Insider-Monitor.
 | `uspto_zitate` | GA1-09 | ja | nur lokal, veröffentlicht 15.11.2026; nicht im Tageslauf |
 | `fed_sf` | GW1-01, GW1-02, WS2-05 | ja | ja (Workflow `einzel`, 15.11.2026) |
 | `rueckrufe` | GA3-02 | ja | ja (Workflow `einzel`, 15.11.2026) |
+| `sec_verfahren` | PR4-01 | ja | GitHub-Lauf abwarten |
 
-71 Parameter, 151 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
+72 Parameter, 154 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
 (`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
 
 ## Prüfliste für den ersten echten Lauf
@@ -157,8 +158,8 @@ privat vor (Ordner `auswertung` neben den Repos) und ruht, bis die Quellen ausge
 4. Offene Bausteine (Tabelle „Noch offen“ in `ENTSCHEIDUNGEN.md`). Erledigt: Lieferausfälle, 13F (auch das
    laufende Quartal), Sponsoren, Bundesaufträge, Patente mit Historie und Zitationen, Abschlüsse II mit Lockup
    und Abspaltung (Lieferung 12), Fed San Francisco (Lieferung 13). H-1B ist zurückgestellt (dol.gov sperrt
-   automatische Abrufe), Rückrufe (Lieferung 14). Als Nächstes: SEC-Verfahren, Insider-Optionsausübungen, N-PORT,
-   zuletzt die Berichtstexte.
+   automatische Abrufe), Rückrufe (Lieferung 14), SEC-Verfahren (Lieferung 15). Als Nächstes:
+   Insider-Optionsausübungen, kleinere Bausteine (13F-Summe, Wahltermine, F-Score), N-PORT, zuletzt die Berichtstexte.
 5. Anbindung im Insider-Monitor (eigener Auftrag; `SCHNITTSTELLE.md` beschreibt das Lesen).
 
 ## Dateien für einen neuen Chat
