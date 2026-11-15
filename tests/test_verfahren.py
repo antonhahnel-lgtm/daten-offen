@@ -65,10 +65,13 @@ class Quelle:
 def firmen():
     gamma = '[{"name": "Gamma Corp", "from": "2001-02-01T00:00:00.000Z", "to": "2010-06-30T00:00:00.000Z"}]'
     penola = '[{"name": "Penola, Inc.", "from": "2010-01-05T00:00:00.000Z", "to": "2012-03-01T00:00:00.000Z"}]'
+    # EDGAR führt den heutigen Namen meist selbst unter den früheren, mit seinem Beginn
+    travel = ('[{"name": "TRAVEL CO", "from": "1994-02-01T05:00:00.000Z", "to": "2026-11-13T05:00:00.000Z"}, '
+              '{"name": "Old Travel Inc", "from": "1990-01-01T00:00:00.000Z", "to": "1994-02-01T00:00:00.000Z"}]')
     return pd.DataFrame({"cik": [10, 11, 12, 13, 14, 15, 16, 17], "sic": ["1000"] * 8,
                          "name": ["ALPHA CORP", "Beta Inc.", "Delta Mining Inc.", "TRAVEL CO", "CITIGROUP INC", "MORGAN STANLEY", "Zeta Inc", "Zeta Inc"],
                          "tickers": ["ALP", None, None, "TVL", "C", "MS", None, None],
-                         "fruehere_namen": ["[]", gamma, penola, "[]", "[]", "[]", "[]", "[]"]})
+                         "fruehere_namen": ["[]", gamma, penola, travel, "[]", "[]", "[]", "[]"]})
 
 
 def test_seite_lesen():
@@ -103,6 +106,7 @@ def test_namen_im_text():
     assert finde("Beta Inc.", pd.Timestamp("2005-01-01")) == [("Beta Inc", None, "keiner")]
     assert finde("Gamma Corp.", pd.Timestamp("2005-01-01")) == [("Gamma Corp", 11, "frueher")]
     assert finde("Zeta Inc.") == [("Zeta Inc", None, "mehrdeutig")]
+    assert finde("Travel Co. and Old Travel Inc.", pd.Timestamp("2000-01-01")) == [("Travel Co", 13, "exakt"), ("Old Travel Inc", 13, "frueher")]
     assert v.abschnitte("W.L. Ware Enterprises, Inc., et al. and Warren L. Ware (Defendants); John Does 1-5") == [
         "W.L. Ware Enterprises, Inc", "and Warren L. Ware"]
 

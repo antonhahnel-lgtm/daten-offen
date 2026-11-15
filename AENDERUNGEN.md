@@ -6,6 +6,7 @@
   `PR4-01`; Tabellen `verfahren_ereignisse`, `verfahren_zuordnung` (`ENTSCHEIDUNGEN.md` Nr. 131–136).
 - `werkzeuge/veroeffentliche.sh`: `parameter__sec_verfahren__*` geht nach `parameter-web`, `parameter-markt` nimmt
   nur noch `parameter__sec_ftd__*`.
+- Erster echter Lauf: 30.886 Veröffentlichungen seit 09/1995, 17.416 Werte für 7.021 Firmen.
 - 154 Offline-Tests.
 
 ## Lieferung 14 – 2026-11-15 (Rückrufe)

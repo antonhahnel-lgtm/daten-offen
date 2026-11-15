@@ -95,6 +95,45 @@ TOCHTER_NAMEN = {
     "The Nasdaq Stock Market LLC": "NASDAQ, INC.", "Standard & Poor's Ratings Services": "S&P Global Inc.",
     "S&P Global Ratings": "S&P Global Inc.", "Moody's Investors Service, Inc.": "MOODYS CORP /DE/",
     "Western Union Financial Services, Inc.": "Western Union CO",
+    # ergänzt nach dem ersten echten Lauf (häufigste Namen ohne Treffer oder mit eigener CIK ohne Aktie)
+    "Merrill Lynch, Pierce and Fenner & Smith Incorporated": "BANK OF AMERICA CORP /DE/",
+    "Banc of America Capital Management, LLC": "BANK OF AMERICA CORP /DE/", "BACAP Distributors, LLC": "BANK OF AMERICA CORP /DE/",
+    "Banc of America Investment Services, Inc.": "BANK OF AMERICA CORP /DE/", "Fleet Specialist, Inc.": "BANK OF AMERICA CORP /DE/",
+    "Columbia Funds Distributor, Inc.": "BANK OF AMERICA CORP /DE/", "Columbia Management Advisors, Inc.": "AMERIPRISE FINANCIAL INC",
+    "AIM Distributors, Inc.": "Invesco Ltd.", "AIM Advisors, Inc.": "Invesco Ltd.", "A I M Advisors, Inc.": "Invesco Ltd.",
+    "Invesco Funds Group, Inc.": "Invesco Ltd.", "Invesco Aim Advisors, Inc.": "Invesco Ltd.", "Invesco Distributors, Inc.": "Invesco Ltd.",
+    "Franklin Advisers, Inc.": "FRANKLIN RESOURCES INC", "Franklin Templeton Distributors, Inc.": "FRANKLIN RESOURCES INC",
+    "Franklin/Templeton Distributors, Inc.": "FRANKLIN RESOURCES INC",
+    "Securities America Advisors, Inc.": None, "Securities America, Inc.": None,
+    "American Express Financial Advisors, Inc.": "AMERIPRISE FINANCIAL INC", "American Express Financial Advisors Inc.": "AMERIPRISE FINANCIAL INC",
+    "American Express Financial Corporation": "AMERIPRISE FINANCIAL INC",
+    "Morgan Keegan & Company, Inc.": "RAYMOND JAMES FINANCIAL INC", "Morgan Keegan & Co., Inc.": "RAYMOND JAMES FINANCIAL INC",
+    "Morgan Asset Management, Inc.": "REGIONS FINANCIAL CORP",
+    "Conseco Services, LLC": "CNO Financial Group, Inc.", "Conseco Equity Sales, Inc.": "CNO Financial Group, Inc.",
+    "CIHC, Inc.": "CNO Financial Group, Inc.",
+    "Evergreen Investment Management Company, LLC": "WELLS FARGO & COMPANY/MN", "Evergreen Service Company, LLC": "WELLS FARGO & COMPANY/MN",
+    "Evergreen Investment Services, Inc.": "WELLS FARGO & COMPANY/MN", "Wells Fargo Brokerage Services, LLC": "WELLS FARGO & COMPANY/MN",
+    "Wells Fargo Investments, LLC": "WELLS FARGO & COMPANY/MN", "Wells Fargo Funds Management, LLC": "WELLS FARGO & COMPANY/MN",
+    "CIBC World Markets Corp.": "CANADIAN IMPERIAL BANK OF COMMERCE /CAN/", "BNY Mellon Securities LLC": "Bank of New York Mellon Corp",
+    "Value Line Securities, Inc.": "VALUE LINE INC", "Southwest Securities, Inc.": "Hilltop Holdings Inc.",
+    "Federated Investment Management Company": "FEDERATED HERMES, INC.",
+    "Smith Barney Fund Management LLC": "CITIGROUP INC", "Citigroup Alternative Investments LLC": "CITIGROUP INC",
+    "Salomon Brothers Asset Management Inc": "CITIGROUP INC",
+    "Banc One Investment Advisors Corporation": "JPMORGAN CHASE & CO", "S&P Dow Jones Indices LLC": "S&P Global Inc.",
+    "Waddell & Reed Investment Management Company": "WADDELL & REED FINANCIAL INC",
+    "Waddell & Reed Services Company": "WADDELL & REED FINANCIAL INC", "Waddell & Reed, Inc.": "WADDELL & REED FINANCIAL INC",
+    "optionsXpress, Inc.": "SCHWAB CHARLES CORP", "Putnam Investment Management, LLC": "FRANKLIN RESOURCES INC",
+    "Massachusetts Financial Services Company": "SUN LIFE FINANCIAL INC", "Prudential Equity Group, LLC": "PRUDENTIAL FINANCIAL INC",
+    "Royal Alliance Associates, Inc.": None, "SunAmerica Asset Management Corp.": "AMERICAN INTERNATIONAL GROUP, INC.",
+    "FCA US LLC": "Stellantis N.V.", "UBS Warburg LLC": "UBS Group AG", "UBS PaineWebber Inc.": "UBS Group AG",
+    "U.S. Bancorp Piper Jaffray, Inc.": "US BANCORP \\DE\\", "U.S. Bank National Association": "US BANCORP \\DE\\",
+    "Dean Witter Reynolds Inc.": "MORGAN STANLEY",
+    "KeyBanc Capital Markets Inc.": "KEYCORP /NEW/", "SunTrust Robinson Humphrey, Inc.": "TRUIST FINANCIAL CORP",
+    "SunTrust Capital Markets, Inc.": "TRUIST FINANCIAL CORP", "SunTrust Bank": "TRUIST FINANCIAL CORP",
+    "SunTrust Investment Services, Inc.": "TRUIST FINANCIAL CORP", "PNC Capital Markets LLC": "PNC FINANCIAL SERVICES GROUP, INC.",
+    "TD Securities (USA) LLC": "TORONTO DOMINION BANK", "BMO Capital Markets Corp.": "BANK OF MONTREAL /CAN/",
+    "Nomura Securities International, Inc.": "NOMURA HOLDINGS INC", "Instinet, LLC": "NOMURA HOLDINGS INC",
+    "Mizuho Securities USA LLC": "MIZUHO FINANCIAL GROUP INC", "Mizuho Securities USA Inc.": "MIZUHO FINANCIAL GROUP INC",
 }
 # Früherer Besitz: (gültig bis, Mutter davor); None = die Firma meldete selbst.
 TOCHTER_FRUEHER = {
@@ -112,6 +151,35 @@ TOCHTER_FRUEHER = {
     "New York Stock Exchange LLC": [("2007-04-04", None), ("2013-11-13", "NYSE Euronext")],
     "NYSE Arca, Inc.": [("2013-11-13", "NYSE Euronext")],
     "Piper Jaffray & Co.": [("2003-12-31", "US BANCORP \\DE\\")],
+    "Merrill Lynch, Pierce and Fenner & Smith Incorporated": [("2009-01-01", "MERRILL LYNCH & CO., INC.")],
+    "Fleet Specialist, Inc.": [("2004-04-01", "FLEETBOSTON FINANCIAL CORP")],
+    "Columbia Funds Distributor, Inc.": [("2004-04-01", "FLEETBOSTON FINANCIAL CORP")],
+    "Columbia Management Advisors, Inc.": [("2004-04-01", "FLEETBOSTON FINANCIAL CORP"), ("2010-05-01", "BANK OF AMERICA CORP /DE/")],
+    "Securities America Advisors, Inc.": [("2005-09-30", "AMERICAN EXPRESS CO"), ("2011-11-04", "AMERIPRISE FINANCIAL INC"),
+                                          ("2020-02-14", "LADENBURG THALMANN FINANCIAL SERVICES INC.")],
+    "Securities America, Inc.": [("2005-09-30", "AMERICAN EXPRESS CO"), ("2011-11-04", "AMERIPRISE FINANCIAL INC"),
+                                 ("2020-02-14", "LADENBURG THALMANN FINANCIAL SERVICES INC.")],
+    "American Express Financial Advisors, Inc.": [("2005-09-30", "AMERICAN EXPRESS CO")],
+    "American Express Financial Advisors Inc.": [("2005-09-30", "AMERICAN EXPRESS CO")],
+    "American Express Financial Corporation": [("2005-09-30", "AMERICAN EXPRESS CO")],
+    "Morgan Keegan & Company, Inc.": [("2001-03-30", "MORGAN KEEGAN INC"), ("2012-04-02", "REGIONS FINANCIAL CORP")],
+    "Morgan Keegan & Co., Inc.": [("2001-03-30", "MORGAN KEEGAN INC"), ("2012-04-02", "REGIONS FINANCIAL CORP")],
+    "Conseco Services, LLC": [("2003-09-10", 719241)], "Conseco Equity Sales, Inc.": [("2003-09-10", 719241)], "CIHC, Inc.": [("2003-09-10", 719241)],
+    "Evergreen Investment Management Company, LLC": [("2008-12-31", "WACHOVIA CORP NEW")],
+    "Evergreen Service Company, LLC": [("2008-12-31", "WACHOVIA CORP NEW")],
+    "Evergreen Investment Services, Inc.": [("2008-12-31", "WACHOVIA CORP NEW")],
+    "Southwest Securities, Inc.": [("2015-01-01", "SWS GROUP INC")],
+    "Banc One Investment Advisors Corporation": [("2004-07-01", 1067092)],
+    "optionsXpress, Inc.": [("2011-09-01", "optionsXpress Holdings, Inc.")],
+    "Putnam Investment Management, LLC": [("2007-08-03", "MARSH & MCLENNAN COMPANIES, INC."), ("2024-01-01", None)],
+    "Prudential Equity Group, LLC": [("2001-12-13", None)], "Prudential Securities Incorporated": [("2001-12-13", None)],
+    "Royal Alliance Associates, Inc.": [("2016-05-06", "AMERICAN INTERNATIONAL GROUP, INC.")],
+    "UBS Securities LLC": [("2014-11-28", "UBS AG")], "UBS Financial Services Inc.": [("2014-11-28", "UBS AG")],
+    "UBS Warburg LLC": [("2014-11-28", "UBS AG")], "UBS PaineWebber Inc.": [("2014-11-28", "UBS AG")], "UBS AG": [("2014-11-28", None)],
+    "Goldman, Sachs & Co.": [("1999-05-04", None)],
+    "SunTrust Robinson Humphrey, Inc.": [("2019-12-06", "SUNTRUST BANKS INC")], "SunTrust Capital Markets, Inc.": [("2019-12-06", "SUNTRUST BANKS INC")],
+    "SunTrust Bank": [("2019-12-06", "SUNTRUST BANKS INC")], "SunTrust Investment Services, Inc.": [("2019-12-06", "SUNTRUST BANKS INC")],
+    "Instinet, LLC": [("2007-02-01", None)],
 }
 
 
@@ -256,8 +324,9 @@ def _tag(text) -> date | None:
 
 
 def baue_verzeichnis(firmen: pd.DataFrame) -> dict[str, list[tuple]]:
-    """Bereinigter Name -> [(cik, gilt_ab, hat_ticker, art)]: heutiger Name ab dem letzten Namenswechsel, frühere
-    Namen ab ihrem ersten Auftreten (jeweils mit Toleranz), ohne Ende – die SEC nennt Firmen auch unter altem Namen."""
+    """Bereinigter Name -> [(cik, gilt_ab, hat_ticker, art)]. Ein Name gilt ab seinem ersten Auftreten bei EDGAR
+    (mit Toleranz), ohne Ende – die SEC nennt Firmen auch unter altem Namen. EDGAR führt den heutigen Namen meist selbst
+    unter den früheren (mit Beginn); fehlt er dort, gilt er ab dem Ende des letzten früheren Namens."""
     verzeichnis: dict[str, list[tuple]] = {}
     for cik, name, tickers, fruehere in zip(firmen["cik"], firmen["name"], firmen["tickers"], firmen["fruehere_namen"]):
         cik, ticker = int(cik), isinstance(tickers, str) and bool(tickers)
@@ -267,14 +336,16 @@ def baue_verzeichnis(firmen: pd.DataFrame) -> dict[str, list[tuple]]:
                 alte = [a for a in json.loads(fruehere) if isinstance(a, dict)]
             except ValueError:
                 alte = []
-        wechsel = max((t for t in (_tag(a.get("to")) for a in alte) if t), default=None)
-        n = bereinige(name)
-        if n:
-            verzeichnis.setdefault(n, []).append((cik, wechsel - NAME_TOLERANZ if wechsel else None, ticker, "exakt"))
+        beginn: dict[str, list] = {}
         for a in alte:
-            m, ab = bereinige(a.get("name")), _tag(a.get("from"))
-            if m and m != n:
-                verzeichnis.setdefault(m, []).append((cik, ab - NAME_TOLERANZ if ab else None, ticker, "frueher"))
+            beginn.setdefault(bereinige(a.get("name")), []).append(_tag(a.get("from")))
+        n = bereinige(name)
+        if n and n not in beginn:
+            beginn[n] = [max((t for t in (_tag(a.get("to")) for a in alte) if t), default=None)]
+        for m, tage in beginn.items():
+            if m:
+                ab = min(tage) - NAME_TOLERANZ if all(tage) else None
+                verzeichnis.setdefault(m, []).append((cik, ab, ticker, "exakt" if m == n else "frueher"))
     return verzeichnis
 
 
@@ -287,8 +358,9 @@ class Suche:
         self.bekannt = set(firmen["cik"].astype(int))
         self.unbekannt: set[str] = set()
 
-    def _aus_verzeichnis(self, n: str, tag: date) -> tuple[int | None, float, str]:
-        gueltig = [k for k in self.verzeichnis.get(n, ()) if k[1] is None or tag >= k[1]]
+    def _aus_verzeichnis(self, n: str, tag: date | None) -> tuple[int | None, float, str]:
+        """``tag`` None: ohne Blick auf den Zeitraum (Mütter der Töchterliste)."""
+        gueltig = [k for k in self.verzeichnis.get(n, ()) if tag is None or k[1] is None or tag >= k[1]]
         if not gueltig:
             return None, 0.0, "keiner"
         for auswahl in (gueltig, [k for k in gueltig if k[3] == "exakt"], [k for k in gueltig if k[2]],
@@ -308,7 +380,7 @@ class Suche:
                 if isinstance(mutter, int):
                     cik = mutter if mutter in self.bekannt else None
                 else:
-                    cik = self._aus_verzeichnis(bereinige(mutter), tag)[0]
+                    cik = self._aus_verzeichnis(bereinige(mutter), None)[0]
                 if cik is None:
                     self.unbekannt.add(str(mutter))
                     return None, 0.0, "keiner"
@@ -345,7 +417,8 @@ class Suche:
                     continue
                 if form[i] and not (i + 1 < len(woerter) and form[i + 1]):
                     # Name mit Rechtsform ohne Treffer: kürzester Abschnitt bis hierher, für den Prüfbericht
-                    start = max((a for a in anfang if a <= i and not all(form[a:i + 1])), default=None)
+                    start = max((a for a in anfang if a <= i and not all(form[a:i + 1]) and not (a and woerter[a - 1] == "&")),
+                                default=None)
                     if start is not None:
                         aus.append((" ".join(woerter[start:i + 1]).strip(" ,."), None, 0.0, "keiner"))
                 i += 1
