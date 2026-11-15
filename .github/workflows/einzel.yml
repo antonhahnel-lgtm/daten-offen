@@ -9,7 +9,7 @@ on:
       quelle:
         description: "Quelle"
         type: choice
-        options: [sec_ftd, edgar_13f, usaspending, uspto_patente, fed_sf, rueckrufe, sec_verfahren, edgar_ausuebungen, politik]
+        options: [sec_ftd, edgar_13f, usaspending, uspto_patente, fed_sf, rueckrufe, sec_verfahren, edgar_ausuebungen, politik, edgar_nport]
       veroeffentlichen:
         description: "Ergebnis in die Releases laden"
         type: boolean
@@ -68,6 +68,11 @@ jobs:
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__patente_*.parquet" || true ;;
             rueckrufe-false)
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__rueckrufe_fda__*.parquet" || true ;;
+            edgar_nport-*)
+              gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet" ;;&
+            edgar_nport-false)
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber \
+                -p "bereinigt__nport_dateien__*.parquet" -p "bereinigt__nport_fonds__*.parquet" -p "bereinigt__nport_firmen__*.parquet" || true ;;
             edgar_ausuebungen-*)
               jahr=$(date -u +%Y)
               gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber -p "bereinigt__edgar_meldungen__*.parquet"

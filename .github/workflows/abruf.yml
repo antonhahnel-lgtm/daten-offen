@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        quelle: [edgar_insider, edgar_ausuebungen, edgar_ereignisse, edgar_xbrl, edgar_rollen, edgar_13f, sec_ftd, cfpb, klinik, usaspending, uspto_patente, rueckrufe, sec_verfahren]
+        quelle: [edgar_insider, edgar_ausuebungen, edgar_nport, edgar_ereignisse, edgar_xbrl, edgar_rollen, edgar_13f, sec_ftd, cfpb, klinik, usaspending, uspto_patente, rueckrufe, sec_verfahren]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -83,6 +83,11 @@ jobs:
             edgar_insider)
               gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber \
                 -p "bereinigt__insider_transaktionen__*.parquet" -p "bereinigt__insider_xml_stand__*.parquet" || true ;;
+            edgar_nport)
+              # die Bestände früherer Datensätze holt das Modul bei Bedarf selbst aus dem Release
+              gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet" || true
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber \
+                -p "bereinigt__nport_dateien__*.parquet" -p "bereinigt__nport_fonds__*.parquet" -p "bereinigt__nport_firmen__*.parquet" || true ;;
             edgar_ausuebungen)
               # Meldungen mit Ausübung der Quartale ohne Datensatz kennt edgar_insider (Stand des letzten Laufs)
               jahr=$(date -u +%Y)

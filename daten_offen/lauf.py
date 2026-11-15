@@ -16,11 +16,11 @@ import pandas as pd
 
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
-from .quellen import (cfpb, edgar_13f, edgar_ausuebungen, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fed_sf, fred,
+from .quellen import (cfpb, edgar_13f, edgar_ausuebungen, edgar_ereignisse, edgar_nport, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fed_sf, fred,
                       klinik, politik, rueckrufe, sec_ftd, sec_verfahren, usaspending, uspto_patente, uspto_zitate, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe", "sec_verfahren", "edgar_ausuebungen", "politik")
+           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe", "sec_verfahren", "edgar_ausuebungen", "politik", "edgar_nport")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -112,6 +112,16 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
         if v and (not v.get("vollstaendig") or v.get("halter_gleich", 0) < 0.95):
             schwer.append(f"Gegenprobe {v['quartal']}: Einzelmeldungen und Datensatz stimmen nicht überein")
         return parameter, info, schwer, hinweise
+    if args.quelle == "edgar_nport":
+        parameter, info, hinweise = edgar_nport.lauf(ablage, arbeits, modus=args.modus, lokal=args.nport_ordner)
+        schwer = []
+        if not args.nport_ordner and info["datensaetze_verzeichnis"] < 20:
+            schwer.append(f"Datenseite nennt nur {info['datensaetze_verzeichnis']} Datensätze (erwartet über 27)")
+        if not args.nport_ordner and not info["unvollstaendig_abgebrochen"] and info["fonds_juengstes"] < 5000:
+            schwer.append(f"jüngstes Quartal {info['juengstes_quartal']}: nur {info['fonds_juengstes']} Fonds (erwartet über 10.000)")
+        if info["anteil_mit_fluss"] < 0.5:
+            schwer.append(f"nur {info['anteil_mit_fluss']:.0%} der Meldungen mit Mittelfluss (Aufbau geändert?)")
+        return parameter, info, schwer, hinweise
     if args.quelle == "usaspending":
         parameter, info, hinweise = usaspending.lauf(ablage, arbeits, modus=args.modus, lokal=args.usaspending_ordner)
         schwer = []
@@ -194,6 +204,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cfpb-zip", default=None, help="lokale Beschwerdedatei statt Abruf (Tests)")
     p.add_argument("--ftd-ordner", default=None, help="lokaler Ordner mit Lieferausfall-Archiven statt Abruf (Tests)")
     p.add_argument("--f13-ordner", default=None, help="lokaler Ordner mit 13F-Datensätzen statt Abruf (Tests)")
+    p.add_argument("--nport-ordner", default=None, help="lokaler Ordner mit N-PORT-Datensätzen statt Abruf (Tests)")
     p.add_argument("--usaspending-ordner", default=None, help="lokaler Ordner mit Auftragsdateien statt Abruf (Tests)")
     p.add_argument("--patente-ordner", default=None,
                    help="lokaler Ordner mit den von Hand geladenen Sammeldateien von PatentsView (Historie der Patente)")

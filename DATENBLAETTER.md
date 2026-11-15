@@ -562,6 +562,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Eröffnung des ersten Handelstags nach Ablauf der Meldefrist |
 | Bekannte Schwächen | Relative Änderung der 13F-Bestände, nicht die Änderung des Anteils am Aktienkapital (Sias, Starks & Titman 2006); ohne Bezug auf die Zahl der ausgegebenen Aktien. Nur Firmen, die im Vorquartal ein solcher Manager hielt. Nur Manager über 100 Mio. $ und nur gemeldete Long-Bestände; Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle zum Zeitpunkt der Berechnung (Trefferquote im Prüfbericht); bis der Datensatz der SEC erscheint (Wochen nach der Frist), stammt das jüngste Quartal aus den Einzelmeldungen (Stand „… Einzelmeldungen“) und kann sich mit dem Datensatz geringfügig ändern |
 
+## IH5-06 Zahl der haltenden Fonds (N-PORT)
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Zahl der Fonds (Serien) mit einem Bestand an Stammaktien der Firma laut ihrer Meldung für das Berichtsquartal |
+| Einheit | Anzahl |
+| Frequenz | je Berichtsquartal |
+| Offenlegung | amtlich offen: Form N-PORT (Rule 30b1-9), öffentlich der dritte Monat jedes Fondsquartals, Frist 60 Tage |
+| Quelle | https://www.sec.gov/data-research/sec-markets-data/form-n-port-data-sets |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2019 (viertes Quartal) |
+| Verzögerung | Eröffnung des ersten Handelstags nach Ablauf der Frist für den letzten Monat des Quartals |
+| Bekannte Schwächen | Nur registrierte Fonds ohne Geldmarktfonds; Fonds mit abweichendem Geschäftsjahr berichten über andere Monate (gezählt wird je Fonds das Berichtsquartal des Berichtstags); Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle. Das Quartal entsteht erst, wenn der Datensatz der SEC alle Meldungen bis zur Frist enthält (bis zu fünf Wochen nach der Frist) |
+
 ## IH6-04 Neue Schulden
 
 | Angabe | Inhalt |
@@ -589,6 +603,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Historie ab | 2006 |
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | Form 25 betrifft teils einzelne Wertpapierklassen; SC TO-T und SC 13E3 fehlen, weil sie unter Bieter und Zielfirma stehen und die Rollen noch nicht gelesen werden |
+
+## KD3-01 Fondsflussdruck der Halter
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Mittelfluss der Fonds, die die Aktie halten, gewichtet mit ihrem Bestand in Stück: Σ Stück × Fluss / Σ Stück; Fluss = (Verkäufe + Wiederanlagen − Rücknahmen der drei Monate) / Nettovermögen am Berichtstag, begrenzt auf ±1; nur Firmen mit mindestens 3 haltenden Fonds. Die Bestände der Fonds mit Abflüssen oder Zuflüssen über 5% stehen in nport_firmen |
+| Einheit | Anteil des Fondsvermögens |
+| Frequenz | je Berichtsquartal |
+| Offenlegung | amtlich offen: Form N-PORT (Rule 30b1-9), öffentlich der dritte Monat jedes Fondsquartals, Frist 60 Tage |
+| Quelle | https://www.sec.gov/data-research/sec-markets-data/form-n-port-data-sets |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2019 (viertes Quartal) |
+| Verzögerung | Eröffnung des ersten Handelstags nach Ablauf der Frist für den letzten Monat des Quartals |
+| Bekannte Schwächen | Ohne Kurse: Gewichtung mit Stückzahlen statt mit Kurswert und ohne Bezug auf das Handelsvolumen; Fluss gegen das Vermögen am Ende statt am Anfang des Quartals. Nur registrierte Fonds ohne Geldmarktfonds; Fonds mit abweichendem Geschäftsjahr berichten über andere Monate (gezählt wird je Fonds das Berichtsquartal des Berichtstags); Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle. Das Quartal entsteht erst, wenn der Datensatz der SEC alle Meldungen bis zur Frist enthält (bis zu fünf Wochen nach der Frist) |
 
 ## PR1-03 Regierungskonstellation
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Lädt die Ergebnisse eines Laufs als Release-Assets hoch (vorhandene Dateien werden ersetzt).
-# Zuordnung nach Dateiname: edgar_*/insider_* -> *-edgar, fred_*/fedsf_*/politik_* -> *-makro, wiki*/cfpb*/klinik*/usaspending*/patente*/rueckrufe*/verfahren*/sec_verfahren -> *-web,
+# Zuordnung nach Dateiname: edgar_*/insider_*/nport_* -> *-edgar, fred_*/fedsf_*/politik_* -> *-makro, wiki*/cfpb*/klinik*/usaspending*/patente*/rueckrufe*/verfahren*/sec_verfahren -> *-web,
 # ftd_*/sec_ftd -> *-markt.
 set -euo pipefail
 shopt -s nullglob
@@ -33,7 +33,7 @@ lade() {
 
 B=ausgabe/bereinigt
 P=ausgabe/parameter
-lade bereinigt-edgar "Bereinigte EDGAR-Daten" "$B"/bereinigt__edgar_*.parquet "$B"/bereinigt__insider_*.parquet
+lade bereinigt-edgar "Bereinigte EDGAR-Daten" "$B"/bereinigt__edgar_*.parquet "$B"/bereinigt__insider_*.parquet "$B"/bereinigt__nport_*.parquet
 lade bereinigt-makro "Bereinigte Makrodaten (FRED/ALFRED, Fed San Francisco)" "$B"/bereinigt__fred_*.parquet "$B"/bereinigt__fedsf_*.parquet "$B"/bereinigt__politik_*.parquet
 lade bereinigt-web "Bereinigte Web- und Registerdaten" "$B"/bereinigt__wiki_*.parquet "$B"/bereinigt__cfpb_*.parquet "$B"/bereinigt__klinik_*.parquet "$B"/bereinigt__usaspending_*.parquet "$B"/bereinigt__patente_*.parquet "$B"/bereinigt__rueckrufe_*.parquet "$B"/bereinigt__verfahren_*.parquet
 lade bereinigt-markt "Bereinigte Marktstrukturdaten (SEC)" "$B"/bereinigt__ftd_*.parquet
@@ -46,7 +46,7 @@ lade pruefbericht "Prüfberichte und Manifeste" ausgabe/berichte/*
 # Jede erzeugte Datei muss einem Release zugeordnet sein
 for datei in "$B"/*.parquet "$P"/*.parquet; do
   case "$(basename "$datei")" in
-    bereinigt__edgar_*|bereinigt__insider_*|bereinigt__fred_*|bereinigt__fedsf_*|bereinigt__politik_*|bereinigt__wiki_*|bereinigt__cfpb_*|bereinigt__klinik_*|bereinigt__ftd_*|bereinigt__usaspending_*|bereinigt__patente_*|bereinigt__rueckrufe_*|bereinigt__verfahren_*) ;;
+    bereinigt__edgar_*|bereinigt__insider_*|bereinigt__nport_*|bereinigt__fred_*|bereinigt__fedsf_*|bereinigt__politik_*|bereinigt__wiki_*|bereinigt__cfpb_*|bereinigt__klinik_*|bereinigt__ftd_*|bereinigt__usaspending_*|bereinigt__patente_*|bereinigt__rueckrufe_*|bereinigt__verfahren_*) ;;
     parameter__edgar_*|parameter__fred__*|parameter__fed_sf__*|parameter__politik__*|parameter__wikipedia__*|parameter__cfpb__*|parameter__klinik__*|parameter__sec_*|parameter__usaspending__*|parameter__uspto_patente__*|parameter__uspto_zitate__*|parameter__rueckrufe__*) ;;
     *) echo "Keinem Release zugeordnet: $datei" >&2; exit 1 ;;
   esac
