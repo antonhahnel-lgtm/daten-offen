@@ -5,6 +5,7 @@
 - Neue Quelle `rueckrufe`: Rückrufe von NHTSA (ab 1967), CPSC (ab 1973) und FDA (ab 2012) → `GA3-02`; Tabellen
   `rueckrufe_ereignisse`, `rueckrufe_fda`, `rueckrufe_zuordnung` (`ENTSCHEIDUNGEN.md` Nr. 126–130).
 - Probelauf mit den echten Daten: 68.363 Rückrufe, 29,9 % zugeordnet, 22.302 Werte für 1.403 Firmen.
+- Echter Lauf (Workflow `einzel`, 15.11.): grün; seitdem im Tageslauf.
 - 151 Offline-Tests.
 
 ## Lieferung 13 – 2026-11-15 (Fed San Francisco)
@@ -15,6 +16,7 @@
 - H-1B-Anträge zurückgestellt: dol.gov weist automatische Abrufe ab (Nr. 120).
 - Neues angeheftetes Paket openpyxl 3.1.5 (die Dateien liegen als Excel vor).
 - Probelauf mit den echten Dateien: 280 Erklärungen bis 28.10.2026, 17.095 Stimmungstage bis 08.11.2026.
+- Echter Lauf (Workflow `einzel`, 15.11.): grün; seitdem im Tageslauf.
 - 149 Offline-Tests.
 
 ## Lieferung 12 – 2026-11-15 (Abschlüsse II, Lockup, Abspaltung)
@@ -26,6 +28,8 @@
 - Tabelle `edgar_abschluesse` mit Rückkäufen, Dividende je Aktie, Verwässerungsangaben und dem Marktwert des
   Streubesitzes (`ENTSCHEIDUNGEN.md` Nr. 110–119).
 - Reihenfolge der weiteren Arbeit nach der Vorgabe des Inhabers: erst alle freien Kennzahlen bauen (Nr. 110).
+- Echter Lauf (Workflow `abruf`, 15.11.): grün; Umsatzwachstum 295.981 Werte, Nettoverschuldung 360.636, Rückkäufe
+  79.562, Verwässerung 239.585, Dividendenwechsel 1.842, F&E-Erfolgsbilanz 964, Lockup-Ablauf 5.777, Abspaltung 622.
 - 146 Offline-Tests.
 
 ## Lieferung 11 – 2026-11-13 (Patent-Historie, Zitationen)

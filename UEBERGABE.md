@@ -1,6 +1,6 @@
 # Übergabe
 
-Stand 15.11.2026, Lieferung 14. Fortschritt 92 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
+Stand 15.11.2026, Lieferung 14. Fortschritt 93 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
 und dem Auftragstext, um in einem neuen Chat weiterzuarbeiten.
 
 ## Ziel
@@ -15,8 +15,8 @@ Insider-Monitor.
 |---|---|---|---|
 | `edgar_index` | – (Zeitbasis) | ja | ja |
 | `edgar_insider` | IH1-01 bis IH1-07, IH1-09, IH1-10, IH1-16, IH1-17, IH1-18, WS3-01 | ja | ja |
-| `edgar_ereignisse` | WS2-04, UA1-10, UA2-03, UA2-04, IH6-04, UA4-05, GA2-03, UA4-01, UA3-03, UA3-04, KD1-11, WS3-02, UA4-04, UA4-02 | ja | ja (UA4-04, UA4-02: Lauf vom 15.11.2026 abwarten) |
-| `edgar_xbrl` | UA1-01 bis UA1-08, UA2-01, UA3-01, UA3-02, UA3-05, UA4-03, GA1-02, GA1-03, GA1-06, GA3-03, PR2-03, GW1-04, WR2-02 | ja | ja (die sechs neuen: Lauf vom 15.11.2026 abwarten) |
+| `edgar_ereignisse` | WS2-04, UA1-10, UA2-03, UA2-04, IH6-04, UA4-05, GA2-03, UA4-01, UA3-03, UA3-04, KD1-11, WS3-02, UA4-04, UA4-02 | ja | ja (UA4-04, UA4-02 seit 15.11.2026) |
+| `edgar_xbrl` | UA1-01 bis UA1-08, UA2-01, UA3-01, UA3-02, UA3-05, UA4-03, GA1-02, GA1-03, GA1-06, GA3-03, PR2-03, GW1-04, WR2-02 | ja | ja (die sechs neuen seit 15.11.2026) |
 | `edgar_rollen` | IH5-01, IH5-02, IH1-14 | ja | ja |
 | `fred` | GW2-01, GW2-03, GW1-06, GW3-01, GW2-04, GW2-06, GW1-05 | ja | ja |
 | `wikipedia` | WS3-05 | ja | ja |
@@ -28,7 +28,7 @@ Insider-Monitor.
 | `uspto_patente` | GA1-01 | ja | ja (Workflow `einzel`, 13.11.2026); Historie ab 2001 lokal gebaut und veröffentlicht (15.11.2026) |
 | `uspto_zitate` | GA1-09 | ja | nur lokal, veröffentlicht 15.11.2026; nicht im Tageslauf |
 | `fed_sf` | GW1-01, GW1-02, WS2-05 | ja | ja (Workflow `einzel`, 15.11.2026) |
-| `rueckrufe` | GA3-02 | ja | Probelauf mit echten Daten (15.11.2026); GitHub-Lauf abwarten |
+| `rueckrufe` | GA3-02 | ja | ja (Workflow `einzel`, 15.11.2026) |
 
 71 Parameter, 151 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
 (`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
@@ -130,6 +130,12 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
   die Zitationen wachsen nur so. Der Rechner hat 8 GB Arbeitsspeicher: nichts Großes nebenher laufen lassen.
   `frisch=true` im Workflow `einzel` für `uspto_patente` nicht verwenden: Es baute `patente_ausgaben` und
   `patente_zuordnung` ohne die Historie neu.
+- Lieferungen 12 bis 14 im echten Lauf (15.11.2026, Workflows `abruf` und `einzel`, alle grün): Umsatzwachstum
+  295.981 Werte für 11.637 Firmen, Nettoverschuldung 360.636 / 14.326, Rückkäufe 79.562 / 5.446, Verwässerung
+  239.585 / 10.195, Dividendenwechsel 1.842 / 1.473, F&E-Erfolgsbilanz 964 / 269 (braucht elf Jahresberichte),
+  Lockup-Ablauf 5.777 Börsengänge seit 2007, Abspaltung 622 Zeilen; Zinsüberraschung 280 Erklärungen seit 1994,
+  Nachrichtenstimmung 17.095 Tage seit 1980; Rückrufe siehe Prüfbericht `rueckrufe`.
+  `rueckrufe` und `fed_sf` laufen ab jetzt im Tageslauf mit.
 - `GW2-06` im echten Lauf bestätigt (340 Werte, letzter Stand 14.10.2026).
 - Actions laufen auf Node 24 (checkout v5, setup-python v6, upload-artifact v6, download-artifact v7).
 - Neue Module zuerst über `gh workflow run einzel.yml -f quelle=<name>` erproben; der Workflow berührt die
