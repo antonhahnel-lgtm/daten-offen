@@ -6,7 +6,7 @@
 |---|---|---|
 | `parameter-edgar` | `parameter__edgar_<quelle>__<jahr>.parquet` | Parameter aus EDGAR: `edgar_insider`, `edgar_ereignisse`, `edgar_xbrl`, `edgar_rollen`, `edgar_13f` |
 | `parameter-makro` | `parameter__fred__<jahr>.parquet`, `parameter__fed_sf__<jahr>.parquet` | Parameter der Gesamtwirtschaft (cik = 0) |
-| `parameter-web` | `parameter__<quelle>__<jahr>.parquet` | `wikipedia`, `cfpb`, `klinik`, `usaspending`, `uspto_patente`, `uspto_zitate` |
+| `parameter-web` | `parameter__<quelle>__<jahr>.parquet` | `wikipedia`, `cfpb`, `klinik`, `usaspending`, `uspto_patente`, `uspto_zitate`, `rueckrufe` |
 | `bereinigt-edgar` | `bereinigt__edgar_meldungen__<jahr>.parquet` | Meldungsverzeichnis: Firma, Aktenzeichen, Formular, Annahmezeit, `verfuegbar_ab` |
 | | `bereinigt__edgar_firmen__alle.parquet` | Stammdaten je CIK: Name, Ticker, SIC, Sitz |
 | | `bereinigt__insider_transaktionen__<jahr>q<q>.parquet` | Alle nicht-derivativen Insidergeschäfte je Quartal; Spalte `herkunft`: `datensatz` (amtlich) oder `xml` (laufende Ergänzung) |
@@ -27,6 +27,8 @@
 | | `bereinigt__patente_erteilt__<jahr>.parquet` | Erteilte US-Patente ab 1976 je Ausgabetag (`tag`), Patentnummer (ohne führende Nullen), Art (`utility`, `design`, `plant`, `reissue`, `sonstige`) und Inhaber wie gedruckt; ein Patent mit mehreren Inhabern steht mehrfach. Bis zum Stand der Sammeldateien aus PatentsView (ohne zurückgezogene Patente und ohne Privatpersonen als Inhaber), danach aus dem Amtsblatt |
 | | `bereinigt__patente_zuordnung__alle.parquet` | Inhabername → CIK mit Konfidenz und Art (`exakt`, `frueher`, `kern`, `tochter`, `mehrdeutig`, `keiner`), Zahl der Patente. Gehörte ein Inhaber nacheinander zu verschiedenen Firmen, steht er einmal je Zeitraum: `gilt_ab` (einschließlich) und `gilt_bis` (ausschließlich), leer = unbegrenzt |
 | | `bereinigt__patente_ausgaben__alle.parquet` | Ausgabetage mit Zahl der Patente, `herkunft` (`patentsview`, `amtsblatt`) und `lesart` (Fassung des Leseverfahrens) |
+| | `bereinigt__rueckrufe_ereignisse__alle.parquet` | Rückrufe je Quelle (`nhtsa`, `cpsc`, `fda_drug`, `fda_device`, `fda_food`), Kennung, Tag der Veröffentlichung, Firma wie gemeldet, `klasse` (FDA 1–3, sonst 0) und betroffene `stueck` |
+| | `bereinigt__rueckrufe_zuordnung__alle.parquet`, `bereinigt__rueckrufe_fda__alle.parquet` | Firma → CIK mit Konfidenz, Art und Zeitraum (`gilt_ab`, `gilt_bis`); Bestand der FDA-Ereignisse |
 | `parameter-markt` | `parameter__sec_ftd__<jahr>.parquet` | Lieferausfälle (`IH3-06`) |
 | `bereinigt-markt` | `bereinigt__ftd_tage__<jahr>.parquet` | Lieferausfälle je CUSIP und Abwicklungstag (alle Wertpapiere, auch unter 10.000 Stück), Spalte `datei` |
 | | `bereinigt__ftd_wertpapiere__alle.parquet` | CUSIP → CIK mit Konfidenz, Art der Zuordnung und Kennzeichen `stamm`; jüngstes Kürzel und Bezeichnung |

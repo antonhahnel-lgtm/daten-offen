@@ -128,6 +128,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | 30 Tage nach Monatsende |
 | Bekannte Schwächen | Nur Finanzfirmen; Zuordnung über Firmennamen (Trefferquote im Prüfbericht); Tochterfirmen mit eigenem Namen werden der Mutter nicht zugerechnet; als Signal ungeprüft |
 
+## GA3-02 Rückrufe und Sicherheitsmeldungen
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Eine Zeile je Rückruf der Firma oder einer bekannten Tochter; wert = Quelle: 1 = NHTSA (Fahrzeuge, Ausrüstung), 2 = CPSC (Verbraucherprodukte), 3 = FDA Arzneimittel, 4 = FDA Medizinprodukte, 5 = FDA Lebensmittel. Schwere (FDA-Klasse) und betroffene Stückzahl stehen in rueckrufe_ereignisse |
+| Einheit | Art (1–5) |
+| Frequenz | je Rückruf |
+| Offenlegung | gesetzlich: 49 CFR Part 573 (NHTSA), Consumer Product Safety Act § 15 (CPSC), 21 CFR Part 7 (FDA) |
+| Quelle | NHTSA Recalls-Sammeldatei (static.nhtsa.gov/odi/ffdd/rcl), CPSC Recalls-Schnittstelle (saferproducts.gov), openFDA Enforcement Reports (api.fda.gov) |
+| Lizenz | gemeinfrei (US-Behörden) |
+| Historie ab | 1967 (NHTSA), 1973 (CPSC), 2012 (FDA) |
+| Verzögerung | Eröffnung des ersten Handelstags nach der Veröffentlichung: Erfassung bei der NHTSA, Mitteilung der CPSC, wöchentlicher Bericht der FDA |
+| Bekannte Schwächen | Zuordnung über Firmennamen und eine kurze Liste von Töchtern (Trefferquote im Prüfbericht); viele Hersteller sind ausländisch oder privat. Der FDA-Bericht erscheint im Mittel sieben Wochen nach Beginn des Rückrufs, die Pressemitteilung der Firma ist früher. Beschwerden und Vorkommnisse fehlen |
+
 ## GA3-03 Werbeausgaben-Änderung
 
 | Angabe | Inhalt |

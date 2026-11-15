@@ -17,10 +17,10 @@ import pandas as pd
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
 from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fed_sf, fred,
-                      klinik, sec_ftd, usaspending, uspto_patente, uspto_zitate, wikipedia)
+                      klinik, rueckrufe, sec_ftd, usaspending, uspto_patente, uspto_zitate, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf")
+           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -121,6 +121,17 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
         schwer = []
         if info["im_fenster"] and info["anteil_zugeordnet"] < 0.1:
             schwer.append("weniger als 10 % der Zitate treffen Patente zugeordneter Firmen")
+        return parameter, info, schwer, hinweise
+    if args.quelle == "rueckrufe":
+        parameter, info, hinweise = rueckrufe.lauf(ablage)
+        schwer = []
+        e = info["ereignisse"]
+        zahlen = {"nhtsa": e.get("nhtsa", 0), "cpsc": e.get("cpsc", 0), "fda": sum(v for k, v in e.items() if k.startswith("fda_"))}
+        for quelle, mindestens in rueckrufe.MINDESTENS.items():
+            if zahlen[quelle] < mindestens:
+                schwer.append(f"{quelle}: nur {zahlen[quelle]} Rückrufe gelesen (erwartet über {mindestens}; Aufbau geändert?)")
+        if info["trefferquote"].get("quote_gewichtet", 0) < 0.1:
+            schwer.append("Namensabgleich ordnet weniger als 10 % der Rückrufe zu")
         return parameter, info, schwer, hinweise
     if args.quelle == "fed_sf":
         parameter, info, hinweise = fed_sf.lauf(ablage)

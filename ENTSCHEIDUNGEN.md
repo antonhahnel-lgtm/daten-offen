@@ -189,6 +189,16 @@ lange und saubere Daten vor Vollständigkeit.
 | 124 | `WS2-05` ist der Tageswert des Daily News Sentiment Index; er gilt ab dem zwölften Tag nach dem Berichtstag. Gespeichert wird der jüngste Stand der Datei. | Die Datei wird wöchentlich fortgeschrieben und reicht dann bis zum Sonntag davor: Der Montag einer Woche erscheint elf Tage später. Frühere Werte können sich bei Neuschätzung ändern; Datenstände veröffentlicht die Fed nicht. |
 | 125 | Dateien einer Federal Reserve Bank gelten als amtlich im Sinn von Nr. 50. Die bereinigte Tabelle `fedsf_ereignisse` enthält nur die Spalten, aus denen die Kennzahlen entstehen (Zeit, MP1, vierter Zinsfuture, Pfad-Anteil). Neues angeheftetes Paket: openpyxl 3.1.5. | Die USMPD ist ein Produkt der Fed San Francisco auf Grundlage von Marktdaten eines Anbieters; übernommen wird nur das Nötige, die Quelle steht im Datenblatt. Die Dateien liegen nur als Excel vor. |
 
+## Rückrufe (Lieferung 14)
+
+| Nr. | Entscheidung | Grund |
+|---|---|---|
+| 126 | Neue Quelle `rueckrufe` → `GA3-02`: eine Zeile je Rückruf und Firma aus drei Behörden; wert = Quelle (1 = NHTSA, 2 = CPSC, 3 bis 5 = FDA Arzneimittel, Medizinprodukte, Lebensmittel). Schwere (FDA-Klasse) und betroffene Stückzahl stehen in `rueckrufe_ereignisse`. | Die drei Behörden decken Fahrzeuge, Verbraucherprodukte, Arzneien, Medizinprodukte und Lebensmittel ab. Eine ID trägt einen Wert; die Quelle sagt am meisten über die Art des Ereignisses, Stückzahl und Klasse gibt es nicht überall. Beschwerden und Vorkommnisse (zweiter Teil der Katalogzeile) fehlen. |
+| 127 | Stichtage: NHTSA = Erfassungsdatum der Behörde, wenn es 0 bis 60 Tage nach dem Eingang des Herstellerberichts liegt, sonst Eingang + 6 Tage; CPSC = Datum der Mitteilung; FDA = Datum des wöchentlichen Enforcement Reports. Gültig jeweils ab der nächsten Börseneröffnung. | Gemessen an 15.402 Kampagnen seit 2010: 95 % sind binnen sechs Tagen erfasst, einzelne Erfassungsdaten liegen Jahre daneben. Der FDA-Bericht folgt dem Beginn des Rückrufs im Median nach 47 Tagen; die Pressemitteilung der Firma ist früher, steht aber in keiner amtlichen Datei. |
+| 128 | Die FDA-Berichte kommen jahresweise über die Schnittstelle, nicht aus den Sammeldateien. Der Bestand liegt in `rueckrufe_fda`; laufend werden nur die beiden jüngsten Jahre neu gelesen. Ist die Schnittstelle gestört, bleibt der Bestand. | Die Sammeldatei der Medizinprodukte ist gepackt 91 MB groß und als JSON nicht in den Speicher eines Laufs zu laden. Ohne Schlüssel erlaubt die Schnittstelle 1.000 Abrufe am Tag; der Tageslauf braucht rund 20, der Erstaufbau rund 150. |
+| 129 | Firma eines CPSC-Rückrufs: der Name vor „Recalls“ im Titel und die genannten Hersteller, Importeure und Händler ohne Ortsangabe – nicht die Liste der Verkaufsstellen. | Die Verkaufsstellen („Sold at: Amazon, Walmart …“) sind nicht verantwortlich; sie zuzuordnen legte den Händlern fremde Rückrufe zur Last. |
+| 130 | Zuordnung wie bei den Patenten: Namensabgleich (exakt, früherer Name, Kernname), dazu die Töchterliste der Patente und eine eigene Liste von rund 60 meldenden Töchtern mit Zeiträumen (Jayco erst seit 2016 bei Thor, Hospira seit 2015 bei Pfizer). | Probelauf mit den echten Daten (15.11.2026): 68.363 Rückrufe, 29,9 % zugeordnet, 22.302 Werte für 1.403 Firmen. Nicht zuzuordnen sind vor allem ausländische Autohersteller ohne SEC-Meldung (BMW, Volkswagen, Hyundai, Daimler) und private Firmen. |
+
 ## Noch offen
 
 | Baustein | Parameter | Hinderungsgrund |
@@ -196,7 +206,7 @@ lange und saubere Daten vor Vollständigkeit.
 | Wahlkampfspenden, Lobbying | PR3-01, PR3-02 | Schlüssel `DATA_GOV_API_KEY` nötig; Namensabgleich über Ausschuss- und Mandantennamen |
 | H-1B-Anträge (DOL) | GA2-02 | dol.gov weist automatische Abrufe ab (Nr. 120); nur als Handimport von rund 40 großen Excel-Dateien möglich |
 | Weitere Abschlusskennzahlen | UA2-02, GW1-03 | Dechow-F-Score braucht weitere Bilanzposten (Vorräte, Verbindlichkeiten, Anlagen); die geldpolitische Exposition braucht Cashflow-Duration und Volatilität |
-| Rückrufe und Sicherheitsmeldungen | GA3-02 | NHTSA, CPSC, openFDA; Namensabgleich Hersteller → Firma |
+| Beschwerden und Vorkommnisse zu Produkten | GA3-02 (zweiter Teil) | Rückrufe sind gebaut (Nr. 126–130); offen sind Fahrzeugbeschwerden (NHTSA), Vorkommnisse mit Medizinprodukten (MAUDE) und Verbrauchermeldungen (SaferProducts) |
 | SEC-Verfahren | PR4-01 | Litigation Releases und AAER von sec.gov; Namensabgleich Beklagte → Firma |
 | Indexaufnahme und -streichung | KD3-03 | Ankündigungen der Indexanbieter; freie, weiterverbreitbare Quelle suchen |
 | Insider: Optionsausübung nahe Verfall | UA6-02 | Derivatetabelle der Insider-Datensätze wird noch nicht gelesen |

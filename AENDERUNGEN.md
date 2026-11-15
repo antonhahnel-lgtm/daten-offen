@@ -1,5 +1,12 @@
 # Änderungen
 
+## Lieferung 14 – 2026-11-15 (Rückrufe)
+
+- Neue Quelle `rueckrufe`: Rückrufe von NHTSA (ab 1967), CPSC (ab 1973) und FDA (ab 2012) → `GA3-02`; Tabellen
+  `rueckrufe_ereignisse`, `rueckrufe_fda`, `rueckrufe_zuordnung` (`ENTSCHEIDUNGEN.md` Nr. 126–130).
+- Probelauf mit den echten Daten: 68.363 Rückrufe, 29,9 % zugeordnet, 22.302 Werte für 1.403 Firmen.
+- 151 Offline-Tests.
+
 ## Lieferung 13 – 2026-11-15 (Fed San Francisco)
 
 - Neue Quelle `fed_sf` (Markt, cik 0): Zinsüberraschung um die Erklärungen des Offenmarktausschusses (`GW1-01`, seit

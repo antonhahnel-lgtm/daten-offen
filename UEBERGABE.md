@@ -1,6 +1,6 @@
 # Übergabe
 
-Stand 15.11.2026, Lieferung 13. Fortschritt 92 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
+Stand 15.11.2026, Lieferung 14. Fortschritt 92 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
 und dem Auftragstext, um in einem neuen Chat weiterzuarbeiten.
 
 ## Ziel
@@ -27,9 +27,10 @@ Insider-Monitor.
 | `usaspending` | PR2-01 | ja | ja (Workflow `einzel`, 11./12.11.2026) |
 | `uspto_patente` | GA1-01 | ja | ja (Workflow `einzel`, 13.11.2026); Historie ab 2001 lokal gebaut und veröffentlicht (15.11.2026) |
 | `uspto_zitate` | GA1-09 | ja | nur lokal, veröffentlicht 15.11.2026; nicht im Tageslauf |
-| `fed_sf` | GW1-01, GW1-02, WS2-05 | ja | Probelauf mit echten Dateien (15.11.2026); GitHub-Lauf abwarten |
+| `fed_sf` | GW1-01, GW1-02, WS2-05 | ja | ja (Workflow `einzel`, 15.11.2026) |
+| `rueckrufe` | GA3-02 | ja | Probelauf mit echten Daten (15.11.2026); GitHub-Lauf abwarten |
 
-70 Parameter, 149 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
+71 Parameter, 151 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
 (`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
 
 ## Prüfliste für den ersten echten Lauf
@@ -150,7 +151,8 @@ privat vor (Ordner `auswertung` neben den Repos) und ruht, bis die Quellen ausge
 4. Offene Bausteine (Tabelle „Noch offen“ in `ENTSCHEIDUNGEN.md`). Erledigt: Lieferausfälle, 13F (auch das
    laufende Quartal), Sponsoren, Bundesaufträge, Patente mit Historie und Zitationen, Abschlüsse II mit Lockup
    und Abspaltung (Lieferung 12), Fed San Francisco (Lieferung 13). H-1B ist zurückgestellt (dol.gov sperrt
-   automatische Abrufe). Als Nächstes: Rückrufe (NHTSA, CPSC, openFDA), SEC-Verfahren, N-PORT, zuletzt die Texte.
+   automatische Abrufe), Rückrufe (Lieferung 14). Als Nächstes: SEC-Verfahren, Insider-Optionsausübungen, N-PORT,
+   zuletzt die Berichtstexte.
 5. Anbindung im Insider-Monitor (eigener Auftrag; `SCHNITTSTELLE.md` beschreibt das Lesen).
 
 ## Dateien für einen neuen Chat
