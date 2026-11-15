@@ -1,6 +1,6 @@
 # Übergabe
 
-Stand 15.11.2026, Lieferung 15. Fortschritt 93 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
+Stand 15.11.2026, Lieferung 15. Fortschritt 94 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
 und dem Auftragstext, um in einem neuen Chat weiterzuarbeiten.
 
 ## Ziel
@@ -29,7 +29,7 @@ Insider-Monitor.
 | `uspto_zitate` | GA1-09 | ja | nur lokal, veröffentlicht 15.11.2026; nicht im Tageslauf |
 | `fed_sf` | GW1-01, GW1-02, WS2-05 | ja | ja (Workflow `einzel`, 15.11.2026) |
 | `rueckrufe` | GA3-02 | ja | ja (Workflow `einzel`, 15.11.2026) |
-| `sec_verfahren` | PR4-01 | ja | GitHub-Lauf abwarten |
+| `sec_verfahren` | PR4-01 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
 
 72 Parameter, 154 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
 (`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
@@ -137,6 +137,9 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
   Lockup-Ablauf 5.777 Börsengänge seit 2007, Abspaltung 622 Zeilen; Zinsüberraschung 280 Erklärungen seit 1994,
   Nachrichtenstimmung 17.095 Tage seit 1980; Rückrufe siehe Prüfbericht `rueckrufe`.
   `rueckrufe` und `fed_sf` laufen ab jetzt im Tageslauf mit.
+- SEC-Verfahren (Lieferung 15, 15.11.2026, grün): 30.886 Veröffentlichungen seit 09/1995 (Zivilklagen 12.011,
+  Verwaltungsverfahren 18.751, davon 3.348 mit AAER-Nummer), 7.867 nennen eine zugeordnete Firma; 17.416 Werte
+  für 7.021 Firmen ab 2001. Folgelauf liest je Liste zwei Seiten. Läuft ab jetzt im Tageslauf mit.
 - `GW2-06` im echten Lauf bestätigt (340 Werte, letzter Stand 14.10.2026).
 - Actions laufen auf Node 24 (checkout v5, setup-python v6, upload-artifact v6, download-artifact v7).
 - Neue Module zuerst über `gh workflow run einzel.yml -f quelle=<name>` erproben; der Workflow berührt die
