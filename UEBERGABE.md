@@ -30,7 +30,7 @@ Insider-Monitor.
 | `fed_sf` | GW1-01, GW1-02, WS2-05 | ja | ja (Workflow `einzel`, 15.11.2026) |
 | `rueckrufe` | GA3-02 | ja | ja (Workflow `einzel`, 15.11.2026) |
 | `sec_verfahren` | PR4-01 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
-| `edgar_ausuebungen` | UA6-02 | ja | GitHub-Lauf abwarten |
+| `edgar_ausuebungen` | UA6-02 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
 
 73 Parameter, 158 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
 (`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
@@ -141,6 +141,9 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
 - SEC-Verfahren (Lieferung 15, 15.11.2026, grün): 30.886 Veröffentlichungen seit 09/1995 (Zivilklagen 12.011,
   Verwaltungsverfahren 18.751, davon 3.348 mit AAER-Nummer), 7.867 nennen eine zugeordnete Firma; 17.416 Werte
   für 7.021 Firmen ab 2001. Folgelauf liest je Liste zwei Seiten. Läuft ab jetzt im Tageslauf mit.
+- Optionsausübungen (Lieferung 16, 15.11.2026, grün): 83 Quartale seit 2006 und 2026q4 aus 2.198 Form-4-Dateien;
+  560.261 ausgeübte Tranchen, 83 % mit Kurs aus derselben Meldung; UA6-02 53.313 Werte für 4.861 Firmen.
+  Läuft ab jetzt im Tageslauf mit (liest nur neue Quartale und neue Meldungen mit Ausübung).
 - `GW2-06` im echten Lauf bestätigt (340 Werte, letzter Stand 14.10.2026).
 - Actions laufen auf Node 24 (checkout v5, setup-python v6, upload-artifact v6, download-artifact v7).
 - Neue Module zuerst über `gh workflow run einzel.yml -f quelle=<name>` erproben; der Workflow berührt die

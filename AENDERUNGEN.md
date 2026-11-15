@@ -5,6 +5,7 @@
 - Neue Quelle `edgar_ausuebungen`: ausgeübte Optionen aus den Insider-Datensätzen (DERIV_TRANS, ab 2006) und für
   Quartale ohne Datensatz aus den Form-4-Dateien → `UA6-02`; Tabellen `insider_ausuebungen`,
   `insider_ausuebungen_stand` (`ENTSCHEIDUNGEN.md` Nr. 138–142).
+- Erster echter Lauf: 83 Quartale, 560.261 ausgeübte Tranchen, 53.313 Werte für 4.861 Firmen.
 - 158 Offline-Tests.
 
 ## Lieferung 15 – 2026-11-15 (SEC-Verfahren)
