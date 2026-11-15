@@ -1,5 +1,15 @@
 # Änderungen
 
+## Lieferung 13 – 2026-11-15 (Fed San Francisco)
+
+- Neue Quelle `fed_sf` (Markt, cik 0): Zinsüberraschung um die Erklärungen des Offenmarktausschusses (`GW1-01`, seit
+  1994), Pfad-Anteil der Zinsreaktion (`GW1-02`) und Nachrichtenstimmung (`WS2-05`, täglich seit 1980); Tabellen
+  `fedsf_ereignisse` und `fedsf_stimmung` (`ENTSCHEIDUNGEN.md` Nr. 121–125).
+- H-1B-Anträge zurückgestellt: dol.gov weist automatische Abrufe ab (Nr. 120).
+- Neues angeheftetes Paket openpyxl 3.1.5 (die Dateien liegen als Excel vor).
+- Probelauf mit den echten Dateien: 280 Erklärungen bis 28.10.2026, 17.095 Stimmungstage bis 08.11.2026.
+- 149 Offline-Tests.
+
 ## Lieferung 12 – 2026-11-15 (Abschlüsse II, Lockup, Abspaltung)
 
 - `edgar_xbrl`: sechs neue Kennzahlen aus der Sammeldatei der Abschlüsse – Umsatzwachstum (`UA1-08`),

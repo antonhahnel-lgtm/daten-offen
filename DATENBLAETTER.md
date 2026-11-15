@@ -142,6 +142,34 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
 | Bekannte Schwächen | Viele Firmen weisen Werbeaufwand nicht gesondert aus |
 
+## GW1-01 Zinsüberraschung
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Überraschende Änderung des Leitzinsziels zur laufenden Sitzung, abgeleitet aus Fed-Funds-Futures im 30-Minuten-Fenster um die Erklärung des Offenmarktausschusses (MP1 der USMPD) |
+| Einheit | Prozentpunkte |
+| Frequenz | je Erklärung (rund acht im Jahr) |
+| Offenlegung | amtlich: Datei der Federal Reserve Bank of San Francisco, fortgeschrieben nach jeder Sitzung |
+| Quelle | https://www.frbsf.org/research-and-insights/data-and-indicators/us-monetary-policy-event-study-database/ (Acosta, Ajello, Bauer, Loria & Miranda-Agrippino 2025) |
+| Lizenz | Federal Reserve Bank of San Francisco, frei abrufbar; als Quelle zu nennen |
+| Historie ab | 02/1994 |
+| Verzögerung | Eröffnung des dritten Handelstags nach der Erklärung (die Datei erscheint rund zwei Tage danach) |
+| Bekannte Schwächen | Der Wert ist am Markt sofort ablesbar, in dieser Datei aber erst Tage später; die Wirkung am Tag selbst lässt sich damit nur rückblickend messen. Vor 1994 keine Werte |
+
+## GW1-02 Pfad-Anteil der Zinsreaktion (Forward Guidance)
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Änderung des vierten Zinsfutures (Eurodollar, ab 2022 SOFR) im 30-Minuten-Fenster um die Erklärung minus der Teil, den die Zinsüberraschung GW1-01 erklärt (Regression über alle Erklärungen bis dahin, mindestens 20) |
+| Einheit | Prozentpunkte |
+| Frequenz | je Erklärung |
+| Offenlegung | amtlich: Datei der Federal Reserve Bank of San Francisco |
+| Quelle | https://www.frbsf.org/research-and-insights/data-and-indicators/us-monetary-policy-event-study-database/ |
+| Lizenz | Federal Reserve Bank of San Francisco, frei abrufbar; als Quelle zu nennen |
+| Historie ab | 1996 |
+| Verzögerung | wie GW1-01 |
+| Bekannte Schwächen | Näherung an den zweiten Faktor nach Gürkaynak, Sack & Swanson (2005): ein Future statt der ganzen Zinskurve, laufend neu geschätzt |
+
 ## GW1-04 Finanzrestriktion (Whited-Wu-Index)
 
 | Angabe | Inhalt |
@@ -897,6 +925,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Historie ab | 2006 |
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | 8-K/A (Nachträge) sind nicht enthalten |
+
+## WS2-05 Nachrichtenstimmung des Marktes
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Daily News Sentiment Index: Stimmung in Wirtschaftsartikeln von 24 US-Zeitungen, Tageswert |
+| Einheit | Indexwert |
+| Frequenz | täglich |
+| Offenlegung | amtlich: Datei der Federal Reserve Bank of San Francisco, wöchentlich fortgeschrieben |
+| Quelle | https://www.frbsf.org/research-and-insights/data-and-indicators/daily-news-sentiment-index/ (Shapiro, Sudhof & Wilson 2020) |
+| Lizenz | Federal Reserve Bank of San Francisco, frei abrufbar; als Quelle zu nennen |
+| Historie ab | 1980 |
+| Verzögerung | Eröffnung des ersten Handelstags ab dem zwölften Tag nach dem Berichtstag |
+| Bekannte Schwächen | Frühere Tageswerte können sich bei einer Neuschätzung ändern; gespeichert ist der jeweils jüngste Stand, nicht der Stand am Tag selbst |
 
 ## WS3-01 Wochentag und Tageszeit der Meldung
 

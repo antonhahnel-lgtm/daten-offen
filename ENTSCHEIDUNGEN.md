@@ -178,16 +178,26 @@ lange und saubere Daten vor Vollständigkeit.
 | 118 | `UA4-02`: wert 1 = erste Anmeldung Form 10-12B der abgespaltenen Firma, wert 2 = erste Wirksamkeitsmitteilung (EFFECT) danach binnen eines Jahres. | Die Wirksamkeit liegt kurz vor der Zuteilung der Aktien; der Zuteilungstag und die Mutter stehen nur im Text. |
 | 119 | Die bereinigte Tabelle `edgar_abschluesse` bekommt die Spalten `buyback`, `dps`, `antidil`, `sh_basic`, `sh_dil` (je mit `_py`, `_q`) und `streubesitz` (Marktwert des Streubesitzes vom Deckblatt des 10-K). Zugelassen ist zusätzlich die Einheit USD/shares. | Bausteine der neuen Kennzahlen; der Streubesitz ist ein amtlich gemeldeter Marktwert und erlaubt Bewertungskennzahlen ohne Kursdaten. |
 
+## Fed San Francisco; H-1B zurückgestellt (Lieferung 13)
+
+| Nr. | Entscheidung | Grund |
+|---|---|---|
+| 120 | `GA2-02` (H-1B-Anträge) wird zurückgestellt. | dol.gov weist automatische Abrufe ab: HTTP 403 „Access Denied“ für die Datenseite, die Dateien und sogar robots.txt, geprüft am 15.11.2026 mit offen deklarierter Kennung. Eine Browser-Kennung vorzutäuschen kommt nicht in Frage. Im Browser lassen sich die Quartalsdateien laden; möglich wäre also nur ein Handimport wie bei den Patenten – rund 40 Dateien seit 2008 mit bis zu 300 MB und eine neue je Quartal. Bei Priorität B und ohne belegte Wirkung steht das hinter den Quellen mit freiem Abruf. |
+| 121 | Neue Quelle `fed_sf`. `GW1-01` ist die Spalte MP1 der USMPD (Blatt „Statements“, 30-Minuten-Fenster um die Erklärung), nicht die Reihe von Bauer & Swanson. | Die USMPD wird nach jeder Sitzung fortgeschrieben (Stand 30.10.2026), die Reihe von Bauer & Swanson endet 12/2023. MP1 ist die Überraschung nach Kuttner (2001), auf die sich der Katalog bezieht. |
+| 122 | `GW1-01` und `GW1-02` gelten ab der Eröffnung des dritten Handelstags nach der Erklärung. | Die Datei erschien nach der Sitzung vom 28.10.2026 am 30.10.2026. Der Wert wäre am Markt sofort ablesbar, in dieser Quelle steht er aber erst dann; die Stichtagsregel (Nr. 6) richtet sich nach der Quelle. |
+| 123 | `GW1-02` ist eine Näherung an den Pfad-Faktor: Änderung des vierten Zinsfutures minus der Teil, den MP1 erklärt; die Regression läuft über alle Erklärungen bis einschließlich der jeweiligen (mindestens 20). | Der Faktor nach Gürkaynak, Sack & Swanson braucht die ganze Zinskurve und eine Schätzung über die gesamte Stichprobe, also auch über spätere Ereignisse. Die laufende Schätzung vermeidet den Blick voraus. |
+| 124 | `WS2-05` ist der Tageswert des Daily News Sentiment Index; er gilt ab dem zwölften Tag nach dem Berichtstag. Gespeichert wird der jüngste Stand der Datei. | Die Datei wird wöchentlich fortgeschrieben und reicht dann bis zum Sonntag davor: Der Montag einer Woche erscheint elf Tage später. Frühere Werte können sich bei Neuschätzung ändern; Datenstände veröffentlicht die Fed nicht. |
+| 125 | Dateien einer Federal Reserve Bank gelten als amtlich im Sinn von Nr. 50. Die bereinigte Tabelle `fedsf_ereignisse` enthält nur die Spalten, aus denen die Kennzahlen entstehen (Zeit, MP1, vierter Zinsfuture, Pfad-Anteil). Neues angeheftetes Paket: openpyxl 3.1.5. | Die USMPD ist ein Produkt der Fed San Francisco auf Grundlage von Marktdaten eines Anbieters; übernommen wird nur das Nötige, die Quelle steht im Datenblatt. Die Dateien liegen nur als Excel vor. |
+
 ## Noch offen
 
 | Baustein | Parameter | Hinderungsgrund |
 |---|---|---|
 | Wahlkampfspenden, Lobbying | PR3-01, PR3-02 | Schlüssel `DATA_GOV_API_KEY` nötig; Namensabgleich über Ausschuss- und Mandantennamen |
-| H-1B-Anträge (DOL) | GA2-02 | Große Excel-Dateien je Quartal mit wechselnden Spalten |
+| H-1B-Anträge (DOL) | GA2-02 | dol.gov weist automatische Abrufe ab (Nr. 120); nur als Handimport von rund 40 großen Excel-Dateien möglich |
 | Weitere Abschlusskennzahlen | UA2-02, GW1-03 | Dechow-F-Score braucht weitere Bilanzposten (Vorräte, Verbindlichkeiten, Anlagen); die geldpolitische Exposition braucht Cashflow-Duration und Volatilität |
 | Rückrufe und Sicherheitsmeldungen | GA3-02 | NHTSA, CPSC, openFDA; Namensabgleich Hersteller → Firma |
 | SEC-Verfahren | PR4-01 | Litigation Releases und AAER von sec.gov; Namensabgleich Beklagte → Firma |
-| Zinsüberraschung, Nachrichtenstimmung | GW1-01, GW1-02, WS2-05 | Dateien der Federal Reserve Bank of San Francisco (amtlich im Sinn von Nr. 50) |
 | Indexaufnahme und -streichung | KD3-03 | Ankündigungen der Indexanbieter; freie, weiterverbreitbare Quelle suchen |
 | Insider: Optionsausübung nahe Verfall | UA6-02 | Derivatetabelle der Insider-Datensätze wird noch nicht gelesen |
 | Passive Großaktionäre, institutioneller Besitz | IH5-07, IH5-05 | 13G braucht die Rollen aus dem Meldungskopf (viele Abrufe); die 13F-Summe ist aus den Beständen ableitbar |

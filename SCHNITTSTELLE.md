@@ -5,7 +5,7 @@
 | Release | Dateien | Inhalt |
 |---|---|---|
 | `parameter-edgar` | `parameter__edgar_<quelle>__<jahr>.parquet` | Parameter aus EDGAR: `edgar_insider`, `edgar_ereignisse`, `edgar_xbrl`, `edgar_rollen`, `edgar_13f` |
-| `parameter-makro` | `parameter__fred__<jahr>.parquet` | Parameter der Gesamtwirtschaft (cik = 0) |
+| `parameter-makro` | `parameter__fred__<jahr>.parquet`, `parameter__fed_sf__<jahr>.parquet` | Parameter der Gesamtwirtschaft (cik = 0) |
 | `parameter-web` | `parameter__<quelle>__<jahr>.parquet` | `wikipedia`, `cfpb`, `klinik`, `usaspending`, `uspto_patente`, `uspto_zitate` |
 | `bereinigt-edgar` | `bereinigt__edgar_meldungen__<jahr>.parquet` | Meldungsverzeichnis: Firma, Aktenzeichen, Formular, Annahmezeit, `verfuegbar_ab` |
 | | `bereinigt__edgar_firmen__alle.parquet` | Stammdaten je CIK: Name, Ticker, SIC, Sitz |
@@ -17,6 +17,7 @@
 | | `bereinigt__edgar_13f_bestaende__<jahr>q<q>.parquet` | Je Manager (`filer_cik`) und CUSIP: Stückzahl und Portfoliogewicht (fristgerechte Erstmeldungen) |
 | | `bereinigt__edgar_13f_dateien__alle.parquet` | Gelesene Datensätze mit Zahl der Meldungen; Zeile `einzel-<jahr>q<q>` für ein Quartal aus Einzelmeldungen |
 | `bereinigt-makro` | `bereinigt__fred_<reihe>__alle.parquet` | Rohreihen mit allen Ständen (`von`, `bis`) und Termine |
+| | `bereinigt__fedsf_ereignisse__alle.parquet`, `bereinigt__fedsf_stimmung__alle.parquet` | Erklärungen des Offenmarktausschusses mit Zinsüberraschung (`mp1`), viertem Zinsfuture (`ed4`) und Pfad-Anteil; Tageswerte der Nachrichtenstimmung (Federal Reserve Bank of San Francisco) |
 | `bereinigt-web` | `bereinigt__wiki_wochen__alle.parquet`, `bereinigt__wiki_zuordnung__alle.parquet` | Wochenaufrufe je CIK und Zuordnung CIK → Artikel |
 | | `bereinigt__cfpb_zuordnung__alle.parquet` | Firmenname → CIK mit Konfidenz |
 | | `bereinigt__klinik_studien__alle.parquet`, `…_aenderungen__<jahr>`, `…_zulassungen__alle` | Studienstand, Änderungsprotokoll, Zulassungen |

@@ -16,11 +16,11 @@ import pandas as pd
 
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
-from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fred,
+from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fed_sf, fred,
                       klinik, sec_ftd, usaspending, uspto_patente, uspto_zitate, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate")
+           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -121,6 +121,14 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
         schwer = []
         if info["im_fenster"] and info["anteil_zugeordnet"] < 0.1:
             schwer.append("weniger als 10 % der Zitate treffen Patente zugeordneter Firmen")
+        return parameter, info, schwer, hinweise
+    if args.quelle == "fed_sf":
+        parameter, info, hinweise = fed_sf.lauf(ablage)
+        schwer = []
+        if info["tage_seit_erklaerung"] > fed_sf.MAX_ALTER_EREIGNIS:
+            schwer.append(f"jüngste Erklärung in der USMPD ist {info['tage_seit_erklaerung']} Tage alt (Datei nicht mehr gepflegt?)")
+        if info["tage_seit_stimmung"] > fed_sf.MAX_ALTER_STIMMUNG:
+            schwer.append(f"jüngster Tag der Nachrichtenstimmung ist {info['tage_seit_stimmung']} Tage alt")
         return parameter, info, schwer, hinweise
     if args.quelle == "fred":
         parameter, info, hinweise = fred.lauf(ablage)
