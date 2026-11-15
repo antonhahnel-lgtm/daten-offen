@@ -31,7 +31,7 @@ Insider-Monitor.
 | `rueckrufe` | GA3-02 | ja | ja (Workflow `einzel`, 15.11.2026) |
 | `sec_verfahren` | PR4-01 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
 | `edgar_ausuebungen` | UA6-02 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
-| `edgar_texte` | UA5-01, UA5-03, UA5-04, UA2-05 | ja | Erstaufbau läuft im Workflow `einzel` (setzt sich selbst fort) |
+| `edgar_texte` | UA5-01, UA5-03, UA5-04, UA2-05 | ja | ja (zwei Probeläufe `einzel`, 15.11.2026); Erstaufbau läuft seit 15.11.2026 abends im Workflow `einzel` und setzt sich selbst fort (rund 5 Läufe, gut einen Tag) |
 | `edgar_nport` | KD3-01, IH5-06 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
 | `politik` | PR1-03 | ja | ja (Workflows `einzel` und `abruf`, 15.11.2026); ab 03.01.2027 Kalender fortschreiben (Nr. 148) |
 
@@ -154,6 +154,9 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
   13.706 Fonds und 5.304 Firmen; `KD3-01` 126.435 Werte für 6.842 Firmen, `IH5-06` 139.195 für 7.483. Das
   Berichtsquartal 2026q3 entsteht, sobald die SEC den Datensatz 2026q4 veröffentlicht (Anfang Januar 2027).
   Läuft ab jetzt im Tageslauf mit (eine Abfrage der Datenseite, sonst nur bei neuem Datensatz).
+- Berichtstexte (Lieferung 19): 610.397 Berichte (10-K, 10-Q ab 2006). Erstaufbau im Workflow `einzel` mit
+  Selbstfortsetzung; prüfen: `gh run list --workflow einzel.yml` (Laufname „einzel edgar_texte“), Prüfbericht
+  `edgar_texte` (`offen` muss auf 0 fallen). Bis dahin setzt `edgar_texte` im Tageslauf aus.
 - `GW2-06` im echten Lauf bestätigt (340 Werte, letzter Stand 14.10.2026).
 - Actions laufen auf Node 24 (checkout v5, setup-python v6, upload-artifact v6, download-artifact v7).
 - Neue Module zuerst über `gh workflow run einzel.yml -f quelle=<name>` erproben; der Workflow berührt die
