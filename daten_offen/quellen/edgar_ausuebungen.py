@@ -223,8 +223,10 @@ def ergaenze_aus_xml(ablage: Ablage, abruf, budget: Zeitbudget, teil: str, kandi
 
 # --------------------------------------------------------------------------- Parameter
 def baue_parameter(df: pd.DataFrame, meldungen: pd.DataFrame) -> pd.DataFrame:
-    """Je Meldung des CEO die kürzeste Restlaufzeit; Nachträge (/A) entfallen, wenn das Original vorliegt."""
-    c = df[df["ist_ceo"]].copy()
+    """Je Meldung des CEO die kürzeste Restlaufzeit; Nachträge (/A) entfallen, wenn das Original vorliegt.
+    Wie bei edgar_insider zählen nur Ausübungen bis zum Einreichungstag und höchstens drei Jahre davor."""
+    plausibel = (df["trans_date"] <= df["filing_date"]) & (df["trans_date"] >= df["filing_date"] - pd.Timedelta(days=3 * 366))
+    c = df[df["ist_ceo"] & plausibel].copy()
     if c.empty:
         return leer()
     schluessel = ["issuer_cik", "owner_cik", "trans_date", "verfall", "basis", "stueck"]
@@ -232,7 +234,7 @@ def baue_parameter(df: pd.DataFrame, meldungen: pd.DataFrame) -> pd.DataFrame:
     nachtrag = c["form"].astype("string").fillna("").str.endswith("/A").to_numpy()
     original = c.loc[~nachtrag, schluessel].drop_duplicates().assign(_orig=True)
     c = c.merge(original, on=schluessel, how="left")
-    c = c[~(nachtrag & c["_orig"].fillna(False).astype(bool).to_numpy())]
+    c = c[~(nachtrag & c["_orig"].notna().to_numpy())]
     c = c.sort_values(["accession", "restlaufzeit", "trans_date"], kind="stable").drop_duplicates("accession")
     zeit = pd.DataFrame(columns=["accession", "verfuegbar_ab"])
     if not meldungen.empty:

@@ -18,10 +18,12 @@ ND_KOPF = ["ACCESSION_NUMBER", "NONDERIV_TRANS_SK", "SECURITY_TITLE", "TRANS_DAT
 
 SUB = [["0001-26-000001", "03-FEB-2026", "02-FEB-2026", "4", "1000", "ALPHA CORP", "ALPH", "0"],
        ["0001-26-000002", "04-FEB-2026", "02-FEB-2026", "4", "1000", "ALPHA CORP", "ALPH", "0"],
-       ["0001-26-000003", "10-FEB-2026", "02-FEB-2026", "4/A", "1000", "ALPHA CORP", "ALPH", "0"]]
+       ["0001-26-000003", "10-FEB-2026", "02-FEB-2026", "4/A", "1000", "ALPHA CORP", "ALPH", "0"],
+       ["0001-26-000004", "03-FEB-2026", "02-FEB-2026", "4", "1000", "ALPHA CORP", "ALPH", "0"]]
 OWN = [["0001-26-000001", "2001", "DOE JANE", "Director,Officer", "President and CEO"],
        ["0001-26-000002", "2002", "ROE RICHARD", "Director", ""],
-       ["0001-26-000003", "2001", "DOE JANE", "Director,Officer", "President and CEO"]]
+       ["0001-26-000003", "2001", "DOE JANE", "Director,Officer", "President and CEO"],
+       ["0001-26-000004", "2001", "DOE JANE", "Director,Officer", "President and CEO"]]
 DT = [["0001-26-000001", 1, "Stock Option (right to buy)", "10.0", "02-FEB-2026", "M", "1000.0", "D", "", "02-AUG-2026", "1000.0"],
       ["0001-26-000001", 2, "Employee Stock Option", "12.0", "02-FEB-2026", "M", "500.0", "D", "01-JAN-2020", "02-FEB-2030", "500.0"],
       ["0001-26-000001", 3, "Restricted Stock Units", "0.0", "02-FEB-2026", "M", "300.0", "D", "", "", "300.0"],
@@ -29,7 +31,8 @@ DT = [["0001-26-000001", 1, "Stock Option (right to buy)", "10.0", "02-FEB-2026"
       ["0001-26-000001", 5, "Stock Option (right to buy)", "10.0", "02-FEB-2026", "A", "800.0", "A", "", "02-FEB-2036", "800.0"],
       ["0001-26-000001", 6, "Stock Option (right to buy)", "10.0", "02-FEB-2026", "M", "50.0", "D", "", "01-JAN-2026", "50.0"],
       ["0001-26-000002", 7, "Director Stock Option", "20.0", "02-FEB-2026", "M", "200.0", "D", "", "02-FEB-2031", "200.0"],
-      ["0001-26-000003", 8, "Stock Option (right to buy)", "10.0", "02-FEB-2026", "M", "1000.0", "D", "", "02-AUG-2026", "1000.0"]]
+      ["0001-26-000003", 8, "Stock Option (right to buy)", "10.0", "02-FEB-2026", "M", "1000.0", "D", "", "02-AUG-2026", "1000.0"],
+      ["0001-26-000004", 9, "Stock Option (right to buy)", "10.0", "02-FEB-2027", "M", "10.0", "D", "", "02-AUG-2027", "10.0"]]
 ND = [["0001-26-000001", 1, "Common Stock", "02-FEB-2026", "M", "1500.0", "10.0", "A"],
       ["0001-26-000001", 2, "Common Stock", "02-FEB-2026", "S", "500.0", "30.0", "D"],
       ["0001-26-000001", 3, "Common Stock", "02-FEB-2026", "F", "100.0", "31.0", "D"],
@@ -88,7 +91,7 @@ def test_datensatz_lesen(tmp_path):
     df = a.lies_quartal(baue_zip(tmp_path / "2026q1_form345.zip"), "2026q1")
     assert list(df.columns) == a.SPALTEN
     # RSU (Basis 0), Optionsschein, Zuteilung (A) und Verfall vor der Ausübung fallen weg
-    assert df["zeile"].tolist() == [0, 1, 6, 7]
+    assert df["zeile"].tolist() == [0, 1, 8, 6, 7]
     z = df.iloc[0]
     assert (z["issuer_cik"], z["owner_cik"], z["code"], z["basis"], z["stueck"]) == (1000, 2001, "M", 10.0, 1000.0)
     assert bool(z["ist_ceo"]) and bool(z["ist_officer"]) and z["herkunft"] == "datensatz"
@@ -96,7 +99,7 @@ def test_datensatz_lesen(tmp_path):
     assert z["kurs"] == pytest.approx((500 * 30 + 100 * 31) / 600)                # S und F am Ausübungstag, nicht am 05.02.
     assert z["kurs_zu_basis"] == pytest.approx(z["kurs"] / 10)
     assert df.iloc[1]["verfall"] == pd.Timestamp("2030-02-02")
-    d = df.iloc[2]
+    d = df.iloc[3]
     assert not bool(d["ist_ceo"]) and pd.isna(d["kurs"]) and d["basis"] == 20
 
 
@@ -146,8 +149,9 @@ def test_lauf(tmp_path):
     p, info, hinweise = a.lauf(ablage, tmp_path / "arbeit", ab_jahr=2026, heute=date(2026, 11, 15), abruf=archiv, lokal=lokal)
     assert info["gelesen"] == ["2026q1"] and info["unveroeffentlicht"] == ["2026q2", "2026q3"]
     assert info["xml"] == [{"quartal": "2026q3", "offen": 0, "abgebrochen": False, "gelesen": 1, "fehlt": 1}]
-    assert len(archiv.aufrufe) == 2 and info["tranchen"] == 5
-    # je Meldung des CEO die kürzeste Restlaufzeit; der Nachtrag mit gleichen Angaben entfällt; der Direktor zählt nicht
+    assert len(archiv.aufrufe) == 2 and info["tranchen"] == 6
+    # je Meldung des CEO die kürzeste Restlaufzeit; der Nachtrag mit gleichen Angaben entfällt; der Direktor zählt nicht;
+    # eine Ausübung nach dem Einreichungstag (Tippfehler im Jahr) zählt nicht
     assert p["stand"].tolist() == ["0001-26-000001", "0001-26-000099"] and set(p["parameter_id"]) == {"UA6-02"}
     assert p["wert"].round(4).tolist() == [round(181 / 365.25, 4), round(110 / 365.25, 4)]
     assert p["verfuegbar_ab"].iloc[0] == pd.Timestamp("2026-02-04 09:30", tz=ET)       # Annahme nach Börsenschluss
