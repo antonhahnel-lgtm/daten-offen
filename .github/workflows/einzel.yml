@@ -9,7 +9,7 @@ on:
       quelle:
         description: "Quelle"
         type: choice
-        options: [sec_ftd, edgar_13f, usaspending, uspto_patente, fed_sf, rueckrufe, sec_verfahren]
+        options: [sec_ftd, edgar_13f, usaspending, uspto_patente, fed_sf, rueckrufe, sec_verfahren, edgar_ausuebungen]
       veroeffentlichen:
         description: "Ergebnis in die Releases laden"
         type: boolean
@@ -68,6 +68,14 @@ jobs:
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__patente_*.parquet" || true ;;
             rueckrufe-false)
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__rueckrufe_fda__*.parquet" || true ;;
+            edgar_ausuebungen-*)
+              jahr=$(date -u +%Y)
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber -p "bereinigt__edgar_meldungen__*.parquet"
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber \
+                -p "bereinigt__insider_transaktionen__${jahr}q*.parquet" -p "bereinigt__insider_transaktionen__$((jahr - 1))q*.parquet" ;;&
+            edgar_ausuebungen-false)
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber \
+                -p "bereinigt__insider_ausuebungen__*.parquet" -p "bereinigt__insider_ausuebungen_stand__*.parquet" || true ;;
             sec_verfahren-false)
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__verfahren_ereignisse__*.parquet" || true ;;
           esac
@@ -78,8 +86,9 @@ jobs:
         if: always()
         run: |
           rm -f ausgabe/bereinigt/bereinigt__edgar_firmen__*.parquet ausgabe/bereinigt/bereinigt__edgar_meldungen__*.parquet
+          rm -f ausgabe/bereinigt/bereinigt__insider_transaktionen__*.parquet
           if [ "${{ inputs.quelle }}" != "sec_ftd" ]; then rm -f ausgabe/bereinigt/bereinigt__ftd_*.parquet; fi
-          find ausgabe/bereinigt \( -name 'bereinigt__ftd_tage__*.parquet' -o -name 'bereinigt__edgar_13f_bestaende__*.parquet' -o -name 'bereinigt__usaspending_monat__*.parquet' -o -name 'bereinigt__patente_erteilt__*.parquet' \) ! -newer ausgabe/.vorher -delete
+          find ausgabe/bereinigt \( -name 'bereinigt__ftd_tage__*.parquet' -o -name 'bereinigt__edgar_13f_bestaende__*.parquet' -o -name 'bereinigt__usaspending_monat__*.parquet' -o -name 'bereinigt__patente_erteilt__*.parquet' -o -name 'bereinigt__insider_ausuebungen__*.parquet' \) ! -newer ausgabe/.vorher -delete
           rm -f ausgabe/.vorher
       - uses: actions/upload-artifact@v6
         if: always()

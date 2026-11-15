@@ -926,6 +926,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | Item 5.02 umfasst auch Vergütungsänderungen und Direktorenwechsel |
 
+## UA6-02 Optionen bis nahe Verfall gehalten
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Je Meldung, in der der CEO Optionen oder Wertsteigerungsrechte ausübt (Code M, X oder O): kürzeste Restlaufzeit der ausgeübten Tranchen bis zum Verfall, in Jahren. Kleine Werte (unter 1) entsprechen dem „Longholder“ von Malmendier & Tate (2005), große einer frühen Ausübung. Alle Insider, Basispreis und Kurs am Ausübungstag (aus Verkäufen und Einbehalt derselben Meldung) stehen in insider_ausuebungen |
+| Einheit | Jahre |
+| Frequenz | je Ausübungsmeldung |
+| Offenlegung | gesetzlich: Section 16(a) Exchange Act, Form 4, Frist 2 Geschäftstage |
+| Quelle | SEC Insider Transactions Data Sets (Tabelle DERIV_TRANS); für Quartale ohne Datensatz die Form-4-Dateien |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2006 |
+| Verzögerung | Annahmezeit der Meldung (aus edgar_index) |
+| Bekannte Schwächen | CEO nur über den Freitext des Titels erkennbar; Malmendier & Tate verlangen zusätzlich, dass die Option zu Beginn ihres letzten Jahres mindestens 40 % im Geld war – hier ist nur das Verhältnis von Kurs und Basispreis am Ausübungstag bekannt (Spalte kurs_zu_basis). Gehaltene, nicht ausgeübte Optionen fehlen |
+
 ## WR2-02 Nettoverschuldung zur Bilanzsumme
 
 | Angabe | Inhalt |

@@ -9,6 +9,7 @@
 | `parameter-web` | `parameter__<quelle>__<jahr>.parquet` | `wikipedia`, `cfpb`, `klinik`, `usaspending`, `uspto_patente`, `uspto_zitate`, `rueckrufe`, `sec_verfahren` |
 | `bereinigt-edgar` | `bereinigt__edgar_meldungen__<jahr>.parquet` | Meldungsverzeichnis: Firma, Aktenzeichen, Formular, Annahmezeit, `verfuegbar_ab` |
 | | `bereinigt__edgar_firmen__alle.parquet` | Stammdaten je CIK: Name, Ticker, SIC, Sitz |
+| | `bereinigt__insider_ausuebungen__<jahr>q<q>.parquet` | Ausgeübte Optionen je Tranche: Meldung, Firma, Person mit Rolle und Titel (`ist_ceo`), Ausübungstag, Code, Wertpapier, `basis`, `stueck`, `verfall`, `restlaufzeit` (Jahre), `kurs` (aus Verkäufen und Einbehalt derselben Meldung), `kurs_zu_basis`, `herkunft` (`datensatz` oder `xml`) |
 | | `bereinigt__insider_transaktionen__<jahr>q<q>.parquet` | Alle nicht-derivativen Insidergeschäfte je Quartal; Spalte `herkunft`: `datensatz` (amtlich) oder `xml` (laufende Ergänzung) |
 | | `bereinigt__edgar_abschluesse__<jahr>.parquet` | Eine Zeile je 10-K/10-Q mit den Abschlussposten (Wert, Vorjahreswert `_py`, abgedeckte Quartale `_q`), geteilt nach Einreichungsjahr; seit Lieferung 12 zusätzlich `buyback`, `dps`, `antidil`, `sh_basic`, `sh_dil` und `streubesitz` (Marktwert des Streubesitzes laut Deckblatt des 10-K) |
 | | `bereinigt__edgar_rollen__<jahr>.parquet` | Betroffene Firma und Einreicher je 13D- und 144-Meldung |

@@ -16,11 +16,11 @@ import pandas as pd
 
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
-from .quellen import (cfpb, edgar_13f, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fed_sf, fred,
+from .quellen import (cfpb, edgar_13f, edgar_ausuebungen, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fed_sf, fred,
                       klinik, rueckrufe, sec_ftd, sec_verfahren, usaspending, uspto_patente, uspto_zitate, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe", "sec_verfahren")
+           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe", "sec_verfahren", "edgar_ausuebungen")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -45,6 +45,19 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
                             f"ohne Annahmezeit: {info['ohne_annahmezeit']}")
             return parameter, info, schwer, hinweise
         return None, info, schwer, hinweise
+    if args.quelle == "edgar_ausuebungen":
+        parameter, info, hinweise = edgar_ausuebungen.lauf(ablage, arbeits, args.ab_jahr, lokal=args.insider_ordner)
+        if info.get("unvollstaendig"):
+            return None, info, [], hinweise
+        schwer = []
+        if not args.insider_ordner and info["tranchen_letzter_datensatz"] < edgar_ausuebungen.MINDESTENS_JE_QUARTAL:
+            schwer.append(f"jüngster Datensatz {info['letzter_datensatz']}: nur {info['tranchen_letzter_datensatz']} Ausübungen "
+                          f"(erwartet über {edgar_ausuebungen.MINDESTENS_JE_QUARTAL}; Aufbau geändert?)")
+        if info["fehlende_quartale"] and not args.insider_ordner:
+            schwer.append(f"Quartale fehlen: {', '.join(info['fehlende_quartale'])}")
+        if info["anteil_mit_kurs"] < 0.5:
+            schwer.append(f"nur {info['anteil_mit_kurs']:.0%} der Ausübungen mit Kurs aus derselben Meldung (erwartet rund 85 %)")
+        return parameter, info, schwer, hinweise
     if args.quelle == "edgar_ereignisse":
         return edgar_ereignisse.lauf(ablage), {}, [], []
     if args.quelle == "edgar_xbrl":

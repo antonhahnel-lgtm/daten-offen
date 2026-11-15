@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        quelle: [edgar_insider, edgar_ereignisse, edgar_xbrl, edgar_rollen, edgar_13f, sec_ftd, cfpb, klinik, usaspending, uspto_patente, rueckrufe, sec_verfahren]
+        quelle: [edgar_insider, edgar_ausuebungen, edgar_ereignisse, edgar_xbrl, edgar_rollen, edgar_13f, sec_ftd, cfpb, klinik, usaspending, uspto_patente, rueckrufe, sec_verfahren]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -83,6 +83,13 @@ jobs:
             edgar_insider)
               gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber \
                 -p "bereinigt__insider_transaktionen__*.parquet" -p "bereinigt__insider_xml_stand__*.parquet" || true ;;
+            edgar_ausuebungen)
+              # Meldungen mit Ausübung der Quartale ohne Datensatz kennt edgar_insider (Stand des letzten Laufs)
+              jahr=$(date -u +%Y)
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber \
+                -p "bereinigt__insider_ausuebungen__*.parquet" -p "bereinigt__insider_ausuebungen_stand__*.parquet" || true
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber \
+                -p "bereinigt__insider_transaktionen__${jahr}q*.parquet" -p "bereinigt__insider_transaktionen__$((jahr - 1))q*.parquet" || true ;;
             edgar_rollen)
               gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber \
                 -p "bereinigt__edgar_rollen__*.parquet" || true ;;
@@ -113,9 +120,10 @@ jobs:
           rm -f ausgabe/bereinigt/bereinigt__edgar_meldungen__*.parquet ausgabe/bereinigt/bereinigt__edgar_firmen__*.parquet
           rm -f ausgabe/berichte/*__edgar_index.*
           if [ "${{ matrix.quelle }}" != "sec_ftd" ]; then rm -f ausgabe/bereinigt/bereinigt__ftd_*.parquet; fi
+          if [ "${{ matrix.quelle }}" = "edgar_ausuebungen" ]; then rm -f ausgabe/bereinigt/bereinigt__insider_transaktionen__*.parquet; fi
           # unveränderte Jahresdateien der Lieferausfälle, der Bundesaufträge und der Patente liegen schon im Release
           if [ -f ausgabe/.vorher ]; then
-            find ausgabe/bereinigt '(' -name 'bereinigt__ftd_tage__*.parquet' -o -name 'bereinigt__usaspending_monat__*.parquet' -o -name 'bereinigt__patente_erteilt__*.parquet' ')' ! -newer ausgabe/.vorher -delete
+            find ausgabe/bereinigt '(' -name 'bereinigt__ftd_tage__*.parquet' -o -name 'bereinigt__usaspending_monat__*.parquet' -o -name 'bereinigt__patente_erteilt__*.parquet' -o -name 'bereinigt__insider_ausuebungen__*.parquet' ')' ! -newer ausgabe/.vorher -delete
             rm -f ausgabe/.vorher
           fi
       - uses: actions/upload-artifact@v6
