@@ -1,6 +1,6 @@
 # Übergabe
 
-Stand 15.11.2026, Lieferung 11. Fortschritt 91 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
+Stand 15.11.2026, Lieferung 12. Fortschritt 91 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
 und dem Auftragstext, um in einem neuen Chat weiterzuarbeiten.
 
 ## Ziel
@@ -15,8 +15,8 @@ Insider-Monitor.
 |---|---|---|---|
 | `edgar_index` | – (Zeitbasis) | ja | ja |
 | `edgar_insider` | IH1-01 bis IH1-07, IH1-09, IH1-10, IH1-16, IH1-17, IH1-18, WS3-01 | ja | ja |
-| `edgar_ereignisse` | WS2-04, UA1-10, UA2-03, UA2-04, IH6-04, UA4-05, GA2-03, UA4-01, UA3-03, UA3-04, KD1-11, WS3-02 | ja | ja |
-| `edgar_xbrl` | UA1-01 bis UA1-07, UA2-01, UA3-01, GA1-02, GA1-06, GA3-03, PR2-03, GW1-04 | ja | ja |
+| `edgar_ereignisse` | WS2-04, UA1-10, UA2-03, UA2-04, IH6-04, UA4-05, GA2-03, UA4-01, UA3-03, UA3-04, KD1-11, WS3-02, UA4-04, UA4-02 | ja | ja (UA4-04, UA4-02: Lauf vom 15.11.2026 abwarten) |
+| `edgar_xbrl` | UA1-01 bis UA1-08, UA2-01, UA3-01, UA3-02, UA3-05, UA4-03, GA1-02, GA1-03, GA1-06, GA3-03, PR2-03, GW1-04, WR2-02 | ja | ja (die sechs neuen: Lauf vom 15.11.2026 abwarten) |
 | `edgar_rollen` | IH5-01, IH5-02, IH1-14 | ja | ja |
 | `fred` | GW2-01, GW2-03, GW1-06, GW3-01, GW2-04, GW2-06, GW1-05 | ja | ja |
 | `wikipedia` | WS3-05 | ja | ja |
@@ -28,7 +28,7 @@ Insider-Monitor.
 | `uspto_patente` | GA1-01 | ja | ja (Workflow `einzel`, 13.11.2026); Historie ab 2001 lokal gebaut und veröffentlicht (15.11.2026) |
 | `uspto_zitate` | GA1-09 | ja | nur lokal, veröffentlicht 15.11.2026; nicht im Tageslauf |
 
-59 Parameter, 140 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
+67 Parameter, 146 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
 (`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
 
 ## Prüfliste für den ersten echten Lauf
@@ -133,6 +133,13 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
 - Neue Module zuerst über `gh workflow run einzel.yml -f quelle=<name>` erproben; der Workflow berührt die
   Fortsetzungskette von `abruf` nicht.
 
+## Vorgabe des Inhabers (15.11.2026)
+
+Erst alle frei verfügbaren Kennzahlen bauen, dann breit über alle Aktien nach Zusammenhängen suchen – nicht
+gefiltert über Insiderkäufe. Keine kostenpflichtigen Daten. Die Reihenfolge der offenen Quellen steht in
+`ENTSCHEIDUNGEN.md` Nr. 110 und in der Tabelle „Noch offen“. Eine erste Bewertung der vorhandenen Kennzahlen liegt
+privat vor (Ordner `auswertung` neben den Repos) und ruht, bis die Quellen ausgebaut sind.
+
 ## Empfohlene Reihenfolge
 
 1. ~~Repo anlegen, Secrets setzen, Workflow `abruf` im Modus `laufend` starten.~~ erledigt
@@ -140,7 +147,8 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
 3. ~~Einmal im Modus `rueckwaerts` starten (Historie der 13D- und 144-Meldungen; setzt sich selbst fort).~~
    erledigt (10. bis 12.11.2026)
 4. Offene Bausteine (Tabelle „Noch offen“ in `ENTSCHEIDUNGEN.md`). Erledigt: Lieferausfälle, 13F (auch das
-   laufende Quartal), Sponsoren, Bundesaufträge, Patente mit Historie und Zitationen. Als Nächstes: H-1B.
+   laufende Quartal), Sponsoren, Bundesaufträge, Patente mit Historie und Zitationen, Abschlüsse II mit Lockup
+   und Abspaltung (Lieferung 12). Als Nächstes: H-1B, dann Rückrufe, SEC-Verfahren, Dateien der Fed San Francisco.
 5. Anbindung im Insider-Monitor (eigener Auftrag; `SCHNITTSTELLE.md` beschreibt das Lesen).
 
 ## Dateien für einen neuen Chat

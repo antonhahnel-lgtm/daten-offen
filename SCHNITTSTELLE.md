@@ -10,7 +10,7 @@
 | `bereinigt-edgar` | `bereinigt__edgar_meldungen__<jahr>.parquet` | Meldungsverzeichnis: Firma, Aktenzeichen, Formular, Annahmezeit, `verfuegbar_ab` |
 | | `bereinigt__edgar_firmen__alle.parquet` | Stammdaten je CIK: Name, Ticker, SIC, Sitz |
 | | `bereinigt__insider_transaktionen__<jahr>q<q>.parquet` | Alle nicht-derivativen Insidergeschäfte je Quartal; Spalte `herkunft`: `datensatz` (amtlich) oder `xml` (laufende Ergänzung) |
-| | `bereinigt__edgar_abschluesse__<jahr>.parquet` | Eine Zeile je 10-K/10-Q mit den Abschlussposten (Wert, Vorjahreswert `_py`, abgedeckte Quartale `_q`), geteilt nach Einreichungsjahr |
+| | `bereinigt__edgar_abschluesse__<jahr>.parquet` | Eine Zeile je 10-K/10-Q mit den Abschlussposten (Wert, Vorjahreswert `_py`, abgedeckte Quartale `_q`), geteilt nach Einreichungsjahr; seit Lieferung 12 zusätzlich `buyback`, `dps`, `antidil`, `sh_basic`, `sh_dil` und `streubesitz` (Marktwert des Streubesitzes laut Deckblatt des 10-K) |
 | | `bereinigt__edgar_rollen__<jahr>.parquet` | Betroffene Firma und Einreicher je 13D- und 144-Meldung |
 | | `bereinigt__edgar_13f_firmen__alle.parquet` | Je Firma (CIK) und Berichtsquartal: `halter`, `beste_idee`, `breite_aenderung`, `manager`, `manager_beide`; `herkunft`: `datensatz` (amtlich) oder `einzelmeldungen` (jüngstes Quartal, bis der Datensatz der SEC erscheint) |
 | | `bereinigt__edgar_13f_quartal__alle.parquet` | Je CUSIP und Berichtsquartal: `halter`, `stueck` (alle Wertpapiere, auch Fonds) |

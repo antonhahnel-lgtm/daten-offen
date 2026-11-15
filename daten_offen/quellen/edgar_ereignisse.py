@@ -52,6 +52,20 @@ registriere(
        offen="gesetzlich: Rule 12d2-2 (Form 25), Rule 12g-4 / 15d-6 (Form 15), Form 8-K, Schedule 14A/14C, Rule 14d-9",
        schwaechen="Form 25 betrifft teils einzelne Wertpapierklassen; SC TO-T und SC 13E3 fehlen, weil sie unter "
                   "Bieter und Zielfirma stehen und die Rollen noch nicht gelesen werden"),
+    Parameter(id="UA4-04", name="Lockup-Ablauf",
+              definition="Erwarteter Ablauf der Haltefrist nach einem Börsengang: 180 Tage nach dem Emissionsprospekt "
+                         "(erster 424B4 oder 424B1 einer Firma ohne früheren 10-K oder 10-Q); ereignis_zeit = Ablauftag, "
+                         "wert = angenommene Frist in Tagen",
+              einheit="Tage", frequenz="je Börsengang", offenlegung="gesetzlich: Rule 424(b)", quelle=_Q, lizenz=_L,
+              historie_ab="2008", verzoegerung="Annahmezeit des Prospekts; der Ablauftag liegt in der Zukunft",
+              schwaechen="Frist als übliche 180 Tage angenommen, nicht aus dem Prospekt gelesen (abweichende und "
+                         "gestaffelte Fristen fehlen); enthält auch Börsengänge von Mantelgesellschaften (SPAC)",
+              ereignis_vor_verfuegbar=False),
+    _p("UA4-02", "Abspaltung (Spin-off)",
+       "wert 1 = erste Anmeldung Form 10-12B der abgespaltenen Firma, 2 = erste Wirksamkeitsmitteilung (EFFECT) danach "
+       "binnen eines Jahres", einheit="Art (1, 2)", offen="gesetzlich: Form 10 (Exchange Act § 12(b))",
+       schwaechen="Zeile steht bei der abgespaltenen Firma, die Mutter nennt nur der Text; Form 10-12B dient vereinzelt "
+                  "anderen Zwecken (Neustart nach Insolvenz); der Tag der Zuteilung fehlt"),
     Parameter(id="WS3-02", name="Zahl gleichzeitiger Zahlenmeldungen",
               definition="Anzahl der 8-K mit Item 2.02 aller Firmen je Annahmetag (Ostküstenzeit)",
               einheit="Anzahl", frequenz="täglich", offenlegung=_G8K, quelle=_Q, lizenz=_L, historie_ab="2006",
@@ -66,6 +80,10 @@ FORM25 = {"25", "25-NSE"}
 FORM15 = {"15-12B", "15-12G", "15-15D", "15-12B/A", "15-12G/A", "15-15D/A"}
 UEBERNAHME = {"PREM14A", "PREM14C", "DEFM14A", "DEFM14C", "SC 14D9"}
 BOERSEN_SCHWELLE = 200  # wer mehr Form-25-Meldungen hat, ist eine Börse, keine betroffene Firma
+IPO_PROSPEKT = {"424B4", "424B1"}
+BERICHTE = {"10-K", "10-Q"}
+LOCKUP_TAGE = 180
+VORLAUF_TAGE = 550      # so lange muss das Verzeichnis vor einem Prospekt zurückreichen, damit „kein früherer Bericht“ gilt
 
 
 def _zeilen(df: pd.DataFrame, pid: str, wert) -> pd.DataFrame:
@@ -113,13 +131,43 @@ def baue_parameter(meldungen: pd.DataFrame, boersen_schwelle: int = BOERSEN_SCHW
     teile.append(_zeilen(f25[~f25["cik"].isin(boersen)], "KD1-11", 1.0))
     teile.append(_zeilen(meldungen[meldungen["form"].isin(FORM15)], "KD1-11", 2.0))
     teile.append(_zeilen(meldungen[meldungen["form"].isin(UEBERNAHME)], "KD1-11", 4.0))
+    teile.append(_lockup(meldungen))
+    teile.append(_abspaltung(meldungen))
     teile = [t for t in teile if len(t)]
     if not teile:
         return leer()
     return als_parameter(pd.concat(teile, ignore_index=True))
 
 
-FORMEN = sorted({"8-K", "D", "S-3", "S-3ASR"} | PROSPEKT | FORM25 | FORM15 | UEBERNAHME)
+def _lockup(meldungen: pd.DataFrame) -> pd.DataFrame:
+    """UA4-04: je Börsengang der erwartete Ablauf der Haltefrist."""
+    prospekte = meldungen[meldungen["form"].isin(IPO_PROSPEKT)].sort_values("annahme_utc")
+    if prospekte.empty:
+        return prospekte.iloc[:0]
+    erster = prospekte.drop_duplicates("cik")
+    bericht = meldungen[meldungen["form"].isin(BERICHTE)].groupby("cik")["annahme_utc"].min()
+    frueher = erster["cik"].map(bericht)
+    beginn = meldungen["annahme_utc"].min() + pd.Timedelta(days=VORLAUF_TAGE)
+    ipo = erster[(frueher.isna() | (frueher > erster["annahme_utc"])) & (erster["annahme_utc"] >= beginn)]
+    aus = _zeilen(ipo, "UA4-04", float(LOCKUP_TAGE))
+    aus["ereignis_zeit"] = (ipo["annahme_utc"] + pd.Timedelta(days=LOCKUP_TAGE)).values
+    return aus
+
+
+def _abspaltung(meldungen: pd.DataFrame) -> pd.DataFrame:
+    """UA4-02: Anmeldung (Form 10-12B) und Wirksamkeit je abgespaltener Firma."""
+    anmeldung = meldungen[meldungen["form"] == "10-12B"].sort_values("annahme_utc").drop_duplicates("cik")
+    if anmeldung.empty:
+        return anmeldung.iloc[:0]
+    wirksam = meldungen[meldungen["form"] == "EFFECT"].merge(
+        anmeldung[["cik", "annahme_utc"]].rename(columns={"annahme_utc": "angemeldet"}), on="cik")
+    wirksam = wirksam[(wirksam["annahme_utc"] > wirksam["angemeldet"])
+                      & (wirksam["annahme_utc"] <= wirksam["angemeldet"] + pd.Timedelta(days=365))]
+    wirksam = wirksam.sort_values("annahme_utc").drop_duplicates("cik")
+    return pd.concat([_zeilen(anmeldung, "UA4-02", 1.0), _zeilen(wirksam, "UA4-02", 2.0)], ignore_index=True)
+
+
+FORMEN = sorted({"8-K", "D", "S-3", "S-3ASR", "10-12B", "EFFECT"} | PROSPEKT | FORM25 | FORM15 | UEBERNAHME | BERICHTE)
 
 
 def lauf(ablage: Ablage, boersen_schwelle: int = BOERSEN_SCHWELLE) -> pd.DataFrame:

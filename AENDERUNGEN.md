@@ -1,5 +1,16 @@
 # Änderungen
 
+## Lieferung 12 – 2026-11-15 (Abschlüsse II, Lockup, Abspaltung)
+
+- `edgar_xbrl`: sechs neue Kennzahlen aus der Sammeldatei der Abschlüsse – Umsatzwachstum (`UA1-08`),
+  Nettoverschuldung zur Bilanzsumme (`WR2-02`), Aktienrückkäufe 12 Monate (`UA3-02`), Dividendenaufnahme oder
+  -streichung (`UA4-03`), potenzielle Verwässerung (`UA3-05`), F&E-Erfolgsbilanz (`GA1-03`).
+- `edgar_ereignisse`: Lockup-Ablauf nach Börsengang (`UA4-04`) und Abspaltung (`UA4-02`) aus dem Meldungsverzeichnis.
+- Tabelle `edgar_abschluesse` mit Rückkäufen, Dividende je Aktie, Verwässerungsangaben und dem Marktwert des
+  Streubesitzes (`ENTSCHEIDUNGEN.md` Nr. 110–119).
+- Reihenfolge der weiteren Arbeit nach der Vorgabe des Inhabers: erst alle freien Kennzahlen bauen (Nr. 110).
+- 146 Offline-Tests.
+
 ## Lieferung 11 – 2026-11-13 (Patent-Historie, Zitationen)
 
 - `uspto_patente`: Historie aller US-Patente ab 1976 aus den Sammeldateien von PatentsView, von Hand geladen und nur

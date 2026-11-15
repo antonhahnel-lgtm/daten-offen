@@ -51,6 +51,12 @@ ZEITRAUM = {
     "div": ["PaymentsOfDividendsCommonStock", "PaymentsOfDividends", "PaymentsOfOrdinaryDividends"],
     "pretax": ["IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest",
                "IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments"],
+    # Lieferung 12: Rückkäufe, Dividende je Aktie, Verwässerung
+    "buyback": ["PaymentsForRepurchaseOfCommonStock", "PaymentsForRepurchaseOfEquity"],
+    "dps": ["CommonStockDividendsPerShareDeclared", "CommonStockDividendsPerShareCashPaid"],
+    "antidil": ["AntidilutiveSecuritiesExcludedFromComputationOfEarningsPerShareAmount"],
+    "sh_basic": ["WeightedAverageNumberOfSharesOutstandingBasic"],
+    "sh_dil": ["WeightedAverageNumberOfDilutedSharesOutstanding"],
 }
 STICHTAG = {
     "cash": ["CashAndCashEquivalentsAtCarryingValue",
@@ -70,6 +76,7 @@ STICHTAG = {
 FELDER = {**ZEITRAUM, **STICHTAG}
 QUARTALE = {"Q": 1, "H": 2, "T": 3, "Y": 4}
 BERICHTSFORMEN = ("10-K", "10-Q")
+EINHEITEN = ("USD", "shares", "USD/shares")
 TAG_JAHR = 365
 SPLIT_GRENZE = 3.0  # Sprung der Aktienzahl über Faktor 3: vermutlich Split, kein Emissionssignal
 
@@ -129,6 +136,33 @@ registriere(
                   "vollständig gemeldet ist"),
     _p("PR2-03", "Effektiver Steuersatz", "Ertragsteueraufwand / Ergebnis vor Steuern des Jahres, nur bei Gewinn vor Steuern",
        "Verhältnis", frequenz="je Jahresbericht", schwaechen="Latente Steuerpositionen fehlen noch"),
+    _p("UA1-08", "Umsatzwachstum", "Umsatz des Berichtszeitraums / Umsatz des Vorjahreszeitraums − 1 (Vergleichszahl "
+       "aus demselben Bericht)", "Verhältnis",
+       schwaechen="Die beiden anderen Bausteine des Katalogs stehen in WR2-02 (Verschuldung) und UA1-02 (Gewinn); "
+                  "bei Banken Zinsüberschuss plus zinsunabhängige Erträge"),
+    _p("WR2-02", "Nettoverschuldung zur Bilanzsumme",
+       "(langfristige Schulden − Zahlungsmittel − kurzfristige Anlagen) / Bilanzsumme; negativ = mehr Kasse als Schulden",
+       "Verhältnis", schwaechen="Kurzfristige Schulden fehlen; ohne ausgewiesene Schulden zählt null"),
+    _p("UA3-02", "Aktienrückkäufe (12 Monate)",
+       "Auszahlungen für den Rückkauf eigener Aktien in den letzten zwölf Monaten laut Kapitalflussrechnung; nur über null",
+       "US-Dollar", schwaechen="Betrag aus der Kapitalflussrechnung statt Stückzahl und Preis je Monat (Item 703 steht "
+                               "nur im Text); enthält Rücknahmen zur Steuerabführung bei Mitarbeiteraktien"),
+    _p("UA4-03", "Dividendenaufnahme oder -streichung",
+       "+1 = Dividende im Quartal nach mindestens sechs Quartalen ohne; −1 = keine Dividende im Quartal nach vier "
+       "Quartalen mit; aus gezahlter Dividende (Kapitalflussrechnung) und erklärter Dividende je Aktie",
+       "Kennzeichen (+1, −1)", frequenz="je Ereignis",
+       schwaechen="Datiert auf den Quartalsbericht, die Ankündigung per 8-K liegt Wochen früher; Sonderdividenden "
+                  "zählen als Aufnahme; wechselt die Firma den Berichtsposten, kann eine Streichung vorgetäuscht sein"),
+    _p("UA3-05", "Potenzielle Verwässerung",
+       "(vom Ergebnis je Aktie ausgeschlossene Wandel- und Optionsrechte + verwässernde Aktien) / gewichtete Aktienzahl "
+       "des Berichtszeitraums; höchstens 5", "Verhältnis",
+       schwaechen="Nur Rechte, die die Firma in der Ergebnisrechnung nennt; Bedingungen und Ausübungspreise fehlen"),
+    _p("GA1-03", "F&E-Erfolgsbilanz",
+       "Mittel der fünf Steigungen aus Regressionen des Umsatzwachstums eines Jahres auf ln(1 + F&E / Umsatz) ein bis "
+       "fünf Jahre zuvor, je über die letzten acht Jahre (mindestens sechs Jahre, mindestens die Hälfte mit F&E); "
+       "nach Cohen, Diether & Malloy (2013)", "Steigung", frequenz="je Jahresbericht",
+       schwaechen="Braucht elf Jahresberichte in Folge, Werte deshalb erst ab etwa 2020; die Studie wertet die "
+                  "Erfolgsbilanz nur unter forschungsstarken Firmen aus (GA1-02 dazunehmen)"),
 )
 
 
@@ -205,7 +239,7 @@ def berichtszeilen(cik: int, js: dict) -> list[dict]:
     for feld, posten in FELDER.items():
         for rang, name in enumerate(posten):
             for einheit, eintraege in ((topf.get(name) or {}).get("units", {}) or {}).items():
-                if einheit not in ("USD", "shares"):
+                if einheit not in EINHEITEN:
                     continue
                 for e in eintraege:
                     if e.get("form") not in BERICHTSFORMEN:
@@ -229,6 +263,16 @@ def berichtszeilen(cik: int, js: dict) -> list[dict]:
             if accn and ende and e.get("form") in BERICHTSFORMEN and not np.isnan(wert):
                 if accn not in deckblatt or ende > deckblatt[accn][0]:
                     deckblatt[accn] = (ende, wert)
+    # Marktwert des Streubesitzes vom Deckblatt des Jahresberichts (Stand: Ende des zweiten Geschäftsquartals)
+    streubesitz: dict[str, tuple[str, float]] = {}
+    for einheit, eintraege in (((fakten.get("dei", {}) or {}).get("EntityPublicFloat") or {}).get("units", {}) or {}).items():
+        if einheit != "USD":
+            continue
+        for e in eintraege:
+            accn, ende, wert = e.get("accn"), e.get("end"), _zahl(e.get("val"))
+            if accn and ende and e.get("form") in BERICHTSFORMEN and not np.isnan(wert):
+                if accn not in streubesitz or ende > streubesitz[accn][0]:
+                    streubesitz[accn] = (ende, wert)
     zeilen = []
     for accn, d in je.items():
         # Die Aktienzahl wird teils zum Deckblattdatum statt zum Periodenende ausgewiesen; sie darf das
@@ -259,6 +303,7 @@ def berichtszeilen(cik: int, js: dict) -> list[dict]:
             vorrang = ("I", "Q", "H", "T", "Y") if f == "shares" else ("I",)
             z[f] = _waehle(d.get(f, []), pe, vorrang)[1]
         z["shares_deckblatt"] = deckblatt.get(accn, ("", np.nan))[1]
+        z["streubesitz"] = streubesitz.get(accn, ("", np.nan))[1]
         if any(not np.isnan(z[f]) for f in FELDER):
             zeilen.append(z)
     return zeilen
@@ -345,6 +390,81 @@ def _verh(a, b):
         return np.where(b > 0, a / b, np.nan)
 
 
+def _dividendenwechsel(tage, div_q, div, dps_q, dps, op_cf) -> np.ndarray:
+    """+1 bei Aufnahme, −1 bei Streichung der Dividende (je Bericht, sonst leer).
+
+    Je Bericht steht fest: zahlt (Dividende im Einzelquartal gezahlt oder erklärt), zahlt nicht (kein Betrag in der
+    Kapitalflussrechnung des laufenden Jahres und keine erklärte Dividende) oder unbekannt.
+    """
+    n = len(tage)
+    ja = (np.nan_to_num(div_q) > 0) | (np.nan_to_num(dps_q) > 0)
+    ohne_betrag = (np.isnan(div) | (div == 0)) & (np.isnan(dps) | (dps == 0)) & ~np.isnan(op_cf)
+    nein = ~ja & (ohne_betrag | ((div_q == 0) & ~(np.nan_to_num(dps_q) > 0)))
+    aus = np.full(n, np.nan)
+    for i in range(n):
+        if not (ja[i] or nein[i]):
+            continue
+        davor = [j for j in range(i - 1, -1, -1) if tage[i] - tage[j] <= 8 * 92 + 25]
+        if ja[i]:
+            ohne = [j for j in davor if nein[j]]
+            if len(ohne) >= 6 and not any(ja[j] for j in davor):
+                aus[i] = 1.0
+        else:
+            letzte = [j for j in davor if tage[i] - tage[j] <= 4 * 92 + 25]
+            if len(letzte) >= 4 and all(ja[j] for j in letzte):
+                aus[i] = -1.0
+    return aus
+
+
+def _erfolgsbilanz(tage, umsatz_j, rnd_j) -> np.ndarray:
+    """F&E-Erfolgsbilanz nach Cohen, Diether & Malloy (2013) je Jahresbericht.
+
+    Für jeden Abstand von ein bis fünf Jahren eine Regression des Umsatzwachstums ln(U_t / U_t−1) auf die
+    F&E-Intensität ln(1 + F&E / Umsatz) des früheren Jahres, über die letzten acht Jahre; der Wert ist das Mittel
+    der fünf Steigungen. Fehlender F&E-Aufwand zählt null.
+    """
+    aus = np.full(len(tage), np.nan)
+    jahre = [i for i in range(len(tage)) if not np.isnan(umsatz_j[i]) and umsatz_j[i] > 0]
+    m = len(jahre)
+    if m < 11:
+        return aus
+    t, u, f = tage[jahre], umsatz_j[jahre], np.nan_to_num(rnd_j[jahre])
+    vor = np.full(m, -1)
+    for p in range(1, m):
+        if 330 <= t[p] - t[p - 1] <= 400:
+            vor[p] = p - 1
+    wachstum = np.array([np.log(u[p] / u[vor[p]]) if vor[p] >= 0 else np.nan for p in range(m)])
+    intensitaet = np.log1p(np.clip(f, 0, None) / u)
+
+    def zurueck(p: int, schritte: int) -> int:
+        for _ in range(schritte):
+            if p < 0:
+                return -1
+            p = vor[p]
+        return p
+
+    for p in range(m):
+        steigungen = []
+        for abstand in range(1, 6):
+            xs, ys, q = [], [], p
+            for _ in range(8):
+                if q < 0:
+                    break
+                frueher = zurueck(q, abstand)
+                if frueher >= 0 and not np.isnan(wachstum[q]):
+                    xs.append(intensitaet[frueher])
+                    ys.append(wachstum[q])
+                q = vor[q]
+            if len(xs) >= 6 and 2 * sum(x > 0 for x in xs) >= len(xs):
+                x, y = np.array(xs), np.array(ys)
+                streuung = float(((x - x.mean()) ** 2).mean())
+                if streuung > 0:
+                    steigungen.append(float(((x - x.mean()) * (y - y.mean())).mean()) / streuung)
+        if len(steigungen) == 5:
+            aus[jahre[p]] = float(np.mean(steigungen))
+    return aus
+
+
 def kennzahlen_firma(g: pd.DataFrame) -> pd.DataFrame:
     """Kennzahlen je Bericht einer Firma. ``g``: Berichte, je Periodenende die zuerst eingereichte Fassung."""
     g = g.sort_values(["period_end", "filed"], kind="stable").drop_duplicates("period_end", keep="first")
@@ -405,6 +525,28 @@ def kennzahlen_firma(g: pd.DataFrame) -> pd.DataFrame:
 
     aus["GA1-02"] = np.where(rnd_12 > 0, rnd_12, np.nan)
 
+    # UA1-08 Umsatzwachstum, WR2-02 Nettoverschuldung
+    aus["UA1-08"] = _verh(umsatz, umsatz_vj) - 1
+    schulden = sp("debt")
+    netto = np.where(np.isnan(kasse) & np.isnan(schulden), np.nan, np.nan_to_num(schulden) - np.nan_to_num(kasse))
+    with np.errstate(divide="ignore", invalid="ignore"):
+        aus["WR2-02"] = np.where(aktiva > 0, netto / aktiva, np.nan)
+
+    # UA3-02 Rückkäufe der letzten zwölf Monate
+    rk_12 = _zwoelf_monate(tage, _einzelquartale(tage, sp("buyback"), sp("buyback_q")), sp("buyback"), sp("buyback_q"))
+    aus["UA3-02"] = np.where(rk_12 > 0, rk_12, np.nan)
+
+    # UA4-03 Dividende aufgenommen oder gestrichen
+    aus["UA4-03"] = _dividendenwechsel(tage, _einzelquartale(tage, sp("div"), sp("div_q")), sp("div"),
+                                        _einzelquartale(tage, sp("dps"), sp("dps_q")), sp("dps"), sp("op_cf"))
+
+    # UA3-05 potenzielle Verwässerung
+    basis, verw, ausgeschl = sp("sh_basic"), sp("sh_dil"), sp("antidil")
+    rechte = np.nan_to_num(ausgeschl) + np.clip(np.nan_to_num(verw - basis), 0, None)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        anteil = np.where((basis > 0) & (~np.isnan(ausgeschl) | ~np.isnan(verw)), rechte / basis, np.nan)
+    aus["UA3-05"] = np.where(anteil <= 5, anteil, np.nan)
+
     # --- Jahreskennzahlen: nur Jahresberichte, Vergleich mit dem Jahresbericht des Vorjahres
     def j(name):  # Jahreswert einer Zeitraumgröße (nur wenn der Bericht ein Jahr abdeckt)
         return np.where(jahr & (sp(name + "_q") == 4), sp(name), np.nan)
@@ -462,6 +604,8 @@ def kennzahlen_firma(g: pd.DataFrame) -> pd.DataFrame:
         kapital[i] = stand
     aus["GA1-06"] = _verh(kapital, aktiva_j)
 
+    aus["GA1-03"] = _erfolgsbilanz(tage, umsatz_j, j("rnd"))
+
     werbung = j("adv")
     aus["GA3-03"] = _verh(werbung, vj(werbung)) - 1
     steuersatz = _verh(j("tax"), j("pretax"))
@@ -477,7 +621,8 @@ def kennzahlen_firma(g: pd.DataFrame) -> pd.DataFrame:
 
 
 PARAMETER_IDS = ["UA1-01", "UA1-02", "UA1-03", "UA1-04", "UA1-05", "UA1-06", "UA1-07", "UA2-01", "UA3-01",
-                 "GA1-02", "GA1-06", "GA3-03", "PR2-03", "GW1-04"]
+                 "GA1-02", "GA1-06", "GA3-03", "PR2-03", "GW1-04",
+                 "UA1-08", "WR2-02", "UA3-02", "UA4-03", "UA3-05", "GA1-03"]
 MINDEST_BRANCHE = 3
 
 

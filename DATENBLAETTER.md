@@ -30,6 +30,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
 | Bekannte Schwächen | Verhältnis zum Marktwert wird im privaten Repo gebildet |
 
+## GA1-03 F&E-Erfolgsbilanz
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Mittel der fünf Steigungen aus Regressionen des Umsatzwachstums eines Jahres auf ln(1 + F&E / Umsatz) ein bis fünf Jahre zuvor, je über die letzten acht Jahre (mindestens sechs Jahre, mindestens die Hälfte mit F&E); nach Cohen, Diether & Malloy (2013) |
+| Einheit | Steigung |
+| Frequenz | je Jahresbericht |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise), XBRL-Pflicht |
+| Quelle | SEC EDGAR, Sammeldatei companyfacts.zip (https://www.sec.gov/search-filings/edgar-application-programming-interfaces) |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2009 (große Firmen), 2011 (alle) |
+| Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
+| Bekannte Schwächen | Braucht elf Jahresberichte in Folge, Werte deshalb erst ab etwa 2020; die Studie wertet die Erfolgsbilanz nur unter forschungsstarken Firmen aus (GA1-02 dazunehmen) |
+
 ## GA1-04 Studienergebnis im Register veröffentlicht
 
 | Angabe | Inhalt |
@@ -646,6 +660,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
 | Bekannte Schwächen | Die Plausibilitätsschwelle gegen den Börsenwert wendet der Insider-Monitor an |
 
+## UA1-08 Umsatzwachstum
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Umsatz des Berichtszeitraums / Umsatz des Vorjahreszeitraums − 1 (Vergleichszahl aus demselben Bericht) |
+| Einheit | Verhältnis |
+| Frequenz | je Quartalsbericht |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise), XBRL-Pflicht |
+| Quelle | SEC EDGAR, Sammeldatei companyfacts.zip (https://www.sec.gov/search-filings/edgar-application-programming-interfaces) |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2009 (große Firmen), 2011 (alle) |
+| Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
+| Bekannte Schwächen | Die beiden anderen Bausteine des Katalogs stehen in WR2-02 (Verschuldung) und UA1-02 (Gewinn); bei Banken Zinsüberschuss plus zinsunabhängige Erträge |
+
 ## UA1-10 Veröffentlichungszeitpunkt der Zahlen
 
 | Angabe | Inhalt |
@@ -716,6 +744,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
 | Bekannte Schwächen | Nicht splitbereinigt: Sprünge über Faktor 3 werden verworfen; kleinere Splits bleiben als Fehler |
 
+## UA3-02 Aktienrückkäufe (12 Monate)
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Auszahlungen für den Rückkauf eigener Aktien in den letzten zwölf Monaten laut Kapitalflussrechnung; nur über null |
+| Einheit | US-Dollar |
+| Frequenz | je Quartalsbericht |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise), XBRL-Pflicht |
+| Quelle | SEC EDGAR, Sammeldatei companyfacts.zip (https://www.sec.gov/search-filings/edgar-application-programming-interfaces) |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2009 (große Firmen), 2011 (alle) |
+| Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
+| Bekannte Schwächen | Betrag aus der Kapitalflussrechnung statt Stückzahl und Preis je Monat (Item 703 steht nur im Text); enthält Rücknahmen zur Steuerabführung bei Mitarbeiteraktien |
+
 ## UA3-03 Kapitalerhöhung / Privatplatzierung
 
 | Angabe | Inhalt |
@@ -744,6 +786,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | Restvolumen fehlt (Text) |
 
+## UA3-05 Potenzielle Verwässerung
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | (vom Ergebnis je Aktie ausgeschlossene Wandel- und Optionsrechte + verwässernde Aktien) / gewichtete Aktienzahl des Berichtszeitraums; höchstens 5 |
+| Einheit | Verhältnis |
+| Frequenz | je Quartalsbericht |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise), XBRL-Pflicht |
+| Quelle | SEC EDGAR, Sammeldatei companyfacts.zip (https://www.sec.gov/search-filings/edgar-application-programming-interfaces) |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2009 (große Firmen), 2011 (alle) |
+| Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
+| Bekannte Schwächen | Nur Rechte, die die Firma in der Ergebnisrechnung nennt; Bedingungen und Ausübungspreise fehlen |
+
 ## UA4-01 Übernahme oder Veräußerung abgeschlossen
 
 | Angabe | Inhalt |
@@ -758,6 +814,48 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | Zahlungsart und Käuferbewertung fehlen (Text der Meldung) |
 
+## UA4-02 Abspaltung (Spin-off)
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | wert 1 = erste Anmeldung Form 10-12B der abgespaltenen Firma, 2 = erste Wirksamkeitsmitteilung (EFFECT) danach binnen eines Jahres |
+| Einheit | Art (1, 2) |
+| Frequenz | je Meldung |
+| Offenlegung | gesetzlich: Form 10 (Exchange Act § 12(b)) |
+| Quelle | SEC EDGAR, Sammeldatei submissions.zip (https://www.sec.gov/search-filings/edgar-application-programming-interfaces) |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2006 |
+| Verzögerung | Annahmezeit der Meldung |
+| Bekannte Schwächen | Zeile steht bei der abgespaltenen Firma, die Mutter nennt nur der Text; Form 10-12B dient vereinzelt anderen Zwecken (Neustart nach Insolvenz); der Tag der Zuteilung fehlt |
+
+## UA4-03 Dividendenaufnahme oder -streichung
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | +1 = Dividende im Quartal nach mindestens sechs Quartalen ohne; −1 = keine Dividende im Quartal nach vier Quartalen mit; aus gezahlter Dividende (Kapitalflussrechnung) und erklärter Dividende je Aktie |
+| Einheit | Kennzeichen (+1, −1) |
+| Frequenz | je Ereignis |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise), XBRL-Pflicht |
+| Quelle | SEC EDGAR, Sammeldatei companyfacts.zip (https://www.sec.gov/search-filings/edgar-application-programming-interfaces) |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2009 (große Firmen), 2011 (alle) |
+| Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
+| Bekannte Schwächen | Datiert auf den Quartalsbericht, die Ankündigung per 8-K liegt Wochen früher; Sonderdividenden zählen als Aufnahme; wechselt die Firma den Berichtsposten, kann eine Streichung vorgetäuscht sein |
+
+## UA4-04 Lockup-Ablauf
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Erwarteter Ablauf der Haltefrist nach einem Börsengang: 180 Tage nach dem Emissionsprospekt (erster 424B4 oder 424B1 einer Firma ohne früheren 10-K oder 10-Q); ereignis_zeit = Ablauftag, wert = angenommene Frist in Tagen |
+| Einheit | Tage |
+| Frequenz | je Börsengang |
+| Offenlegung | gesetzlich: Rule 424(b) |
+| Quelle | SEC EDGAR, Sammeldatei submissions.zip (https://www.sec.gov/search-filings/edgar-application-programming-interfaces) |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2008 |
+| Verzögerung | Annahmezeit des Prospekts; der Ablauftag liegt in der Zukunft |
+| Bekannte Schwächen | Frist als übliche 180 Tage angenommen, nicht aus dem Prospekt gelesen (abweichende und gestaffelte Fristen fehlen); enthält auch Börsengänge von Mantelgesellschaften (SPAC) |
+
 ## UA4-05 Führungswechsel
 
 | Angabe | Inhalt |
@@ -771,6 +869,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Historie ab | 2006 |
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | Item 5.02 umfasst auch Vergütungsänderungen und Direktorenwechsel |
+
+## WR2-02 Nettoverschuldung zur Bilanzsumme
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | (langfristige Schulden − Zahlungsmittel − kurzfristige Anlagen) / Bilanzsumme; negativ = mehr Kasse als Schulden |
+| Einheit | Verhältnis |
+| Frequenz | je Quartalsbericht |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise), XBRL-Pflicht |
+| Quelle | SEC EDGAR, Sammeldatei companyfacts.zip (https://www.sec.gov/search-filings/edgar-application-programming-interfaces) |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2009 (große Firmen), 2011 (alle) |
+| Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
+| Bekannte Schwächen | Kurzfristige Schulden fehlen; ohne ausgewiesene Schulden zählt null |
 
 ## WS2-04 8-K-Meldungen nach Item
 
