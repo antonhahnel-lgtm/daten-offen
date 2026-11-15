@@ -856,6 +856,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | – |
 
+## UA2-05 Zweifel an der Fortführung (Going Concern)
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | 1 = der Bericht stellt erhebliche Zweifel an der Fortführung fest („substantial doubt … going concern“, nicht in bedingter oder verneinter Form), 0 = nicht |
+| Einheit | Kennzeichen 0/1 |
+| Frequenz | je Bericht |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise) |
+| Quelle | SEC EDGAR, Hauptdokument des Berichts im Archiv (https://www.sec.gov/Archives/edgar/data/) |
+| Lizenz | gemeinfrei (US-Behörde); gespeichert werden nur Kennzahlen |
+| Historie ab | 2006 (Vergleich ab 2007) |
+| Verzögerung | Annahmezeit des Berichts (aus edgar_index) |
+| Bekannte Schwächen | Textsuche statt des Prüfvermerks; bedingte Aussagen in Risikofaktoren werden verworfen, erkannt aber nur an Signalwörtern unmittelbar davor |
+
 ## UA3-01 Netto-Aktienemission (12 Monate)
 
 | Angabe | Inhalt |
@@ -995,6 +1009,48 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Historie ab | 2006 |
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | Item 5.02 umfasst auch Vergütungsänderungen und Direktorenwechsel |
+
+## UA5-01 Änderungsgrad des Berichts
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Kosinus-Ähnlichkeit der Worthäufigkeiten des Berichts mit dem Bericht derselben Art ein Jahr zuvor (10-K mit 10-K, 10-Q mit dem 10-Q desselben Quartals); Wörter aus mindestens zwei Buchstaben ohne Füllwörter, ohne Zahlen. Niedrig = stark geändert (Cohen, Malloy & Nguyen 2020). Die Jaccard-Ähnlichkeit steht in edgar_texte |
+| Einheit | Ähnlichkeit 0–1 |
+| Frequenz | je Bericht |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise) |
+| Quelle | SEC EDGAR, Hauptdokument des Berichts im Archiv (https://www.sec.gov/Archives/edgar/data/) |
+| Lizenz | gemeinfrei (US-Behörde); gespeichert werden nur Kennzahlen |
+| Historie ab | 2006 (Vergleich ab 2007) |
+| Verzögerung | Annahmezeit des Berichts (aus edgar_index) |
+| Bekannte Schwächen | Nur das Hauptdokument, ohne Anlagen; Berichte unter 500 Wörtern (Verweise auf Anlagen) ohne Wert |
+
+## UA5-03 Änderung der Risikofaktoren
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Kosinus-Ähnlichkeit des Abschnitts Item 1A (Risikofaktoren) des 10-K mit dem Abschnitt des Vorjahres-10-K; nur wenn beide Abschnitte mindestens 200 Wörter haben |
+| Einheit | Ähnlichkeit 0–1 |
+| Frequenz | je Jahresbericht |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise) |
+| Quelle | SEC EDGAR, Hauptdokument des Berichts im Archiv (https://www.sec.gov/Archives/edgar/data/) |
+| Lizenz | gemeinfrei (US-Behörde); gespeichert werden nur Kennzahlen |
+| Historie ab | 2006 (Vergleich ab 2007) |
+| Verzögerung | Annahmezeit des Berichts (aus edgar_index) |
+| Bekannte Schwächen | Abschnitt über die Überschriften „Item 1A Risk Factors“ bis „Item 1B“, „Item 1C“ oder „Item 2“ gefunden; abweichende Gliederungen fehlen. Item 3 (Rechtsstreitigkeiten) ist nicht getrennt |
+
+## UA5-04 Länge des Berichts
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Zahl der Wörter des Hauptdokuments (Loughran & McDonald 2014: Dateigröße als Maß der Lesbarkeit) |
+| Einheit | Wörter |
+| Frequenz | je Bericht |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise) |
+| Quelle | SEC EDGAR, Hauptdokument des Berichts im Archiv (https://www.sec.gov/Archives/edgar/data/) |
+| Lizenz | gemeinfrei (US-Behörde); gespeichert werden nur Kennzahlen |
+| Historie ab | 2006 (Vergleich ab 2007) |
+| Verzögerung | Annahmezeit des Berichts (aus edgar_index) |
+| Bekannte Schwächen | Ohne Anlagen; seit 2019 zählen die Zahlen der Inline-XBRL-Tabellen nicht mit |
 
 ## UA6-02 Optionen bis nahe Verfall gehalten
 

@@ -1,5 +1,14 @@
 # Änderungen
 
+## Lieferung 19 – 2026-11-15 (Texte der Jahres- und Quartalsberichte)
+
+- Neue Quelle `edgar_texte`: Hauptdokumente der 10-K und 10-Q aus dem EDGAR-Archiv → `UA5-01` Änderungsgrad,
+  `UA5-03` Änderung der Risikofaktoren, `UA5-04` Länge, `UA2-05` Going Concern; Tabelle `edgar_texte`
+  (`ENTSCHEIDUNGEN.md` Nr. 153–157).
+- Workflow `einzel`: setzt sich am Zeitbudget selbst fort (Eingabe `kette`), Laufname nennt die Quelle.
+- Workflow `abruf`: `edgar_texte` setzt aus, solange ein Lauf `einzel edgar_texte` läuft oder wartet.
+- 168 Offline-Tests.
+
 ## Lieferung 18 – 2026-11-15 (Fondsbestände und Mittelflüsse aus N-PORT)
 
 - Neue Quelle `edgar_nport`: Form-N-PORT-Datensätze der SEC ab 2019q4 → `KD3-01` Fondsflussdruck der Halter,

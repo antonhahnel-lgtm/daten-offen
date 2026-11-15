@@ -1,4 +1,5 @@
 name: einzel
+run-name: einzel ${{ inputs.quelle }}
 
 # Eine einzelne Quelle von Hand laufen lassen (neue Module erproben), ohne den Workflow abruf zu berühren.
 # Die Firmentabelle und das Meldungsverzeichnis kommen aus dem Release statt aus einem frischen Lauf.
@@ -9,7 +10,7 @@ on:
       quelle:
         description: "Quelle"
         type: choice
-        options: [sec_ftd, edgar_13f, usaspending, uspto_patente, fed_sf, rueckrufe, sec_verfahren, edgar_ausuebungen, politik, edgar_nport]
+        options: [sec_ftd, edgar_13f, usaspending, uspto_patente, fed_sf, rueckrufe, sec_verfahren, edgar_ausuebungen, politik, edgar_nport, edgar_texte]
       veroeffentlichen:
         description: "Ergebnis in die Releases laden"
         type: boolean
@@ -21,9 +22,16 @@ on:
       pruefquartal:
         description: "Nur edgar_13f: Gegenprobe der Einzelmeldungen gegen dieses Quartal des Datensatzes (z. B. 2026q2)"
         default: ""
+      kette:
+        description: "Zähler der selbst gestarteten Fortsetzungen (nicht von Hand setzen)"
+        default: "0"
+      budget:
+        description: "Zeitbudget des Abrufs in Minuten (Probelauf kürzer)"
+        default: "300"
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: einzel-${{ inputs.quelle }}
@@ -33,7 +41,7 @@ env:
   KONTAKT_EMAIL: ${{ secrets.KONTAKT_EMAIL }}
   FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
   GH_TOKEN: ${{ github.token }}
-  ZEITBUDGET_MIN: "300"
+  ZEITBUDGET_MIN: ${{ inputs.budget || '300' }}
   F13_PRUEFQUARTAL: ${{ inputs.pruefquartal }}
 
 jobs:
@@ -68,6 +76,10 @@ jobs:
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__patente_*.parquet" || true ;;
             rueckrufe-false)
               gh release download bereinigt-web -D ausgabe/bereinigt --clobber -p "bereinigt__rueckrufe_fda__*.parquet" || true ;;
+            edgar_texte-*)
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber -p "bereinigt__edgar_meldungen__*.parquet" ;;&
+            edgar_texte-false)
+              gh release download bereinigt-edgar -D ausgabe/bereinigt --clobber -p "bereinigt__edgar_texte__*.parquet" || true ;;
             edgar_nport-*)
               gh release download bereinigt-markt -D ausgabe/bereinigt --clobber -p "bereinigt__ftd_wertpapiere__*.parquet" ;;&
             edgar_nport-false)
@@ -123,3 +135,14 @@ jobs:
       - name: Releases aktualisieren
         if: inputs.veroeffentlichen
         run: bash werkzeuge/veroeffentliche.sh
+      - name: Fortsetzen, falls der Lauf am Zeitbudget endete
+        if: inputs.veroeffentlichen
+        run: |
+          kette="${{ inputs.kette }}"
+          if ls ausgabe/FORTSETZEN__* >/dev/null 2>&1; then
+            if [ "${kette:-0}" -ge 40 ]; then
+              echo "::warning::Vierzig Fortsetzungen in Folge – Kette beendet, bitte von Hand prüfen."
+            else
+              gh workflow run einzel.yml -f quelle="${{ inputs.quelle }}" -f veroeffentlichen=true -f frisch=false -f kette="$((${kette:-0} + 1))"
+            fi
+          fi

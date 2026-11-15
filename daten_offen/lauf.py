@@ -16,11 +16,11 @@ import pandas as pd
 
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
-from .quellen import (cfpb, edgar_13f, edgar_ausuebungen, edgar_ereignisse, edgar_nport, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fed_sf, fred,
+from .quellen import (cfpb, edgar_13f, edgar_ausuebungen, edgar_ereignisse, edgar_nport, edgar_texte, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fed_sf, fred,
                       klinik, politik, rueckrufe, sec_ftd, sec_verfahren, usaspending, uspto_patente, uspto_zitate, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe", "sec_verfahren", "edgar_ausuebungen", "politik", "edgar_nport")
+           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe", "sec_verfahren", "edgar_ausuebungen", "politik", "edgar_nport", "edgar_texte")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -111,6 +111,14 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
         v = info.get("vergleich")
         if v and (not v.get("vollstaendig") or v.get("halter_gleich", 0) < 0.95):
             schwer.append(f"Gegenprobe {v['quartal']}: Einzelmeldungen und Datensatz stimmen nicht überein")
+        return parameter, info, schwer, hinweise
+    if args.quelle == "edgar_texte":
+        parameter, info, hinweise = edgar_texte.lauf(ablage)
+        schwer = []
+        status = info.get("status", {})
+        gesamt = sum(status.values())
+        if gesamt >= 1000 and status.get("gelesen", 0) < 0.8 * gesamt:
+            schwer.append(f"nur {status.get('gelesen', 0)} von {gesamt} Berichten gelesen (unter 80 %; Archiv gesperrt?)")
         return parameter, info, schwer, hinweise
     if args.quelle == "edgar_nport":
         parameter, info, hinweise = edgar_nport.lauf(ablage, arbeits, modus=args.modus, lokal=args.nport_ordner)

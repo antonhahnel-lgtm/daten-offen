@@ -1,6 +1,6 @@
 # Übergabe
 
-Stand 15.11.2026, Lieferung 18. Fortschritt 94 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
+Stand 15.11.2026, Lieferung 19. Fortschritt 95 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
 und dem Auftragstext, um in einem neuen Chat weiterzuarbeiten.
 
 ## Ziel
@@ -31,10 +31,11 @@ Insider-Monitor.
 | `rueckrufe` | GA3-02 | ja | ja (Workflow `einzel`, 15.11.2026) |
 | `sec_verfahren` | PR4-01 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
 | `edgar_ausuebungen` | UA6-02 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
+| `edgar_texte` | UA5-01, UA5-03, UA5-04, UA2-05 | ja | Erstaufbau läuft im Workflow `einzel` (setzt sich selbst fort) |
 | `edgar_nport` | KD3-01, IH5-06 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
 | `politik` | PR1-03 | ja | ja (Workflows `einzel` und `abruf`, 15.11.2026); ab 03.01.2027 Kalender fortschreiben (Nr. 148) |
 
-78 Parameter, 164 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
+82 Parameter, 168 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
 (`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
 
 ## Prüfliste für den ersten echten Lauf
@@ -175,7 +176,8 @@ privat vor (Ordner `auswertung` neben den Repos) und ruht, bis die Quellen ausge
    laufende Quartal), Sponsoren, Bundesaufträge, Patente mit Historie und Zitationen, Abschlüsse II mit Lockup
    und Abspaltung (Lieferung 12), Fed San Francisco (Lieferung 13). H-1B ist zurückgestellt (dol.gov sperrt
    automatische Abrufe), Rückrufe (Lieferung 14), SEC-Verfahren (Lieferung 15), Optionsausübungen (Lieferung 16), institutioneller Besitz, F-Score nach Dechow und
-   Regierungskonstellation (Lieferung 17), N-PORT (Lieferung 18). Als Nächstes: die Berichtstexte.
+   Regierungskonstellation (Lieferung 17), N-PORT (Lieferung 18), Berichtstexte (Lieferung 19). Als Nächstes: Ton der
+   Berichte und Pressemitteilungen (Lizenz der Wortliste prüfen), dann die breite Auswertung im Ordner `auswertung`.
 5. Anbindung im Insider-Monitor (eigener Auftrag; `SCHNITTSTELLE.md` beschreibt das Lesen).
 
 ## Dateien für einen neuen Chat
