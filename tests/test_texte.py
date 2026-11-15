@@ -119,3 +119,22 @@ def test_zeitbudget(tmp_path):
     archiv = Archiv(DATEIEN)
     p, info, hinweise = t.lauf(ablage, abruf=archiv, budget=Zeitbudget(0), parallel=2)
     assert info["unvollstaendig"] and info["offen"] == 7 and (ablage.wurzel / "FORTSETZEN__edgar_texte").exists()
+
+
+@pytest.mark.parametrize("satz, soll", [
+    ("these conditions raise substantial doubt about the company's ability to continue as a going concern.", True),
+    ("there is substantial doubt as to whether we can continue as a going concern.", True),
+    ("the company has suffered recurring losses from operations that raise substantial doubt about its ability to continue "
+     "as a going concern.", True),
+    ("if we fail to raise capital, this could raise substantial doubt about our ability to continue as a going concern.", False),
+    ("asu 2014-15 requires management to evaluate whether there are conditions or events that raise substantial doubt about "
+     "an entity's ability to continue as a going concern.", False),
+    ("there is no substantial doubt about our ability to continue as a going concern.", False),
+    ("in its 2016 annual report on form 10-k, sears indicated that substantial doubt exists related to its ability to "
+     "continue as a going concern.", False),                                                   # Mieter, nicht die Firma
+    ("its external auditors stated there was “substantial doubt” about the company’s ability to continue as a "
+     "going concern.", False),                                                                 # Zitat über einen Kunden
+    ("these factors raise substantial doubt about our ability to meet obligations.", False),
+])
+def test_going_concern(satz, soll):
+    assert t.going_concern(satz) is soll

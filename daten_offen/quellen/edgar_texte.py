@@ -56,6 +56,10 @@ AFFIRMATIV = re.compile(r"\b(?:raise|raises|raised|there is|there was|there exis
                         r"indicated|create|creates|created|give rise to|gives rise to|gave rise to)\b[^.]{0,15}$")
 BEDINGT = re.compile(r"\b(?:could|may|might|would|will|if|whether|not|no|cannot|can|potential|possible|unless)\b[^.]{0,25}$")
 VORSCHRIFT = re.compile(r"\b(?:asu|accounting standards update|standard|guidance|requires?|evaluate whether|assess whether)\b")
+# die berichtende Firma selbst ist gemeint (nicht ein Mieter, Kunde oder Schuldner, über den sie berichtet)
+EIGEN = re.compile(r"\b(?:our|we|us)\b|compan(?:y|ies)['\u2019]s\b|\bthe company\b|partnership['\u2019]s|\btrust['\u2019]s|"
+                   r"\bregistrant|\bfund['\u2019]s|\bbank['\u2019]s|\bcorporation['\u2019]s")
+ZITAT = set("\"'\u201c\u2018")
 
 _G = "gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise)"
 _Q = "SEC EDGAR, Hauptdokument des Berichts im Archiv (https://www.sec.gov/Archives/edgar/data/)"
@@ -116,11 +120,14 @@ def risikoteil(text: str) -> str:
 def going_concern(text: str) -> bool:
     """Feststellung erheblicher Zweifel an der Fortführung: „substantial doubt“ mit „going concern“ im selben Satz,
     unmittelbar davor ein feststellendes Verb (raise, there is, indicate …), kein bedingendes oder verneinendes Wort
-    und keine Beschreibung der Rechnungslegungsvorschrift (ASU 2014-15)."""
+    und keine Beschreibung der Rechnungslegungsvorschrift (ASU 2014-15); der Satz muss die berichtende Firma meinen
+    (our, we, the company …), und die Formel darf nicht in Anführungszeichen stehen (Zitat über eine andere Firma)."""
     for m in ZWEIFEL.finditer(text):
         nach = text[m.end():m.end() + 150].split(".")[0]
         vor_satz = text[max(0, m.start() - 150):m.start()].split(".")[-1]
         if "going concern" not in nach and "going concern" not in vor_satz:
+            continue
+        if text[max(0, m.start() - 1):m.start()] in ZITAT or not EIGEN.search(vor_satz + " " + nach):
             continue
         davor = text[max(0, m.start() - 60):m.start()]
         if AFFIRMATIV.search(davor) and not BEDINGT.search(davor) and not VORSCHRIFT.search(text[max(0, m.start() - 200):m.start()]):
