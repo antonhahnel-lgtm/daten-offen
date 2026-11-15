@@ -31,7 +31,7 @@ Insider-Monitor.
 | `rueckrufe` | GA3-02 | ja | ja (Workflow `einzel`, 15.11.2026) |
 | `sec_verfahren` | PR4-01 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
 | `edgar_ausuebungen` | UA6-02 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
-| `edgar_nport` | KD3-01, IH5-06 | ja | GitHub-Lauf abwarten |
+| `edgar_nport` | KD3-01, IH5-06 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
 | `politik` | PR1-03 | ja | ja (Workflows `einzel` und `abruf`, 15.11.2026); ab 03.01.2027 Kalender fortschreiben (Nr. 148) |
 
 78 Parameter, 164 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
@@ -149,6 +149,10 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
 - Lieferung 17 im echten Lauf (15.11.2026, Workflow `abruf`, alle Quellen grün): `IH5-05` 291.817 Werte für
   11.443 Firmen seit 2013 (52 Quartale nachgerechnet, Splits wie NVIDIA 10:1 erkannt); `UA2-02` 25.302 Werte für
   6.139 Firmen (Median 0,65, über 2,45 rund 3–6 %); `PR1-03` 19 Zeiträume seit 2001.
+- N-PORT (Lieferung 18, 15.11.2026, grün): 28 Datensätze ab 2019q4, 27 Berichtsquartale (2019q4–2026q2), im jüngsten
+  13.706 Fonds und 5.304 Firmen; `KD3-01` 126.435 Werte für 6.842 Firmen, `IH5-06` 139.195 für 7.483. Das
+  Berichtsquartal 2026q3 entsteht, sobald die SEC den Datensatz 2026q4 veröffentlicht (Anfang Januar 2027).
+  Läuft ab jetzt im Tageslauf mit (eine Abfrage der Datenseite, sonst nur bei neuem Datensatz).
 - `GW2-06` im echten Lauf bestätigt (340 Werte, letzter Stand 14.10.2026).
 - Actions laufen auf Node 24 (checkout v5, setup-python v6, upload-artifact v6, download-artifact v7).
 - Neue Module zuerst über `gh workflow run einzel.yml -f quelle=<name>` erproben; der Workflow berührt die

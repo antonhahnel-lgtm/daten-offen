@@ -5,6 +5,7 @@
 - Neue Quelle `edgar_nport`: Form-N-PORT-Datensätze der SEC ab 2019q4 → `KD3-01` Fondsflussdruck der Halter,
   `IH5-06` Zahl der haltenden Fonds; Tabellen `nport_dateien`, `nport_fonds`, `nport_bestaende`, `nport_firmen`
   (`ENTSCHEIDUNGEN.md` Nr. 149–152).
+- Echter Lauf (Workflow `einzel`, 15.11.): 28 Datensätze, 27 Quartale; KD3-01 126.435 Werte, IH5-06 139.195.
 - 164 Offline-Tests.
 
 ## Lieferung 17 – 2026-11-15 (institutioneller Besitz, F-Score nach Dechow, Regierungskonstellation)
