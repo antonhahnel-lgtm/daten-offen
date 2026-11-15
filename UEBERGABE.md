@@ -1,6 +1,6 @@
 # Übergabe
 
-Stand 15.11.2026, Lieferung 16. Fortschritt 94 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
+Stand 15.11.2026, Lieferung 17. Fortschritt 94 %. Diese Datei reicht zusammen mit dem Repo-Zip, `PARAMETERKATALOG.md`
 und dem Auftragstext, um in einem neuen Chat weiterzuarbeiten.
 
 ## Ziel
@@ -31,8 +31,9 @@ Insider-Monitor.
 | `rueckrufe` | GA3-02 | ja | ja (Workflow `einzel`, 15.11.2026) |
 | `sec_verfahren` | PR4-01 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
 | `edgar_ausuebungen` | UA6-02 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
+| `politik` | PR1-03 | ja | GitHub-Lauf abwarten; ab 03.01.2027 Kalender fortschreiben (Nr. 148) |
 
-73 Parameter, 158 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
+76 Parameter, 161 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
 (`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
 
 ## Prüfliste für den ersten echten Lauf
@@ -165,8 +166,8 @@ privat vor (Ordner `auswertung` neben den Repos) und ruht, bis die Quellen ausge
 4. Offene Bausteine (Tabelle „Noch offen“ in `ENTSCHEIDUNGEN.md`). Erledigt: Lieferausfälle, 13F (auch das
    laufende Quartal), Sponsoren, Bundesaufträge, Patente mit Historie und Zitationen, Abschlüsse II mit Lockup
    und Abspaltung (Lieferung 12), Fed San Francisco (Lieferung 13). H-1B ist zurückgestellt (dol.gov sperrt
-   automatische Abrufe), Rückrufe (Lieferung 14), SEC-Verfahren (Lieferung 15), Optionsausübungen (Lieferung 16).
-   Als Nächstes: kleinere Bausteine (13F-Summe, Wahltermine, F-Score), N-PORT, zuletzt die Berichtstexte.
+   automatische Abrufe), Rückrufe (Lieferung 14), SEC-Verfahren (Lieferung 15), Optionsausübungen (Lieferung 16), institutioneller Besitz, F-Score nach Dechow und
+   Regierungskonstellation (Lieferung 17). Als Nächstes: N-PORT, zuletzt die Berichtstexte.
 5. Anbindung im Insider-Monitor (eigener Auftrag; `SCHNITTSTELLE.md` beschreibt das Lesen).
 
 ## Dateien für einen neuen Chat

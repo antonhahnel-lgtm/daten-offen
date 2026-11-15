@@ -548,6 +548,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Verzögerung | Eröffnung des ersten Handelstags nach Ablauf der Meldefrist |
 | Bekannte Schwächen | Nur Manager über 100 Mio. $ und nur gemeldete Long-Bestände; Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle zum Zeitpunkt der Berechnung (Trefferquote im Prüfbericht); bis der Datensatz der SEC erscheint (Wochen nach der Frist), stammt das jüngste Quartal aus den Einzelmeldungen (Stand „… Einzelmeldungen“) und kann sich mit dem Datensatz geringfügig ändern |
 
+## IH5-05 Änderung institutioneller Besitz
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Summe der gemeldeten Stückzahlen der Firma im Quartal geteilt durch die Summe im Vorquartal, minus 1; gezählt werden nur Manager, die in beiden Quartalen gemeldet haben. Ein Aktiensplit zwischen den Quartalen wird herausgerechnet: Liegt der Median des Verhältnisses der Positionen, die in beiden Quartalen bestehen (mindestens 3), über 1.3 oder unter 1/1.3, gilt er als Splitfaktor (Spalte split_faktor in edgar_13f_firmen) |
+| Einheit | Anteil (relative Änderung) |
+| Frequenz | je Berichtsquartal |
+| Offenlegung | amtlich offen: Form 13F (§ 13(f) Exchange Act), Frist 45 Tage nach Quartalsende |
+| Quelle | https://www.sec.gov/data-research/sec-markets-data/form-13f-data-sets |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2013 |
+| Verzögerung | Eröffnung des ersten Handelstags nach Ablauf der Meldefrist |
+| Bekannte Schwächen | Relative Änderung der 13F-Bestände, nicht die Änderung des Anteils am Aktienkapital (Sias, Starks & Titman 2006); ohne Bezug auf die Zahl der ausgegebenen Aktien. Nur Firmen, die im Vorquartal ein solcher Manager hielt. Nur Manager über 100 Mio. $ und nur gemeldete Long-Bestände; Nachträge und verspätete Meldungen bleiben außen vor; Zuordnung über die CUSIP-Tabelle der Lieferausfälle zum Zeitpunkt der Berechnung (Trefferquote im Prüfbericht); bis der Datensatz der SEC erscheint (Wochen nach der Frist), stammt das jüngste Quartal aus den Einzelmeldungen (Stand „… Einzelmeldungen“) und kann sich mit dem Datensatz geringfügig ändern |
+
 ## IH6-04 Neue Schulden
 
 | Angabe | Inhalt |
@@ -575,6 +589,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Historie ab | 2006 |
 | Verzögerung | Annahmezeit der Meldung |
 | Bekannte Schwächen | Form 25 betrifft teils einzelne Wertpapierklassen; SC TO-T und SC 13E3 fehlen, weil sie unter Bieter und Zielfirma stehen und die Rollen noch nicht gelesen werden |
+
+## PR1-03 Regierungskonstellation
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Partei des Präsidenten mit Vorzeichen (+ Demokraten, − Republikaner) mal (1 + Zahl der Kammern des Kongresses, in denen seine Partei die Mehrheit hat): ±3 = Präsident und beide Kammern einer Partei, ±1 = beide Kammern bei der Gegenpartei. Eine Zeile je Beginn eines Kongresses, Amtsantritt oder Mehrheitswechsel; Wahltermine in politik_wahlen |
+| Einheit | Stufe −3 bis +3 |
+| Frequenz | je Wechsel (rund alle zwei Jahre) |
+| Offenlegung | amtlich (Wahlergebnisse, Verfassungstermine 3. und 20. Januar) |
+| Quelle | Kalender im Code nach Office of the Historian (history.house.gov), Senate Historical Office (senate.gov) und National Archives |
+| Lizenz | gemeinfrei (Fakten) |
+| Historie ab | 2001 |
+| Verzögerung | Beginn des Zeitraums (12:00 Uhr Ostküstenzeit), sonst Eröffnung des nächsten Handelstags; bekannt ist die Konstellation meist schon seit der Wahl im November |
+| Bekannte Schwächen | Marktweite Größe (cik = 0); der Kalender wird nach jeder Wahl von Hand fortgeschrieben. Knappe Mehrheiten und Stichentscheide des Vizepräsidenten zählen wie klare Mehrheiten |
 
 ## PR2-01 Vergabevolumen je Firma
 
@@ -757,6 +785,20 @@ Automatisch aus dem Code erzeugt. Jede Zeile der Parameter-Tabellen trägt eine 
 | Historie ab | 2009 (große Firmen), 2011 (alle) |
 | Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
 | Bekannte Schwächen | Nur wenn alle acht Bausteine berechenbar sind; nicht für Finanzfirmen |
+
+## UA2-02 F-Score nach Dechow
+
+| Angabe | Inhalt |
+|---|---|
+| Definition | Dechow, Ge, Larson & Sloan (2011), Modell 1: Wahrscheinlichkeit einer Bilanzfälschung aus −7,893 + 0,790·RSST-Accruals + 2,518·Δ Forderungen + 1,191·Δ Vorräte + 1,979·weiche Aktiva + 0,171·Δ Barumsatz − 0,932·Δ Gesamtkapitalrendite + 1,029·Kapitalaufnahme, geteilt durch die Grundrate 0,0037; aus drei Jahresabschlüssen |
+| Einheit | Vielfaches der Grundrate (über 1 auffällig, über 2,45 hoch) |
+| Frequenz | je Jahresbericht |
+| Offenlegung | gesetzlich: Form 10-K (jährlich) und 10-Q (quartalsweise), XBRL-Pflicht |
+| Quelle | SEC EDGAR, Sammeldatei companyfacts.zip (https://www.sec.gov/search-filings/edgar-application-programming-interfaces) |
+| Lizenz | gemeinfrei (US-Behörde) |
+| Historie ab | 2009 (große Firmen), 2011 (alle) |
+| Verzögerung | Annahmezeit des 10-Q/10-K (aus edgar_index); die Pressemitteilung ist oft früher |
+| Bekannte Schwächen | Fehlende Nebenposten (Vorräte, kurzfristige Schulden, Finanzanlagen, Vorzugsaktien) zählen null; ohne ausgewiesene Gesamtverbindlichkeiten Bilanzsumme minus Eigenkapital; nicht für Banken (ohne Umlaufvermögen) |
 
 ## UA2-03 Restatement / Non-Reliance
 

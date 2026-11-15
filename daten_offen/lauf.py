@@ -17,10 +17,10 @@ import pandas as pd
 from .kern.ablage import Ablage
 from .kern.pruefung import lies_vorlauf, pruefe_parameter, schreibe_bericht
 from .quellen import (cfpb, edgar_13f, edgar_ausuebungen, edgar_ereignisse, edgar_index, edgar_insider, edgar_rollen, edgar_xbrl, fed_sf, fred,
-                      klinik, rueckrufe, sec_ftd, sec_verfahren, usaspending, uspto_patente, uspto_zitate, wikipedia)
+                      klinik, politik, rueckrufe, sec_ftd, sec_verfahren, usaspending, uspto_patente, uspto_zitate, wikipedia)
 
 QUELLEN = ("edgar_index", "edgar_insider", "edgar_ereignisse", "edgar_xbrl", "edgar_rollen", "cfpb", "klinik", "fred",
-           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe", "sec_verfahren", "edgar_ausuebungen")
+           "wikipedia", "sec_ftd", "edgar_13f", "usaspending", "uspto_patente", "uspto_zitate", "fed_sf", "rueckrufe", "sec_verfahren", "edgar_ausuebungen", "politik")
 # Bereinigte Tabellen, die bei einem schweren Fehler der Quelle nicht veröffentlicht werden dürfen
 VERWIRF_BEI_FEHLER = {"edgar_index": ("edgar_meldungen", "edgar_firmen")}
 
@@ -163,6 +163,13 @@ def _fuehre_aus(args, ablage: Ablage) -> tuple[pd.DataFrame | None, dict, list[s
             schwer.append(f"jüngste Erklärung in der USMPD ist {info['tage_seit_erklaerung']} Tage alt (Datei nicht mehr gepflegt?)")
         if info["tage_seit_stimmung"] > fed_sf.MAX_ALTER_STIMMUNG:
             schwer.append(f"jüngster Tag der Nachrichtenstimmung ist {info['tage_seit_stimmung']} Tage alt")
+        return parameter, info, schwer, hinweise
+    if args.quelle == "politik":
+        parameter, info, hinweise = politik.lauf(ablage)
+        schwer = []
+        if info["kalender_veraltet"]:
+            schwer.append(f"Kalender endet vor dem neuen Kongress ({politik.NAECHSTER_KONGRESS}): Mehrheiten in "
+                          "daten_offen/quellen/politik.py nachtragen und NAECHSTER_KONGRESS weiterschieben")
         return parameter, info, schwer, hinweise
     if args.quelle == "fred":
         parameter, info, hinweise = fred.lauf(ablage)

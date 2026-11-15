@@ -141,7 +141,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        quelle: [fred, wikipedia, fed_sf]
+        quelle: [fred, wikipedia, fed_sf, politik]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6

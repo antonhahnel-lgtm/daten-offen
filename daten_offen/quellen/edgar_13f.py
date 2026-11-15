@@ -10,7 +10,8 @@ Firmenebene: Alle Stammaktien-CUSIP einer Firma zählen zusammen, damit ein CUSI
 Umfirmierung, Sitzwechsel) nicht wie ein Aus- und Einstieg aller Halter aussieht.
 
   edgar_13f_quartal   je CUSIP: halter, stueck
-  edgar_13f_firmen    je Firma: halter, beste_idee, breite_aenderung, manager, manager_beide, herkunft
+  edgar_13f_firmen    je Firma: halter, beste_idee, breite_aenderung, besitz_aenderung, split_faktor, manager,
+                      manager_beide, herkunft
 
 Der Datensatz der SEC erscheint erst Wochen nach der Meldefrist. Bis dahin entsteht das jüngste Quartal aus den
 einzelnen Meldungen (eine Einreichungsdatei je 13F-HR, Auswahl über das Meldungsverzeichnis), sobald das
@@ -48,6 +49,8 @@ MINDEST_KONFIDENZ = 0.90
 MONATE = {m: i + 1 for i, m in enumerate("jan feb mar apr may jun jul aug sep oct nov dec".split())}
 TABELLE_DATEIEN, TABELLE_BESTAND = "edgar_13f_dateien", "edgar_13f_bestaende"
 TABELLE_QUARTAL, TABELLE_FIRMEN = "edgar_13f_quartal", "edgar_13f_firmen"
+MIN_SPLIT_PAARE = 3        # so viele fortbestehende Positionen braucht die Schätzung eines Splitfaktors
+SPLIT_GRENZE_13F = 1.3     # Median-Verhältnis der Positionen über 1,3 (unter 1/1,3): Split zwischen den Quartalen
 SPALTEN_MELDUNG = ["ACCESSION_NUMBER", "FILING_DATE", "SUBMISSIONTYPE", "CIK", "PERIODOFREPORT"]
 SPALTEN_POSITION = ["ACCESSION_NUMBER", "CUSIP", "VALUE", "SSHPRNAMT", "SSHPRNAMTTYPE", "PUTCALL"]
 RELEASE_URL = "https://github.com/{repo}/releases/download/bereinigt-edgar/{datei}"
@@ -86,6 +89,14 @@ registriere(
        "nur Werte ab 1", "Anzahl",
        "Vereinfachung von Anton, Cohen & Polk: Vergleich mit dem Gesamtbestand der 13F-Manager statt mit dem "
        "Marktgewicht, ohne Gewichtung mit der Kursschwankung."),
+    _p("IH5-05", "Änderung institutioneller Besitz",
+       "Summe der gemeldeten Stückzahlen der Firma im Quartal geteilt durch die Summe im Vorquartal, minus 1; gezählt "
+       "werden nur Manager, die in beiden Quartalen gemeldet haben. Ein Aktiensplit zwischen den Quartalen wird "
+       "herausgerechnet: Liegt der Median des Verhältnisses der Positionen, die in beiden Quartalen bestehen "
+       f"(mindestens {MIN_SPLIT_PAARE}), über {SPLIT_GRENZE_13F} oder unter 1/{SPLIT_GRENZE_13F}, gilt er als Splitfaktor "
+       "(Spalte split_faktor in edgar_13f_firmen)", "Anteil (relative Änderung)",
+       "Relative Änderung der 13F-Bestände, nicht die Änderung des Anteils am Aktienkapital (Sias, Starks & Titman "
+       "2006); ohne Bezug auf die Zahl der ausgegebenen Aktien. Nur Firmen, die im Vorquartal ein solcher Manager hielt."),
 )
 
 
@@ -432,6 +443,40 @@ def breite_aenderung(heute: pd.DataFrame, vor: pd.DataFrame, zu_firma: pd.Series
                          "manager_beide": len(beide)})
 
 
+def besitz_aenderung(heute: pd.DataFrame, vor: pd.DataFrame, zu_firma: pd.Series) -> pd.DataFrame:
+    """Relative Änderung der gemeldeten Stückzahl je Firma unter Managern, die in beiden Quartalen gemeldet haben.
+
+    ``heute`` und ``vor``: Bestände (filer_cik, cusip, stueck). Der Splitfaktor ist der Median des Verhältnisses der
+    Positionen (Manager und Firma), die in beiden Quartalen bestehen, wenn er deutlich von 1 abweicht."""
+    beide = np.intersect1d(heute["filer_cik"].unique(), vor["filer_cik"].unique())
+    leer_ = pd.DataFrame(columns=["cik", "besitz_aenderung", "split_faktor"])
+    if not len(beide):
+        return leer_
+
+    def je_paar(bestand: pd.DataFrame) -> pd.Series:
+        b = bestand[bestand["filer_cik"].isin(beide)]
+        cik = b["cusip"].map(zu_firma)
+        b = b[cik.notna()]
+        return b.groupby([b["filer_cik"], cik[cik.notna()].astype("int64").rename("cik")])["stueck"].sum()
+
+    p1, p0 = je_paar(heute), je_paar(vor)
+    if p0.empty:
+        return leer_
+    s1 = p1.groupby(level="cik").sum()
+    s0 = p0.groupby(level="cik").sum()
+    gemeinsam = p1.index.intersection(p0.index)
+    verh = (p1.reindex(gemeinsam) / p0.reindex(gemeinsam)).where(lambda x: np.isfinite(x) & (x > 0)).dropna()
+    paare = verh.groupby(level="cik").agg(["median", "size"])
+    faktor = pd.Series(1.0, index=s0.index)
+    ok = paare.index[(paare["size"] >= MIN_SPLIT_PAARE)
+                     & ((paare["median"] > SPLIT_GRENZE_13F) | (paare["median"] < 1 / SPLIT_GRENZE_13F))]
+    faktor[ok.intersection(faktor.index)] = paare.loc[ok.intersection(faktor.index), "median"]
+    basis = s0[s0 > 0] * faktor.reindex(s0[s0 > 0].index)
+    wert = s1.reindex(basis.index, fill_value=0) / basis - 1
+    return pd.DataFrame({"cik": wert.index.to_numpy(dtype="int64"), "besitz_aenderung": wert.to_numpy(dtype="float64"),
+                         "split_faktor": faktor.reindex(wert.index).to_numpy(dtype="float64")})
+
+
 def baue_parameter(firmen: pd.DataFrame) -> pd.DataFrame:
     if firmen.empty:
         return leer()
@@ -441,8 +486,11 @@ def baue_parameter(firmen: pd.DataFrame) -> pd.DataFrame:
                 pd.Timestamp(verfuegbar_ab(p)), quartal_name(p) + (" Einzelmeldungen" if p in einzel else ""))
             for p in q["periode"].drop_duplicates()}
     teile = []
+    if "besitz_aenderung" not in q.columns:
+        q["besitz_aenderung"] = np.nan
     for pid, tabelle, spalte in (("IH5-04", q[q["breite_aenderung"].notna()], "breite_aenderung"),
-                                 ("IH5-03", q[q["beste_idee"] >= 1], "beste_idee")):
+                                 ("IH5-03", q[q["beste_idee"] >= 1], "beste_idee"),
+                                 ("IH5-05", q[q["besitz_aenderung"].notna()], "besitz_aenderung")):
         if tabelle.empty:
             continue
         teile.append(pd.DataFrame({
@@ -459,9 +507,12 @@ def _bestand_pfad(ablage: Ablage, periode) -> Path:
 
 
 def _lies_bestand(ablage: Ablage, arbeits: Path, periode, fern: bool) -> pd.DataFrame | None:
-    """Manager und CUSIP eines Quartals: aus der Ablage, sonst aus dem Release (die Bestände früherer Quartale
-    werden im Tagesbetrieb nicht mitgeführt; gebraucht wird nur das Vorquartal eines neuen Datensatzes)."""
+    """Manager, CUSIP und Stückzahl eines Quartals: aus der Ablage, sonst aus dem Release (die Bestände früherer
+    Quartale werden im Tagesbetrieb nicht mitgeführt; gebraucht wird nur das Vorquartal eines neuen Datensatzes)."""
     pfad = _bestand_pfad(ablage, periode)
+    zwischen = Path(arbeits) / "f13" / pfad.name
+    if not pfad.exists() and zwischen.exists():
+        pfad = zwischen
     if not pfad.exists():
         repo = os.environ.get("GITHUB_REPOSITORY", "").strip()
         if not fern or not repo:
@@ -473,7 +524,7 @@ def _lies_bestand(ablage: Ablage, arbeits: Path, periode, fern: bool) -> pd.Data
             return None
         if pfad is None:
             return None
-    return pd.read_parquet(pfad, columns=["filer_cik", "cusip"]).astype({"cusip": str})
+    return pd.read_parquet(pfad, columns=["filer_cik", "cusip", "stueck"]).astype({"cusip": str})
 
 
 def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | None = None, lokal: Path | None = None,
@@ -517,7 +568,8 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
         bestand, je_cusip, je_firma = verdichte(teil, zu_firma)
         ablage.schreibe_bereinigt(TABELLE_BESTAND, quartal_name(periode), bestand.astype({"cusip": "category"}))
         je_cusip = je_cusip.assign(periode=periode)
-        je_firma = je_firma.assign(periode=periode, breite_aenderung=np.nan, manager_beide=0)
+        je_firma = je_firma.assign(periode=periode, breite_aenderung=np.nan, besitz_aenderung=np.nan, split_faktor=np.nan,
+                                   manager_beide=0)
         quartal = pd.concat([quartal, je_cusip], ignore_index=True) if len(quartal) else je_cusip
         firmen = pd.concat([firmen, je_firma], ignore_index=True) if len(firmen) else je_firma
         return je_cusip
@@ -584,21 +636,31 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
     quartal = quartal.sort_values(["periode", "cusip"], kind="stable").reset_index(drop=True)
     ablage.schreibe_bereinigt(TABELLE_QUARTAL, "alle", quartal)
 
-    # Breite: für jedes neue Quartal und für das Quartal nach einem neuen, sofern beide Bestände vorliegen
+    # Breite und Besitz: für jedes neue Quartal und für das Quartal nach einem neuen, sofern beide Bestände vorliegen;
+    # außerdem für Quartale, denen die Änderung des Besitzes noch fehlt (eingeführt mit Lieferung 17)
     ohne_vorquartal = 0
+    for spalte in ("besitz_aenderung", "split_faktor"):
+        if len(firmen) and spalte not in firmen.columns:
+            firmen[spalte] = np.nan
+    mit_besitz = set(firmen.loc[firmen["besitz_aenderung"].notna(), "periode"]) if len(firmen) else set()
+    nachgeholt = 0
     for p in sorted(vorhanden):
         vor = (p - pd.offsets.QuarterEnd(1)).normalize()
-        if (p not in geaendert and vor not in geaendert) or vor not in vorhanden:
+        if (p not in geaendert and vor not in geaendert and p in mit_besitz) or vor not in vorhanden:
             continue
+        if budget.abgelaufen():
+            break
+        nachgeholt += p not in geaendert and vor not in geaendert
         heute = _lies_bestand(ablage, arbeits, p, fern=lokal is None)
         davor = _lies_bestand(ablage, arbeits, vor, fern=lokal is None) if heute is not None else None
         if heute is None or davor is None:
             ohne_vorquartal += p in geaendert
             continue
         d = breite_aenderung(heute, davor, zu_firma)
-        teil = firmen[firmen["periode"] == p].drop(columns=["breite_aenderung", "manager_beide"])
+        b = besitz_aenderung(heute, davor, zu_firma)
+        teil = firmen[firmen["periode"] == p].drop(columns=["breite_aenderung", "manager_beide", "besitz_aenderung", "split_faktor"])
         manager = int(teil["manager"].max()) if len(teil) else int(heute["filer_cik"].nunique())
-        teil = teil.merge(d, on="cik", how="outer").assign(periode=p, manager=manager)
+        teil = teil.merge(d, on="cik", how="outer").merge(b, on="cik", how="left").assign(periode=p, manager=manager)
         for s in ("halter", "beste_idee"):
             teil[s] = teil[s].fillna(0).astype("int64")
         teil["manager_beide"] = int(d["manager_beide"].max()) if len(d) else 0
@@ -635,6 +697,8 @@ def lauf(ablage: Ablage, arbeits: Path, modus: str = "laufend", abruf: Abruf | N
         hinweise.append(f"{rest} Datensätze noch nicht gelesen (Zeitbudget; der nächste Lauf setzt fort)")
     if ohne_vorquartal:
         hinweise.append(f"{ohne_vorquartal} neue Quartale ohne Bestand des Vorquartals: Änderung der Breite fehlt")
+    if nachgeholt:
+        hinweise.append(f"Änderung des Besitzes für {nachgeholt} frühere Quartale nachgerechnet")
     juengstes = quartal[(quartal["periode"] == quartal["periode"].max()) & (quartal["halter"] >= 10)].reset_index(drop=True)
     z = juengstes[["cusip"]].merge(gut[["cusip", "cik", "art"]].drop_duplicates("cusip"), on="cusip", how="left")
     z["art"] = z["art"].fillna("keiner")

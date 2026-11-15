@@ -115,6 +115,12 @@ def test_jahreskennzahlen(parameter):
     m = -4.84 + 0.920 * dsri + 0.528 * gmi + 0.404 * aqi + 0.892 * sgi + 0.115 * depi - 0.172 * sgai + 4.679 * tata - 0.327 * lvgi
     assert wert(p, "UA2-01", "K-2023") == pytest.approx(m)
     assert fehlt(p, "UA2-01", "K-2022") and fehlt(p, "UA2-01", "Q-2023-2")
+    # Dechow 2023: mittlere Bilanzsumme 990 (Vorjahr 900); Betriebskapital 160 gegen 120, langfristiges operatives
+    # Vermögen 440 gegen 410, Finanzposition −110 gegen −120; Barumsatz 470 gegen 440; Anleihe begeben
+    pv = (-7.893 + 0.790 * 80 / 990 + 2.518 * 10 / 990 + 1.191 * 10 / 990 + 1.979 * 670 / 1040 + 0.171 * 30 / 440
+          - 0.932 * (68 / 990 - 60 / 900) + 1.029)
+    assert wert(p, "UA2-02", "K-2023") == pytest.approx(1 / (1 + np.exp(-pv)) / 0.0037)
+    assert fehlt(p, "UA2-02", "K-2022") and fehlt(p, "UA2-02", "Q-2023-2")
     # Piotroski 2023: Gewinn, Cashflow, Rendite gestiegen, Cashflow < Gewinn (0), Verschuldung gesunken,
     # Liquidität gestiegen, Aktienzahl gestiegen (0), Marge gestiegen, Umschlag gesunken (0) = 6
     assert wert(p, "UA1-06", "K-2023") == 6

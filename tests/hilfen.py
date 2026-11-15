@@ -121,14 +121,16 @@ def musterfirma() -> Fakten:
     cf = {2021: [4, 6, 8, 10], 2022: [5, 7, 9, 11], 2023: [6, 8, 10, 12]}
     aktiva = {2021: [800, 820, 840, 860], 2022: [880, 900, 920, 940], 2023: [960, 1000, 1020, 1040]}
     aktien = {2021: [1000] * 4, 2022: [1000] * 4, 2023: [1050, 1100, 3500, 3500]}
-    jahr = {2022: dict(GrossProfit=180, SellingGeneralAndAdministrativeExpense=90, DepreciationDepletionAndAmortization=20,
+    jahr = {2021: dict(AccountsReceivableNetCurrent=80),
+            2022: dict(GrossProfit=180, SellingGeneralAndAdministrativeExpense=90, DepreciationDepletionAndAmortization=20,
                        AdvertisingExpense=10, IncomeTaxExpenseBenefit=15, pretax=75,
                        AssetsCurrent=400, LiabilitiesCurrent=200, AccountsReceivableNetCurrent=90,
-                       PropertyPlantAndEquipmentNet=300, LongTermDebtNoncurrent=150),
+                       PropertyPlantAndEquipmentNet=300, LongTermDebtNoncurrent=150, Liabilities=480, InventoryNet=50),
             2023: dict(GrossProfit=200, SellingGeneralAndAdministrativeExpense=92, DepreciationDepletionAndAmortization=22,
                        AdvertisingExpense=12, IncomeTaxExpenseBenefit=17, pretax=85,
                        AssetsCurrent=450, LiabilitiesCurrent=210, AccountsReceivableNetCurrent=100,
-                       PropertyPlantAndEquipmentNet=320, LongTermDebtNoncurrent=140)}
+                       PropertyPlantAndEquipmentNet=320, LongTermDebtNoncurrent=140, Liabilities=500, InventoryNet=60,
+                       ProceedsFromIssuanceOfLongTermDebt=25)}
     PRETAX = "IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest"
     f = Fakten()
     for y in (2021, 2022, 2023):
@@ -166,7 +168,7 @@ def musterfirma() -> Fakten:
                 for posten, wert in jahr[y].items():
                     name = PRETAX if posten == "pretax" else posten
                     if posten in ("AssetsCurrent", "LiabilitiesCurrent", "AccountsReceivableNetCurrent",
-                                  "PropertyPlantAndEquipmentNet", "LongTermDebtNoncurrent"):
+                                  "PropertyPlantAndEquipmentNet", "LongTermDebtNoncurrent", "Liabilities", "InventoryNet"):
                         f.plus(name, wert, accn, form, filed, ende)
                     else:
                         f.plus(name, wert, accn, form, filed, ende, start=f"{y}-01-01")

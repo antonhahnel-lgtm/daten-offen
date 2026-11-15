@@ -1,5 +1,14 @@
 # Änderungen
 
+## Lieferung 17 – 2026-11-15 (institutioneller Besitz, F-Score nach Dechow, Regierungskonstellation)
+
+- `edgar_13f`: `IH5-05` Änderung institutioneller Besitz mit Splitbereinigung; Spalten `besitz_aenderung`,
+  `split_faktor` in `edgar_13f_firmen`; frühere Quartale werden einmal nachgerechnet (`ENTSCHEIDUNGEN.md` Nr. 144–145).
+- `edgar_xbrl`: `UA2-02` F-Score nach Dechow; neue Spalten `inv`, `liab`, `debt_cur`, `lt_inv`, `pref`, `iss_eq`,
+  `iss_debt` in `edgar_abschluesse` (Nr. 146).
+- Neue Quelle `politik`: `PR1-03` Regierungskonstellation, Tabellen `politik_regierung`, `politik_wahlen` (Nr. 147–148).
+- 161 Offline-Tests.
+
 ## Lieferung 16 – 2026-11-15 (Optionsausübungen der Insider)
 
 - Neue Quelle `edgar_ausuebungen`: ausgeübte Optionen aus den Insider-Datensätzen (DERIV_TRANS, ab 2006) und für

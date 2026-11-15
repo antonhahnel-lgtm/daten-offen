@@ -9,7 +9,7 @@ on:
       quelle:
         description: "Quelle"
         type: choice
-        options: [sec_ftd, edgar_13f, usaspending, uspto_patente, fed_sf, rueckrufe, sec_verfahren, edgar_ausuebungen]
+        options: [sec_ftd, edgar_13f, usaspending, uspto_patente, fed_sf, rueckrufe, sec_verfahren, edgar_ausuebungen, politik]
       veroeffentlichen:
         description: "Ergebnis in die Releases laden"
         type: boolean

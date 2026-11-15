@@ -5,7 +5,7 @@
 | Release | Dateien | Inhalt |
 |---|---|---|
 | `parameter-edgar` | `parameter__edgar_<quelle>__<jahr>.parquet` | Parameter aus EDGAR: `edgar_insider`, `edgar_ereignisse`, `edgar_xbrl`, `edgar_rollen`, `edgar_13f` |
-| `parameter-makro` | `parameter__fred__<jahr>.parquet`, `parameter__fed_sf__<jahr>.parquet` | Parameter der Gesamtwirtschaft (cik = 0) |
+| `parameter-makro` | `parameter__fred__<jahr>.parquet`, `parameter__fed_sf__<jahr>.parquet`, `parameter__politik__<jahr>.parquet` | Parameter der Gesamtwirtschaft (cik = 0) |
 | `parameter-web` | `parameter__<quelle>__<jahr>.parquet` | `wikipedia`, `cfpb`, `klinik`, `usaspending`, `uspto_patente`, `uspto_zitate`, `rueckrufe`, `sec_verfahren` |
 | `bereinigt-edgar` | `bereinigt__edgar_meldungen__<jahr>.parquet` | Meldungsverzeichnis: Firma, Aktenzeichen, Formular, Annahmezeit, `verfuegbar_ab` |
 | | `bereinigt__edgar_firmen__alle.parquet` | Stammdaten je CIK: Name, Ticker, SIC, Sitz |
@@ -13,11 +13,12 @@
 | | `bereinigt__insider_transaktionen__<jahr>q<q>.parquet` | Alle nicht-derivativen Insidergeschäfte je Quartal; Spalte `herkunft`: `datensatz` (amtlich) oder `xml` (laufende Ergänzung) |
 | | `bereinigt__edgar_abschluesse__<jahr>.parquet` | Eine Zeile je 10-K/10-Q mit den Abschlussposten (Wert, Vorjahreswert `_py`, abgedeckte Quartale `_q`), geteilt nach Einreichungsjahr; seit Lieferung 12 zusätzlich `buyback`, `dps`, `antidil`, `sh_basic`, `sh_dil` und `streubesitz` (Marktwert des Streubesitzes laut Deckblatt des 10-K) |
 | | `bereinigt__edgar_rollen__<jahr>.parquet` | Betroffene Firma und Einreicher je 13D- und 144-Meldung |
-| | `bereinigt__edgar_13f_firmen__alle.parquet` | Je Firma (CIK) und Berichtsquartal: `halter`, `beste_idee`, `breite_aenderung`, `manager`, `manager_beide`; `herkunft`: `datensatz` (amtlich) oder `einzelmeldungen` (jüngstes Quartal, bis der Datensatz der SEC erscheint) |
+| | `bereinigt__edgar_13f_firmen__alle.parquet` | Je Firma (CIK) und Berichtsquartal: `halter`, `beste_idee`, `breite_aenderung`, `besitz_aenderung`, `split_faktor`, `manager`, `manager_beide`; `herkunft`: `datensatz` (amtlich) oder `einzelmeldungen` (jüngstes Quartal, bis der Datensatz der SEC erscheint) |
 | | `bereinigt__edgar_13f_quartal__alle.parquet` | Je CUSIP und Berichtsquartal: `halter`, `stueck` (alle Wertpapiere, auch Fonds) |
 | | `bereinigt__edgar_13f_bestaende__<jahr>q<q>.parquet` | Je Manager (`filer_cik`) und CUSIP: Stückzahl und Portfoliogewicht (fristgerechte Erstmeldungen) |
 | | `bereinigt__edgar_13f_dateien__alle.parquet` | Gelesene Datensätze mit Zahl der Meldungen; Zeile `einzel-<jahr>q<q>` für ein Quartal aus Einzelmeldungen |
 | `bereinigt-makro` | `bereinigt__fred_<reihe>__alle.parquet` | Rohreihen mit allen Ständen (`von`, `bis`) und Termine |
+| | `bereinigt__politik_regierung__alle.parquet`, `bereinigt__politik_wahlen__alle.parquet` | Zeiträume mit Präsident, Partei, Mehrheit in Repräsentantenhaus und Senat (`gilt_ab`, Wert von `PR1-03`); Termine der Bundeswahlen 2000–2032 |
 | | `bereinigt__fedsf_ereignisse__alle.parquet`, `bereinigt__fedsf_stimmung__alle.parquet` | Erklärungen des Offenmarktausschusses mit Zinsüberraschung (`mp1`), viertem Zinsfuture (`ed4`) und Pfad-Anteil; Tageswerte der Nachrichtenstimmung (Federal Reserve Bank of San Francisco) |
 | `bereinigt-web` | `bereinigt__wiki_wochen__alle.parquet`, `bereinigt__wiki_zuordnung__alle.parquet` | Wochenaufrufe je CIK und Zuordnung CIK → Artikel |
 | | `bereinigt__cfpb_zuordnung__alle.parquet` | Firmenname → CIK mit Konfidenz |

@@ -57,6 +57,9 @@ ZEITRAUM = {
     "antidil": ["AntidilutiveSecuritiesExcludedFromComputationOfEarningsPerShareAmount"],
     "sh_basic": ["WeightedAverageNumberOfSharesOutstandingBasic"],
     "sh_dil": ["WeightedAverageNumberOfDilutedSharesOutstanding"],
+    # Lieferung 17: Kapitalaufnahme für den F-Score nach Dechow
+    "iss_eq": ["ProceedsFromIssuanceOfCommonStock", "ProceedsFromIssuanceOrSaleOfEquity"],
+    "iss_debt": ["ProceedsFromIssuanceOfLongTermDebt", "ProceedsFromIssuanceOfDebt", "ProceedsFromIssuanceOfSeniorLongTermDebt"],
 }
 STICHTAG = {
     "cash": ["CashAndCashEquivalentsAtCarryingValue",
@@ -72,6 +75,12 @@ STICHTAG = {
     "liab_cur": ["LiabilitiesCurrent"],
     "recv": ["AccountsReceivableNetCurrent", "ReceivablesNetCurrent"],
     "ppe": ["PropertyPlantAndEquipmentNet"],
+    # Lieferung 17: Bilanzposten für den F-Score nach Dechow
+    "inv": ["InventoryNet"],
+    "liab": ["Liabilities"],
+    "debt_cur": ["LongTermDebtCurrent", "DebtCurrent", "LongTermDebtAndCapitalLeaseObligationsCurrent"],
+    "lt_inv": ["LongTermInvestments", "MarketableSecuritiesNoncurrent"],
+    "pref": ["PreferredStockValue"],
 }
 FELDER = {**ZEITRAUM, **STICHTAG}
 QUARTALE = {"Q": 1, "H": 2, "T": 3, "Y": 4}
@@ -117,6 +126,14 @@ registriere(
        "Beneish (1999): −4,84 + 0,920·DSRI + 0,528·GMI + 0,404·AQI + 0,892·SGI + 0,115·DEPI − 0,172·SGAI "
        "+ 4,679·TATA − 0,327·LVGI aus zwei Jahresabschlüssen", "Punktwert (über −1,78 auffällig)",
        frequenz="je Jahresbericht", schwaechen="Nur wenn alle acht Bausteine berechenbar sind; nicht für Finanzfirmen"),
+    _p("UA2-02", "F-Score nach Dechow",
+       "Dechow, Ge, Larson & Sloan (2011), Modell 1: Wahrscheinlichkeit einer Bilanzfälschung aus "
+       "−7,893 + 0,790·RSST-Accruals + 2,518·Δ Forderungen + 1,191·Δ Vorräte + 1,979·weiche Aktiva + 0,171·Δ Barumsatz "
+       "− 0,932·Δ Gesamtkapitalrendite + 1,029·Kapitalaufnahme, geteilt durch die Grundrate 0,0037; aus drei "
+       "Jahresabschlüssen", "Vielfaches der Grundrate (über 1 auffällig, über 2,45 hoch)", frequenz="je Jahresbericht",
+       schwaechen="Fehlende Nebenposten (Vorräte, kurzfristige Schulden, Finanzanlagen, Vorzugsaktien) zählen null; "
+                  "ohne ausgewiesene Gesamtverbindlichkeiten Bilanzsumme minus Eigenkapital; nicht für Banken (ohne "
+                  "Umlaufvermögen)"),
     _p("UA3-01", "Netto-Aktienemission (12 Monate)", "Aktienzahl / Aktienzahl ein Jahr zuvor − 1", "Verhältnis",
        schwaechen="Nicht splitbereinigt: Sprünge über Faktor 3 werden verworfen; kleinere Splits bleiben als Fehler"),
     _p("GA1-02", "F&E-Aufwand (12 Monate)", "Forschungs- und Entwicklungsaufwand der letzten zwölf Monate",
@@ -383,6 +400,36 @@ def _vorjahr(tage: np.ndarray, wert: np.ndarray, maske: np.ndarray | None = None
     return aus
 
 
+def _dechow(j, vj, aktiva, umlauf, kurzfr, ford, sach, schuld, umsatz, gewinn, p: dict) -> np.ndarray:
+    """F-Score nach Dechow u. a. (2011), Modell 1, aus Jahreswerten; ``j``/``vj`` wie in kennzahlen_firma."""
+    null = np.nan_to_num
+
+    def aend(x):                       # Änderung zum Vorjahr; fehlt ein Posten in beiden Jahren, ist sie null
+        v = vj(x)
+        return np.where(np.isnan(x) & np.isnan(v), 0.0, x - v)
+
+    verb = np.where(np.isnan(p["liab"]), aktiva - p["equity"], p["liab"])
+    wc = (umlauf - null(p["cash"]) - null(p["sti"])) - (kurzfr - null(p["debt_cur"]))
+    nco = (aktiva - umlauf - null(p["lt_inv"])) - (verb - kurzfr - null(schuld))
+    fin = (null(p["sti"]) + null(p["lt_inv"])) - (null(schuld) + null(p["debt_cur"]) + null(p["pref"]))
+    mittel = (aktiva + vj(aktiva)) / 2
+    mittel_vj = vj(mittel)
+    with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+        rsst = _verh(aend(wc) + aend(nco) + aend(fin), mittel)
+        d_ford = aend(ford)
+        ch_rec = _verh(d_ford, mittel)
+        ch_inv = _verh(aend(p["inv"]), mittel)
+        weich = _verh(aktiva - null(sach) - null(p["cash"]), aktiva)
+        bar = umsatz - d_ford
+        ch_cs = _verh(bar - vj(bar), vj(bar))
+        ch_roa = _verh(gewinn, mittel) - _verh(vj(gewinn), mittel_vj)
+        aufnahme = ((null(j("iss_eq")) > 0) | (null(j("iss_debt")) > 0)).astype("float64")
+        pv = (-7.893 + 0.790 * rsst + 2.518 * ch_rec + 1.191 * ch_inv + 1.979 * weich + 0.171 * ch_cs
+              - 0.932 * ch_roa + 1.029 * aufnahme)
+        f = 1 / (1 + np.exp(-pv)) / 0.0037
+    return np.where(np.isfinite(f), f, np.nan)
+
+
 def _verh(a, b):
     """a / b, leer bei b <= 0 oder fehlenden Werten."""
     a, b = np.asarray(a, dtype="float64"), np.asarray(b, dtype="float64")
@@ -588,6 +635,9 @@ def kennzahlen_firma(g: pd.DataFrame) -> pd.DataFrame:
         m = (-4.84 + 0.920 * dsri + 0.528 * gmi + 0.404 * aqi + 0.892 * sgi + 0.115 * depi
              - 0.172 * sgai + 4.679 * tata - 0.327 * lvgi)
     aus["UA2-01"] = np.where(np.isfinite(m), m, np.nan)
+    aus["UA2-02"] = _dechow(j, vj, aktiva_j, umlauf, kurzfr, ford, sach, schuld, umsatz_j, ni_j,
+                            {n: np.where(jahr, sp(n), np.nan) for n in ("cash", "sti", "inv", "liab", "debt_cur", "lt_inv",
+                                                                         "pref", "equity")})
 
     # GA1-06 Organisationskapital: fortgeschriebener Vertriebs- und Verwaltungsaufwand
     kapital = np.full(len(g), np.nan)
@@ -620,7 +670,7 @@ def kennzahlen_firma(g: pd.DataFrame) -> pd.DataFrame:
     return aus
 
 
-PARAMETER_IDS = ["UA1-01", "UA1-02", "UA1-03", "UA1-04", "UA1-05", "UA1-06", "UA1-07", "UA2-01", "UA3-01",
+PARAMETER_IDS = ["UA1-01", "UA1-02", "UA1-03", "UA1-04", "UA1-05", "UA1-06", "UA1-07", "UA2-01", "UA2-02", "UA3-01",
                  "GA1-02", "GA1-06", "GA3-03", "PR2-03", "GW1-04",
                  "UA1-08", "WR2-02", "UA3-02", "UA4-03", "UA3-05", "GA1-03"]
 MINDEST_BRANCHE = 3

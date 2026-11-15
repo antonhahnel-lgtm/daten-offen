@@ -111,9 +111,11 @@ def test_lauf(lage):
     assert f2["beste_idee"].sum() == 1 and f2.loc[12, "beste_idee"] == 1
 
     werte = {(z.parameter_id, int(z.cik)): z.wert for z in p.itertuples() if z.cik < 100}
+    # Besitz unter Managern 1 und 2: Firma 10 40 -> 45 Stück, Firma 11 10 -> 3, Firma 13 1 -> 0; Firma 12 hielt keiner
     assert werte == {("IH5-04", 10): 0.0, ("IH5-04", 11): 0.0, ("IH5-04", 12): 0.5, ("IH5-04", 13): -0.5,
-                     ("IH5-03", 12): 1.0}
-    assert len(p) == 17 and set(p["stand"]) == {"2024q2"}
+                     ("IH5-03", 12): 1.0, ("IH5-05", 10): 0.125, ("IH5-05", 11): -0.7, ("IH5-05", 13): -1.0}
+    assert (f2["split_faktor"].dropna() == 1.0).all() and pd.isna(f2.loc[12, "besitz_aenderung"])
+    assert len(p) == 20 and set(p["stand"]) == {"2024q2"}
     zeile = p[p["parameter_id"] == "IH5-03"].iloc[0]
     assert zeile["verfuegbar_ab"] == pd.Timestamp("2024-08-15 09:30", tz=ET)
     assert zeile["ereignis_zeit"] == pd.Timestamp("2024-06-30 18:00", tz=ET)
@@ -139,9 +141,25 @@ def test_fortschreibung(lage):
     weg.rename(spaeter)
     p2, info, _ = f.lauf(ablage, tmp / "arb", lokal=ordner)            # das zweite kommt dazu, das erste bleibt
     assert info["datensaetze_neu"] == 1 and info["datensaetze_gelesen"] == 2
-    assert len(p2) == 17 and not ablage.lies_bereinigt("edgar_13f_firmen").duplicated(["periode", "cik"]).any()
+    assert len(p2) == 20 and not ablage.lies_bereinigt("edgar_13f_firmen").duplicated(["periode", "cik"]).any()
     p3, info, _ = f.lauf(ablage, tmp / "arb", lokal=ordner)            # Tagesbetrieb ohne neuen Datensatz
-    assert info["datensaetze_neu"] == 0 and len(p3) == 17
+    assert info["datensaetze_neu"] == 0 and len(p3) == 20
+
+    # Bestand aus der Zeit vor IH5-05: die Änderung des Besitzes wird nachgerechnet
+    fi = ablage.lies_bereinigt("edgar_13f_firmen").drop(columns=["besitz_aenderung", "split_faktor"])
+    ablage.schreibe_bereinigt("edgar_13f_firmen", "alle", fi)
+    p4, _, hinweise = f.lauf(ablage, tmp / "arb", lokal=ordner)
+    assert len(p4) == 20 and any("1 frühere Quartale nachgerechnet" in h for h in hinweise)
+
+
+def test_besitz_mit_split():
+    zu_firma = pd.Series({A: 10, B: 11}, dtype="int64")
+    vor = pd.DataFrame({"filer_cik": [1, 2, 3, 4, 1], "cusip": [A, A, A, A, B], "stueck": [10, 20, 30, 40, 100]})
+    # Split 2:1 bei Firma 10; Manager 4 verkauft die Hälfte, Manager 5 ist neu (zählt nicht)
+    heute = pd.DataFrame({"filer_cik": [1, 2, 3, 4, 5, 1], "cusip": [A, A, A, A, A, B], "stueck": [20, 40, 60, 40, 500, 110]})
+    b = f.besitz_aenderung(heute, vor, zu_firma).set_index("cik")
+    assert b.loc[10, "split_faktor"] == 2.0 and b.loc[10, "besitz_aenderung"] == pytest.approx(160 / 200 - 1)
+    assert b.loc[11, "split_faktor"] == 1.0 and b.loc[11, "besitz_aenderung"] == pytest.approx(0.1)
 
 
 def test_vorquartal_fehlt_lokal(lage):
@@ -287,7 +305,8 @@ def test_einzelmeldungen(lage):
     assert (f3["manager_beide"] == 3).all() and f3.loc[13, "breite_aenderung"] == pytest.approx(1 / 3)
     assert f3.loc[[10, 11, 12], "breite_aenderung"].tolist() == [0.0, 0.0, 0.0] and f3.loc[12, "beste_idee"] == 1
     neu = p[p["stand"] == "2024q3 Einzelmeldungen"]
-    assert len(p) == 34 and len(neu) == 17 and set(p["stand"]) == {"2024q2", "2024q3 Einzelmeldungen"}
+    assert f3.loc[10, "besitz_aenderung"] == pytest.approx(40 / 45 - 1) and f3.loc[12, "besitz_aenderung"] == 0.0
+    assert len(p) == 52 and len(neu) == 32 and set(p["stand"]) == {"2024q2", "2024q3 Einzelmeldungen"}
     assert (neu["verfuegbar_ab"] == pd.Timestamp("2024-11-15 09:30", tz=ET)).all()
     bestand = pd.read_parquet(ablage.bereinigt / "bereinigt__edgar_13f_bestaende__2024q3.parquet")
     assert set(bestand.columns) == {"filer_cik", "cusip", "stueck", "gewicht"} and X not in set(bestand["cusip"])
@@ -295,7 +314,7 @@ def test_einzelmeldungen(lage):
     assert dateien.loc["einzel-2024q3", ["meldungen", "erstmeldungen", "fristgerecht", "quartale"]].tolist() == [6, 5, 4, "2024q3"]
 
     p2, info, _ = f.lauf(ablage, tmp / "arb", lokal=ordner, abruf=quelle)      # Folgelauf: nichts neu lesen
-    assert len(quelle.anfragen) == 6 and len(p2) == 34 and "einzelmeldungen" not in info
+    assert len(quelle.anfragen) == 6 and len(p2) == 52 and "einzelmeldungen" not in info
     assert info["aus_einzelmeldungen"] == ["2024q3"]
 
     # der Datensatz der SEC erscheint und ersetzt das Quartal; er kennt zusätzlich Manager 9
@@ -313,7 +332,7 @@ def test_einzelmeldungen(lage):
     f3 = fi[fi["periode"] == Q3].set_index("cik")
     assert set(fi["herkunft"]) == {"datensatz"} and not fi.duplicated(["periode", "cik"]).any()
     assert f3.loc[13, "halter"] == 2 and (f3["manager"] == 5).all() and (f3["manager_beide"] == 3).all()
-    assert set(p3["stand"]) == {"2024q2", "2024q3"} and len(p3) == 34
+    assert set(p3["stand"]) == {"2024q2", "2024q3"} and len(p3) == 52
     assert not ablage.lies_bereinigt("edgar_13f_quartal").duplicated(["periode", "cusip"]).any()
 
 
@@ -368,5 +387,5 @@ def test_gegenprobe(lage):
     v = info["vergleich"]
     assert v["vollstaendig"] and v["halter_gleich"] == 1.0 and v["halter_alt"] == v["halter_neu"] == 17
     assert v["manager_einzel"] == v["manager_datensatz"] == 3 and len(quelle.anfragen) == 4
-    assert info["aus_einzelmeldungen"] == [] and len(p) == 17          # die Gegenprobe schreibt nichts
+    assert info["aus_einzelmeldungen"] == [] and len(p) == 20          # die Gegenprobe schreibt nichts
     assert any("Gegenprobe 2024q2" in h for h in hinweise)
