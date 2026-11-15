@@ -7,6 +7,7 @@
 - `edgar_xbrl`: `UA2-02` F-Score nach Dechow; neue Spalten `inv`, `liab`, `debt_cur`, `lt_inv`, `pref`, `iss_eq`,
   `iss_debt` in `edgar_abschluesse` (Nr. 146).
 - Neue Quelle `politik`: `PR1-03` Regierungskonstellation, Tabellen `politik_regierung`, `politik_wahlen` (Nr. 147–148).
+- Echter Lauf (Workflow `abruf`, 15.11.): alle Quellen grün; IH5-05 291.817 Werte, UA2-02 25.302, PR1-03 19.
 - 161 Offline-Tests.
 
 ## Lieferung 16 – 2026-11-15 (Optionsausübungen der Insider)

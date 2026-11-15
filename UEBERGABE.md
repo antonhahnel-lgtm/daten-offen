@@ -31,7 +31,7 @@ Insider-Monitor.
 | `rueckrufe` | GA3-02 | ja | ja (Workflow `einzel`, 15.11.2026) |
 | `sec_verfahren` | PR4-01 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
 | `edgar_ausuebungen` | UA6-02 | ja | ja (Workflow `einzel`, 15.11.2026, Aufbau und Folgelauf) |
-| `politik` | PR1-03 | ja | GitHub-Lauf abwarten; ab 03.01.2027 Kalender fortschreiben (Nr. 148) |
+| `politik` | PR1-03 | ja | ja (Workflows `einzel` und `abruf`, 15.11.2026); ab 03.01.2027 Kalender fortschreiben (Nr. 148) |
 
 76 Parameter, 161 Tests (zuletzt unter pandas 2.3.3). Die neun ersten Module liefen am 10.11.2026 im echten Lauf
 (`laufend`, 53 Minuten) grün; Ergebnis unten. Stand 11.11.2026 darunter.
@@ -145,6 +145,9 @@ Keine schweren Befunde, alle Annahmen der Prüfliste haben gehalten. Auffällig:
 - Optionsausübungen (Lieferung 16, 15.11.2026, grün): 83 Quartale seit 2006 und 2026q4 aus 2.198 Form-4-Dateien;
   560.261 ausgeübte Tranchen, 83 % mit Kurs aus derselben Meldung; UA6-02 53.313 Werte für 4.861 Firmen.
   Läuft ab jetzt im Tageslauf mit (liest nur neue Quartale und neue Meldungen mit Ausübung).
+- Lieferung 17 im echten Lauf (15.11.2026, Workflow `abruf`, alle Quellen grün): `IH5-05` 291.817 Werte für
+  11.443 Firmen seit 2013 (52 Quartale nachgerechnet, Splits wie NVIDIA 10:1 erkannt); `UA2-02` 25.302 Werte für
+  6.139 Firmen (Median 0,65, über 2,45 rund 3–6 %); `PR1-03` 19 Zeiträume seit 2001.
 - `GW2-06` im echten Lauf bestätigt (340 Werte, letzter Stand 14.10.2026).
 - Actions laufen auf Node 24 (checkout v5, setup-python v6, upload-artifact v6, download-artifact v7).
 - Neue Module zuerst über `gh workflow run einzel.yml -f quelle=<name>` erproben; der Workflow berührt die
